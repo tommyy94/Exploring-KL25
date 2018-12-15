@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|VisualGDB">
+      <Configuration>Debug</Configuration>
+      <Platform>VisualGDB</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|VisualGDB">
+      <Configuration>Release</Configuration>
+      <Platform>VisualGDB</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{C6C93B83-ED40-4D32-9D64-9F7A8F5231BD}</ProjectGuid>
+    <BSP_ID>com.sysprogs.arm.freescale.kinetis_ksdk</BSP_ID>
+    <BSP_VERSION>1.3.2</BSP_VERSION>
+    <InPlaceBSPSubdir />
+    <ProjectName>kl25_test</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
+    <MCUPropertyListFile>$(ProjectDir)kinetis.props</MCUPropertyListFile>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|VisualGDB'">
+    <MCUPropertyListFile>$(ProjectDir)kinetis.props</MCUPropertyListFile>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
+    <GNUConfigurationType>Debug</GNUConfigurationType>
+    <ToolchainID>com.visualgdb.arm-eabi</ToolchainID>
+    <ToolchainVersion>7.2.0/8.0.1/r3</ToolchainVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|VisualGDB'">
+    <ToolchainID>com.visualgdb.arm-eabi</ToolchainID>
+    <ToolchainVersion>7.2.0/8.0.1/r3</ToolchainVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
+    <ClCompile>
+      <CLanguageStandard>GNU99</CLanguageStandard>
+      <AdditionalIncludeDirectories>.;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions />
+      <CPPLanguageStandard />
+    </ClCompile>
+    <Link>
+      <AdditionalLinkerInputs>;%(Link.AdditionalLinkerInputs)</AdditionalLinkerInputs>
+      <LibrarySearchDirectories>;%(Link.LibrarySearchDirectories)</LibrarySearchDirectories>
+      <AdditionalLibraryNames>;%(Link.AdditionalLibraryNames)</AdditionalLibraryNames>
+      <LinkerScript />
+      <VerboseMode>false</VerboseMode>
+      <AdditionalOptions />
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|VisualGDB'">
+    <ClCompile>
+      <CLanguageStandard>GNU99</CLanguageStandard>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ItemGroup>
+    <ClCompile Include="analog.c" />
+    <ClCompile Include="comm.c" />
+    <ClCompile Include="dma.c" />
+    <ClCompile Include="gpio.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="timers.c" />
+    <ClInclude Include="analog.h" />
+    <ClInclude Include="comm.h" />
+    <ClInclude Include="defines.h" />
+    <ClInclude Include="dma.h" />
+    <ClInclude Include="dma_multiplexer_ch.h" />
+    <ClInclude Include="gpio.h" />
+    <ClInclude Include="includes.h" />
+    <ClInclude Include="timers.h" />
+    <None Include="kinetis.props" />
+    <ClCompile Include="$(BSP_ROOT)\KL25Z4\StartupFiles\startup.c" />
+    <ClCompile Include="$(BSP_ROOT)\KL25Z4\StartupFiles\vectors_KL25Z4.c" />
+    <ClCompile Include="$(BSP_ROOT)\platform\devices\MKL25Z4\startup\system_MKL25Z4.c" />
+    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\arm_common_tables.h" />
+    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\arm_const_structs.h" />
+    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\arm_math.h" />
+    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cm0plus.h" />
+    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cm4.h" />
+    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cm7.h" />
+    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cmFunc.h" />
+    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cmInstr.h" />
+    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cmSimd.h" />
+    <ClInclude Include="$(BSP_ROOT)\platform\devices\fsl_device_registers.h" />
+    <ClInclude Include="$(BSP_ROOT)\platform\devices\MKL25Z4\include\fsl_bitaccess.h" />
+    <ClInclude Include="$(BSP_ROOT)\platform\devices\MKL25Z4\include\MKL25Z4.h" />
+    <ClInclude Include="$(BSP_ROOT)\platform\devices\MKL25Z4\include\MKL25Z4_extension.h" />
+    <ClInclude Include="$(BSP_ROOT)\platform\devices\MKL25Z4\include\MKL25Z4_features.h" />
+    <ClInclude Include="$(BSP_ROOT)\platform\devices\MKL25Z4\startup\system_MKL25Z4.h" />
+    <None Include="kl25_test-Debug.vgdbsettings" />
+    <None Include="kl25_test-Release.vgdbsettings" />
+    <None Include="kinetis.xml" />
+  </ItemGroup>
+</Project>
