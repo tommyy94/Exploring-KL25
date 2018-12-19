@@ -1,13 +1,9 @@
 #include "includes.h"
 
 
-void Delay(volatile unsigned int time_del);
-
-
-int main(void)
+void main(void)
 {
     uint16_t ADC_Result;
-    
     
     GPIO_Init();
     ADC0_Init();
@@ -17,28 +13,12 @@ int main(void)
     WDT_Init();
     SysTick_Init();
     
-    TPM0_Start();
-    
 	while(1)
 	{
-//    	ADC_Result = ADC0_ReadPolling();
+	    /* Start conversion on channel 0 */
+	    ADC0->SC1[0] = 0x00;
     	
-        ADC0->SC1[0] = 0x00;
-    	while (1);
-    	
-//    	UART0_TransmitPolling("abc\r\n");
-//    	Service_COP_WDT();
-//    	Delay(200000);
+    	UART0_printf("ADC result: %d\r\n", ADC_Result);
+    	Service_COP_WDT();
 	}
-
-	return 0;
-}
-
-
-void Delay(volatile unsigned int time_del)
-{
-    while (time_del--)
-    {
-        ;
-    }
 }

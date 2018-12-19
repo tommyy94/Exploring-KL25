@@ -1,9 +1,6 @@
 #include "dma.h"
 
 
-volatile uint32_t Reload_DMA_Byte_Count = 2;
-
-
 void DMA0_Init(uint32_t *dstAddr)
 {
     /* Turn on clock to DMA0 & DMAMUX */
@@ -29,8 +26,8 @@ void DMA0_Init(uint32_t *dstAddr)
     DMA0->DMA[0].DAR = DMA_DAR_DAR((uint32_t)dstAddr);
     
     /* Byte count */
-    DMA0->DMA[0].DSR_BCR = DMA_DSR_BCR_BCR(Reload_DMA_Byte_Count);
-    	
+    DMA0->DMA[0].DSR_BCR = DMA_DSR_BCR_BCR(2);
+    
     /* Set NVIC for DMA ISR */
     NVIC_SetPriority(DMA0_IRQn, 2);
     NVIC_ClearPendingIRQ(DMA0_IRQn); 

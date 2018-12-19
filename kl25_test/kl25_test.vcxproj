@@ -45,8 +45,15 @@
       <CLanguageStandard>GNU99</CLanguageStandard>
       <AdditionalIncludeDirectories>.;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DEBUG=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions />
+      <AdditionalOptions>
+      </AdditionalOptions>
       <CPPLanguageStandard />
+      <WarningLevel>Extra</WarningLevel>
+      <AdditionalCOptions>-ffreestanding</AdditionalCOptions>
+      <EnableAddressSanitizer>false</EnableAddressSanitizer>
+      <EnableThreadSanitizer>false</EnableThreadSanitizer>
+      <EnableLeakSanitizer>false</EnableLeakSanitizer>
+      <EnableUndefSanitizer>false</EnableUndefSanitizer>
     </ClCompile>
     <Link>
       <AdditionalLinkerInputs>;%(Link.AdditionalLinkerInputs)</AdditionalLinkerInputs>
@@ -78,7 +85,6 @@
     <ClInclude Include="comm.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="dma.h" />
-    <ClInclude Include="dma_multiplexer_ch.h" />
     <ClInclude Include="gpio.h" />
     <ClInclude Include="includes.h" />
     <ClInclude Include="timers.h" />

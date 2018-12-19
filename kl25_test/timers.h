@@ -20,4 +20,3 @@ void WDT_Init(void);
 void SysTick_Init(void);
 void Service_COP_WDT(void);
 void TPM0_Init(void);
-void TPM0_Start(void);

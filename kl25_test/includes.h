@@ -16,4 +16,3 @@
 #include "comm.h"
 #include "gpio.h"
 #include "dma.h"
-#include "dma_multiplexer_ch.h"

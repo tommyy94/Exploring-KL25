@@ -139,8 +139,5 @@
     <ClInclude Include="dma.h">
       <Filter>Source files\Inc</Filter>
     </ClInclude>
-    <ClInclude Include="dma_multiplexer_ch.h">
-      <Filter>Source files\Inc</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

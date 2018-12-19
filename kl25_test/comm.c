@@ -6,6 +6,8 @@
 #define UART0_OVERSAMPLE_RATE (16)
 #define TX_PIN 2
 
+#define SERIAL_MAX_MSG_LEN 128
+
 
 void UART0_Init(const uint32_t baudrate)
 {
@@ -78,4 +80,22 @@ void UART0_TransmitPolling(const char *data)
         /* Send character */
         UART0->D = data[i];
     }
+}
+
+
+void UART0_printf(const char *p_fmt, ...)
+{
+    char string[SERIAL_MAX_MSG_LEN];
+    va_list xArgp;
+
+    /* Initialize variable arguments */
+    va_start(xArgp, p_fmt);
+
+    /* Format string */
+    if (vsprintf(string, p_fmt, xArgp) > 0)
+    {
+        UART0_TransmitPolling(string);
+    }
+
+    va_end(xArgp);
 }

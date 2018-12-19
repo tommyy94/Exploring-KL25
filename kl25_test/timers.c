@@ -16,7 +16,7 @@ void SysTick_Init(void)
     SysTick->LOAD = (48000000UL / 16);
 
     /* Set interrupt priority */
-    NVIC_SetPriority(SysTick_IRQn, 3);
+    NVIC_SetPriority(SysTick_IRQn, 4);
 
     /* Force load of reload value */
     SysTick->VAL = 0;
@@ -46,7 +46,7 @@ void Service_COP_WDT(void)
 void TPM0_Init(void)
 {
     /* Turn on clock to TPM0 */
-    SIM->SCGC6 |= SIM_SCGC6_TPM0_MASK;
+    SIM->SCGC6 |= SIM_SCGC6_TPM0(1);
 
     /* Set clock source for TPM0 */
     SIM->SOPT2 |= SIM_SOPT2_TPMSRC(1) | SIM_SOPT2_PLLFLLSEL_MASK;
@@ -57,15 +57,26 @@ void TPM0_Init(void)
     /* Load the counter and mod, given prescaler of 32 */
     TPM0->MOD = (F_TPM_CLOCK / (F_TPM_OVFLW * 32)) - 1;
 
-    /* Divide by 32 prescaler */
-    TPM0->SC = TPM_SC_PS(5);
+    /**
+     * Enable interrupts
+     * Divide by 32 prescaler
+     */
+    TPM0->SC = TPM_SC_TOIE(1) | TPM_SC_PS(5);
+    
+    /* Set NVIC for TPM0 ISR */
+    NVIC_SetPriority(TPM0_IRQn, 3);
+    NVIC_ClearPendingIRQ(TPM0_IRQn);
+    NVIC_EnableIRQ(TPM0_IRQn);
+    
+    /* Enable counter */
+    TPM0->SC |= TPM_SC_CMOD(1);
 }
 
 
-void TPM0_Start(void)
+void TPM0_IRQHandler(void)
 {
-    /* Enable counter */
-    TPM0->SC |= TPM_SC_CMOD(1);
+    /* Reset overflow flag */
+    TPM0->SC |= TPM_SC_TOIE(1);
 }
 
 
