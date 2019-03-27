@@ -48,18 +48,20 @@
       <AdditionalOptions>
       </AdditionalOptions>
       <CPPLanguageStandard />
-      <WarningLevel>Extra</WarningLevel>
+      <WarningLevel>Pedantic</WarningLevel>
       <AdditionalCOptions>-ffreestanding</AdditionalCOptions>
       <EnableAddressSanitizer>false</EnableAddressSanitizer>
       <EnableThreadSanitizer>false</EnableThreadSanitizer>
       <EnableLeakSanitizer>false</EnableLeakSanitizer>
       <EnableUndefSanitizer>false</EnableUndefSanitizer>
+      <Optimization>Og</Optimization>
+      <InlineFunctions>false</InlineFunctions>
     </ClCompile>
     <Link>
       <AdditionalLinkerInputs>;%(Link.AdditionalLinkerInputs)</AdditionalLinkerInputs>
       <LibrarySearchDirectories>;%(Link.LibrarySearchDirectories)</LibrarySearchDirectories>
       <AdditionalLibraryNames>;%(Link.AdditionalLibraryNames)</AdditionalLibraryNames>
-      <LinkerScript />
+      <LinkerScript>MKL25Z128xxx4_flash.lds</LinkerScript>
       <VerboseMode>false</VerboseMode>
       <AdditionalOptions />
     </Link>
@@ -69,8 +71,6 @@
       <CLanguageStandard>GNU99</CLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemGroup>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
@@ -79,7 +79,12 @@
     <ClCompile Include="comm.c" />
     <ClCompile Include="dma.c" />
     <ClCompile Include="gpio.c" />
-    <ClCompile Include="main.c" />
+    <ClCompile Include="main.c">
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">Pedantic</WarningLevel>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">Og</Optimization>
+      <InlineFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">false</InlineFunctions>
+    </ClCompile>
+    <ClCompile Include="rf_module.c" />
     <ClCompile Include="timers.c" />
     <ClInclude Include="analog.h" />
     <ClInclude Include="comm.h" />
@@ -87,6 +92,7 @@
     <ClInclude Include="dma.h" />
     <ClInclude Include="gpio.h" />
     <ClInclude Include="includes.h" />
+    <ClInclude Include="rf_module.h" />
     <ClInclude Include="timers.h" />
     <None Include="kinetis.props" />
     <ClCompile Include="$(BSP_ROOT)\KL25Z4\StartupFiles\startup.c" />
@@ -94,10 +100,7 @@
     <ClCompile Include="$(BSP_ROOT)\platform\devices\MKL25Z4\startup\system_MKL25Z4.c" />
     <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\arm_common_tables.h" />
     <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\arm_const_structs.h" />
-    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\arm_math.h" />
     <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cm0plus.h" />
-    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cm4.h" />
-    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cm7.h" />
     <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cmFunc.h" />
     <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cmInstr.h" />
     <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cmSimd.h" />
@@ -110,5 +113,8 @@
     <None Include="kl25_test-Debug.vgdbsettings" />
     <None Include="kl25_test-Release.vgdbsettings" />
     <None Include="kinetis.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <LinkerScript Include="MKL25Z128xxx4_flash.lds" />
   </ItemGroup>
 </Project>

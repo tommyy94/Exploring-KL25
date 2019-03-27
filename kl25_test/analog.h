@@ -11,6 +11,7 @@
 #include "MKL25Z4.h"
 
 /* User headers */
+#include "defines.h"
 
 /* Global defines */
 /* ADC0 trigger sources */
@@ -31,7 +32,50 @@
 #define ADC_SC3_AVGS_16SAMPLES                  (0x02)          /* 16 samples averaged */
 #define ADC_SC3_AVGS_32SAMPLES                  (0x03)          /* 32 samples averaged */
 
+enum ADC_Channels
+{
+    ADC_CH_DADP0,
+    ADC_CH_DADP1,
+    ADC_CH_DADP2,
+    ADC_CH_DADP3,
+    ADC_CH_AD4,
+    ADC_CH_AD5,
+    ADC_CH_AD6,
+    ADC_CH_AD7,
+    ADC_CH_AD8,
+    ADC_CH_AD9,
+    ADC_CH_AD10,
+    ADC_CH_AD11,
+    ADC_CH_AD12,
+    ADC_CH_AD13,
+    ADC_CH_AD14,
+    ADC_CH_AD15,
+    ADC_CH_AD16,
+    ADC_CH_AD17,
+    ADC_CH_AD18,
+    ADC_CH_AD19,
+    ADC_CH_AD20,
+    ADC_CH_AD21,
+    ADC_CH_AD22,
+    ADC_CH_AD23,
+    ADC_CH_RESERVED0,
+    ADC_CH_RESERVED1,
+    ADC_CH_TEMP_SENSOR,
+    ADCH_CH_BANDGAP,
+    ADC_CH_VREFSH,
+    ADC_CH_VREFSL,
+    ADC_CH_DISABLED
+};
+
+
+struct ADC_Values
+{
+    volatile uint16_t CH8_Result;
+    volatile uint16_t CH9_Result;
+    volatile uint16_t CH12_Result;
+};
+
 
 /* Global function prototypes */
 void ADC0_Init(void);
-uint16_t ADC_ReadPolling(ADC_Type *adc);
+uint16_t ADC0_ReadPolling(const uint8_t channel);

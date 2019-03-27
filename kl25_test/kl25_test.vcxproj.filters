@@ -48,16 +48,7 @@
     <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\arm_const_structs.h">
       <Filter>Header files\Device-specific files</Filter>
     </ClInclude>
-    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\arm_math.h">
-      <Filter>Header files\Device-specific files</Filter>
-    </ClInclude>
     <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cm0plus.h">
-      <Filter>Header files\Device-specific files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cm4.h">
-      <Filter>Header files\Device-specific files</Filter>
-    </ClInclude>
-    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cm7.h">
       <Filter>Header files\Device-specific files</Filter>
     </ClInclude>
     <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cmFunc.h">
@@ -116,6 +107,9 @@
     <ClCompile Include="dma.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
+    <ClCompile Include="rf_module.c">
+      <Filter>Source files\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes.h">
@@ -139,5 +133,13 @@
     <ClInclude Include="dma.h">
       <Filter>Source files\Inc</Filter>
     </ClInclude>
+    <ClInclude Include="rf_module.h">
+      <Filter>Source files\Inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <LinkerScript Include="MKL25Z128xxx4_flash.lds">
+      <Filter>Source files</Filter>
+    </LinkerScript>
   </ItemGroup>
 </Project>

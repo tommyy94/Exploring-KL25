@@ -2,18 +2,17 @@
 
 
 /* Local defines*/
-#define F_TPM_CLOCK (48000000UL)
-#define F_TPM_OVFLW (100UL)
 
 
-/* Local global variables */
+/* Global variables */
 volatile uint32_t g_sTicks = 0; /* Store second ticks */
 
 
+/* Configures SysTick to use 3 MHz clock */
 void SysTick_Init(void)
 {
     /* Set reload to trigger interrupt every 1 second */
-    SysTick->LOAD = (48000000UL / 16);
+    SysTick->LOAD = (SystemCoreClock / 16);
 
     /* Set interrupt priority */
     NVIC_SetPriority(SysTick_IRQn, 4);
@@ -43,45 +42,25 @@ void Service_COP_WDT(void)
 }
 
 
-void TPM0_Init(void)
-{
-    /* Turn on clock to TPM0 */
-    SIM->SCGC6 |= SIM_SCGC6_TPM0(1);
-
-    /* Set clock source for TPM0 */
-    SIM->SOPT2 |= SIM_SOPT2_TPMSRC(1) | SIM_SOPT2_PLLFLLSEL_MASK;
-
-    /* Disable TPM0 */
-    TPM0->SC = 0;
-
-    /* Load the counter and mod, given prescaler of 32 */
-    TPM0->MOD = (F_TPM_CLOCK / (F_TPM_OVFLW * 32)) - 1;
-
-    /**
-     * Enable interrupts
-     * Divide by 32 prescaler
-     */
-    TPM0->SC = TPM_SC_TOIE(1) | TPM_SC_PS(5);
-    
-    /* Set NVIC for TPM0 ISR */
-    NVIC_SetPriority(TPM0_IRQn, 3);
-    NVIC_ClearPendingIRQ(TPM0_IRQn);
-    NVIC_EnableIRQ(TPM0_IRQn);
-    
-    /* Enable counter */
-    TPM0->SC |= TPM_SC_CMOD(1);
-}
-
-
-void TPM0_IRQHandler(void)
-{
-    /* Reset overflow flag */
-    TPM0->SC |= TPM_SC_TOIE(1);
-}
-
-
 void SysTick_Handler(void)
 {
     /* Count seconds since CPU boot */
     g_sTicks++;
+}
+
+
+void DelayUs(const uint32_t us)
+{
+    /**
+     * Get delta of SysTick and compare to delay parameter
+     * SysTick configured to use 3 MHz clock => multiply delay by 3 to achieve 1 MHz = 1 us
+     * NOTE: SysTick is decrementing timer
+     */
+    static const uint8_t clockMultiplier = 3;
+    uint32_t delta = SysTick->VAL;
+    
+    while ((delta - SysTick->VAL) < (clockMultiplier * us)) 
+    {
+        ; /*  Wait until time passed */
+    }
 }

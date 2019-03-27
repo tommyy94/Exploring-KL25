@@ -5,7 +5,7 @@
 
 #pragma once
 
-/* System ehaders */
+/* System headers */
 #include <stdint.h>
 
 /* Devices vendor headers */

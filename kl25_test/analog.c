@@ -2,17 +2,21 @@
 
 
 /* Local defines */
-#define ADC_POS (20)
+#define TEMP_SENSOR_PIN     (0UL) /* TMP36GT */
+#define MOIST_SENSOR_PIN    (1UL) /* YL-69 */
+#define HUMID_SENSOR_PIN    (2UL) /* HS1101 */
 
 
 void ADC0_Init(void)
 {
-    /* Enable clock to ADC0 & PORTE */
+    /* Enable clock to ADC0 & PORTB */
     SIM->SCGC6 |= SIM_SCGC6_ADC0(1);
-    SIM->SCGC5 |= SIM_SCGC5_PORTE(1);
+    SIM->SCGC5 |= SIM_SCGC5_PORTB(1);
     
     /* Select analog for pin */
-    PORTE->PCR[ADC_POS] |= PORT_PCR_MUX(0);
+    PORTB->PCR[TEMP_SENSOR_PIN] |= PORT_PCR_MUX(ALT0);
+    PORTB->PCR[MOIST_SENSOR_PIN] |= PORT_PCR_MUX(ALT0);
+    PORTB->PCR[HUMID_SENSOR_PIN] |= PORT_PCR_MUX(ALT0);
     
     /**
      * Low power configuration
@@ -20,30 +24,14 @@ void ADC0_Init(void)
      * 16 bit single-ended conversion
      * Bus clock input
      */
-    ADC0->CFG1 |= ADC_CFG1_ADLPC(1) | ADC_CFG1_ADLSMP(1) | ADC_CFG1_MODE(3);
-    
-//    /**
-//     * Hardware trigger
-//     * Compare function disabled
-//     * DMA enabled
-//     * Default voltage reference (VREFH & VREFL)
-//     */
-//    ADC0->SC2 = ADC_SC2_ADTRG(1) | ADC_SC2_DMAEN(1) | ADC_SC2_REFSEL(0);
-    
-//    /**
-//     * Alternate trigger for ADC0
-//     * Pre-trigger A
-//     * TPM0 overflow as trigger source
-//     */
-//    SIM->SOPT7 |= SIM_SOPT7_ADC0ALTTRGEN(1) | SIM_SOPT7_ADC0PRETRGSEL(0) | SIM_SOPT7_ADC0TRGSEL(SIM_SOPT7_ADC0TRGSEL_TMP0_OVF);
+    ADC0->CFG1 = ADC_CFG1_ADLPC(1) | ADC_CFG1_ADLSMP(1) | ADC_CFG1_MODE(3);
     
      /**
      * Software trigger
      * Compare function disabled
-     * DMA enabled
      * Default voltage reference (VREFH & VREFL)
      */
-    ADC0->SC2 = ADC_SC2_DMAEN(1) | ADC_SC2_REFSEL(0);
+    ADC0->SC2 = ADC_SC2_REFSEL(0);
     
     /**
      * Enable hardware average
@@ -52,20 +40,18 @@ void ADC0_Init(void)
     ADC0->SC3 = ADC_SC3_AVGE(1) | ADC_SC3_AVGS(ADC_SC3_AVGS_32SAMPLES);
 }
 
-
-uint16_t ADC_ReadPolling(ADC_Type *adc)
+        
+/* Read frequency 10 Hz */
+uint16_t ADC0_ReadPolling(const uint8_t channel)
 {
-    uint16_t ADC_Result;
+    /* Start conversion on selected channel */
+    ADC0->SC1[0] = ADC_SC1_ADCH(channel);
     
-    /* Start conversion on channel 0 */
-    adc->SC1[0] = 0x00;
-    
-    while (!(adc->SC1[0] & ADC_SC1_COCO(1)))
+    while (!(ADC0->SC1[0] & ADC_SC1_COCO(1)))
     {
         ; /* Wait until conversion is finished */
     }
     
     /* Read the result */
-    ADC_Result = (uint16_t)adc->R[0];
-    return ADC_Result;
+    return ((uint16_t)ADC0->R[0]);
 }
