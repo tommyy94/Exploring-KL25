@@ -54,7 +54,7 @@ void RF_SetPowerdownMode(void)
 /* Power consumption 4.7  mA */
 void RF_SetIdleMode(void)
 {
-    PORTE->PCR[DATA_IN] = PORT_PCR_MUX(ALT1);
+    PORTE->PCR[DATA_IN] &= ~PORT_PCR_MUX(ALT1);
     FGPIOE->PSOR |= MASK(ENABLE) | MASK(TXRX);
     FGPIOE->PCOR |= MASK(DATA_IN);
     gs_CurrentMode = IDLE_MODE;

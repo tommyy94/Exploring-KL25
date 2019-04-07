@@ -9,9 +9,24 @@
 #define MASK(pin) (1UL << (pin))
 
 /* Sensor formulas */
-#define RELATIVE_HUMIDITY(adc)      ((adc) * 100 / 65536) /* Vout * 100% / 2^16 */
-#define SOIL_MOISTURE(adc)          ((adc) * 100 / 65536) /* Vout * 100% / 2^16 */
-#define CELSIUS_TEMPERATURE(adc)    (((adc) * 3.3 - 0.5) * 100)
+
+/**
+ * steps = 2^16 = 0xFFFF
+ * multiplier = 100
+ * moisturity = (ADC * multiplier) / steps
+ */
+#define SOIL_MOISTURE(adc)          ((adc) * 100 / 0xFFFF)
+
+/**
+ * steps = 2^16 = 0xFFFF
+ * Vref = 3300 mV
+ * mVout = (Vref / steps) * ADC
+ * scaleFactor = 10
+ * offsetVoltage = 500 mV
+ * TempC = (mVout - offsetVoltage) / scaleFactor
+ * Formula is optimized to avoid floating point calculation
+ */
+#define CELSIUS_TEMPERATURE(adc)    ((((3300 * (adc)) / 0xFFFF) - 500) / 10)
 
 
 /* Define alternative functions for pins. */

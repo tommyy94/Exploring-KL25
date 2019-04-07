@@ -15,44 +15,37 @@ void main(void)
 {
     struct ADC_Values adc;
     
-    GPIO_Init();
-    ADC0_Init();
-    UART0_Init(9600);
+    //GPIO_Init();
+    //ADC0_Init();
+    //UART0_Init(9600);
     //SPI1_Init();
     //WDT_Init();
     SysTick_Init();
-    RF_Init();
+    //RF_Init();
     
+    TPM1_Init();
+    CMP0_Init();
     
     while (1)
     {
-        RF_SetTransmissionMode();
-        UART0_printf("ABCD");
-        RF_SetReceiverMode();
-        RF_SetIdleMode();
-        RF_SetPowerdownMode();
-        RF_SetIdleMode();
-        RF_SetTransmissionMode();
-        RF_SetReceiverMode();
-        RF_SetIdleMode();
-        RF_SetTransmissionMode();
-        RF_SetIdleMode();
-        RF_SetReceiverMode();
-        DelayUs(1000000);
-
+        HS1101_SendSignal();
+        
+//        RF_SetTransmissionMode();
+//
 //        /* Read temperature */
 //        adc.CH8_Result = ADC0_ReadPolling(ADC_CH_AD8);
-//        volatile uint16_t temp = CELSIUS_TEMPERATURE(adc.CH8_Result);
 //        UART0_printf("Temperature: %d\r\n", CELSIUS_TEMPERATURE(adc.CH8_Result));
 //        /* Read soil moisture */
 //        adc.CH9_Result = ADC0_ReadPolling(ADC_CH_AD9);
 //        UART0_printf("Soil moisture: %d\r\n", SOIL_MOISTURE(adc.CH9_Result));
-        /* Read humidity */
+//        /* Read potentiometer */
 //        adc.CH12_Result = ADC0_ReadPolling(ADC_CH_AD12);
-//        UART0_printf("Humidity: %d\r\n", RELATIVE_HUMIDITY(adc.CH12_Result));
+//        UART0_printf("Potentiometer: %d\r\n", adc.CH12_Result);
 //        
 //        UART0_printf("Uptime: %d seconds\r\n", g_sTicks);
-        //Service_COP_WDT();
+//        //Service_COP_WDT();
+//        RF_SetPowerdownMode();
+        DelayUs(10000);
     }
 }
 

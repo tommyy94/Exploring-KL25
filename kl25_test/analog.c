@@ -2,9 +2,11 @@
 
 
 /* Local defines */
-#define TEMP_SENSOR_PIN     (0UL) /* TMP36GT */
-#define MOIST_SENSOR_PIN    (1UL) /* YL-69 */
-#define HUMID_SENSOR_PIN    (2UL) /* HS1101 */
+#define TEMP_SENSOR_PIN     (0UL)   /* TMP36GT */
+#define MOIST_SENSOR_PIN    (1UL)   /* YL-69 */
+#define HUMID_SENSOR_PIN    (29UL)  /* HS1101 */
+
+#define CMP0_OUT_PIN        (0UL)
 
 
 void ADC0_Init(void)
@@ -54,4 +56,60 @@ uint16_t ADC0_ReadPolling(const uint8_t channel)
     
     /* Read the result */
     return ((uint16_t)ADC0->R[0]);
+}
+
+
+void CMP0_Init(void)
+{
+    /* Enable clock to comparator */
+    SIM->SCGC4 |= SIM_SCGC4_CMP(1);
+    
+    /* Enable clock to PORTE */
+    SIM->SCGC5 |= SIM_SCGC5_PORTE_MASK;
+    
+    /* Select pin multiplexer for CMP0 */
+    PORTE->PCR[CMP0_OUT_PIN] |= PORT_PCR_MUX(ALT5); 
+    
+    /**
+     * Enable comparator
+     * Enable output pin
+     */
+    CMP0->CR1 = CMP_CR1_EN(1) | CMP_CR1_OPE(1);
+    
+    /**
+     * Select input channels
+     * Plus: channel 5 on PORTE29
+     * Minus: DAC is channel 7 (internally connected)
+     */
+    CMP0->MUXCR |= CMP_MUXCR_PSEL(5) | CMP_MUXCR_MSEL(7);
+    
+    /**
+     * Enable 6-bit DAC
+     * Set reference voltage at 0.3V => 64 * 0.3V / 3.3V = 6
+     */
+    CMP0->DACCR = CMP_DACCR_DACEN(1) | CMP_DACCR_VOSEL(6);
+}
+
+
+/* TODO: Write this in assembly? */
+void HS1101_SendSignal(void)
+{
+    /* Select GPIO for pin */
+    PORTE->PCR[HUMID_SENSOR_PIN] |= PORT_PCR_MUX(ALT1);
+    FGPIOE->PDDR |= MASK(HUMID_SENSOR_PIN);
+    
+    /* Send start signal to HS1101 */
+    FGPIOE->PSOR |= MASK(HUMID_SENSOR_PIN);
+    
+    /* Give capacitor time to charge */
+    __NOP();
+    
+    /* Set pin LOW so we can configure it as input */
+    FGPIOE->PCOR |= MASK(HUMID_SENSOR_PIN);
+    
+    /* Start counter */
+    TPM1->SC |= TPM_SC_CMOD(1);
+    
+    /* Select CMP0 for pin */
+    PORTE->PCR[HUMID_SENSOR_PIN] = PORT_PCR_MUX(ALT0);
 }

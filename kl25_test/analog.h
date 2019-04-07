@@ -12,6 +12,7 @@
 
 /* User headers */
 #include "defines.h"
+#include "timers.h"
 
 /* Global defines */
 /* ADC0 trigger sources */
@@ -79,3 +80,5 @@ struct ADC_Values
 /* Global function prototypes */
 void ADC0_Init(void);
 uint16_t ADC0_ReadPolling(const uint8_t channel);
+void CMP0_Init(void);
+void HS1101_SendSignal(void);

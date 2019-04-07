@@ -22,5 +22,6 @@
 /* Global function prototypes */
 void UART0_Init(const uint32_t baudrate);
 void UART0_printf(const char *p_fmt, ...);
+void UART0_TransmitInterrupt(const char *data);
 void SPI1_Init(void);
 void SPI1_TransmitPolling(const char *data);

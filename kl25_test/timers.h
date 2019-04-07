@@ -14,6 +14,8 @@
 /* User headers */
 #include "defines.h"
 
+/* Global defines */
+
 /* Global variables */
 volatile uint32_t g_sTicks; /* Store second ticks */
 
@@ -22,3 +24,4 @@ void WDT_Init(void);
 void SysTick_Init(void);
 void Service_COP_WDT(void);
 void DelayUs(uint32_t us);
+void TPM1_Init(void);
