@@ -78,8 +78,9 @@
       <EnableLeakSanitizer>false</EnableLeakSanitizer>
       <EnableUndefSanitizer>false</EnableUndefSanitizer>
       <Optimization>O0</Optimization>
-      <InlineFunctions>false</InlineFunctions>
+      <InlineFunctions>true</InlineFunctions>
       <VerboseMode>false</VerboseMode>
+      <LinkTimeOptimization>false</LinkTimeOptimization>
     </ClCompile>
     <Link>
       <AdditionalLinkerInputs>;%(Link.AdditionalLinkerInputs)</AdditionalLinkerInputs>
@@ -152,6 +153,7 @@
     <ClInclude Include="defines.h" />
     <ClInclude Include="dma.h" />
     <ClInclude Include="gpio.h" />
+    <ClInclude Include="HS1101.h" />
     <ClInclude Include="includes.h" />
     <ClInclude Include="rf_module.h" />
     <ClInclude Include="timers.h" />

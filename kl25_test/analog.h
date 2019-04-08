@@ -33,6 +33,12 @@
 #define ADC_SC3_AVGS_16SAMPLES                  (0x02)          /* 16 samples averaged */
 #define ADC_SC3_AVGS_32SAMPLES                  (0x03)          /* 32 samples averaged */
 
+/* Sensor pins */
+#define TEMP_SENSOR_PIN     (0UL)   /* TMP36GT */
+#define MOIST_SENSOR_PIN    (1UL)   /* YL-69 */
+#define HUMID_SENSOR_PIN    (29UL)  /* HS1101 */
+
+
 enum ADC_Channels
 {
     ADC_CH_DADP0,

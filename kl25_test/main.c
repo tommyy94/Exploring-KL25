@@ -23,6 +23,7 @@ void main(void)
     SysTick_Init();
     //RF_Init();
     
+    HS1101_Init();
     TPM1_Init();
     CMP0_Init();
     

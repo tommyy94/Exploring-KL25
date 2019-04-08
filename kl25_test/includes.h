@@ -10,3 +10,4 @@
 #include "comm.h"
 #include "gpio.h"
 #include "rf_module.h"
+#include "HS1101.h"

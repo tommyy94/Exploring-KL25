@@ -136,6 +136,9 @@
     <ClInclude Include="rf_module.h">
       <Filter>Source files\Inc</Filter>
     </ClInclude>
+    <ClInclude Include="HS1101.h">
+      <Filter>Source files\Inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <LinkerScript Include="MKL25Z128xxx4_flash.lds">
