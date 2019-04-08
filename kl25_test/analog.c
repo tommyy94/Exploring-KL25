@@ -78,10 +78,10 @@ void CMP0_Init(void)
     
     /**
      * Select input channels
-     * Plus: channel 5 on PORTE29
-     * Minus: DAC is channel 7 (internally connected)
+     * Plus: DAC is channel 7 (internally connected)
+     * Minus: channel 5 on PORTE29
      */
-    CMP0->MUXCR |= CMP_MUXCR_PSEL(5) | CMP_MUXCR_MSEL(7);
+    CMP0->MUXCR |= CMP_MUXCR_PSEL(7) | CMP_MUXCR_MSEL(5);
     
     /**
      * Enable 6-bit DAC
@@ -91,6 +91,7 @@ void CMP0_Init(void)
 }
 
 
+/* TODO: Calibrate humidity sensor */
 /* TODO: Write this in assembly? */
 void HS1101_SendSignal(void)
 {
@@ -100,12 +101,6 @@ void HS1101_SendSignal(void)
     
     /* Send start signal to HS1101 */
     FGPIOE->PSOR |= MASK(HUMID_SENSOR_PIN);
-    
-    /* Give capacitor time to charge */
-    __NOP();
-    
-    /* Set pin LOW so we can configure it as input */
-    FGPIOE->PCOR |= MASK(HUMID_SENSOR_PIN);
     
     /* Start counter */
     TPM1->SC |= TPM_SC_CMOD(1);
