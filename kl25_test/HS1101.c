@@ -28,6 +28,7 @@ void HS1101_Init(void)
  * 
  * TODO: Calibrate humidity sensor
  * TODO: Figure CPU register usage
+ * TODO: Figure out parameters to inline assembly
  */
 void HS1101_SendSignal(void)
 {
@@ -66,6 +67,7 @@ uint32_t HS1101_ReadHumidity(void)
 {
     uint32_t humid = 0;
     
+    /* TODO: Add timeout */
     while (!g_HS1101_flag)
     {
         ; /* Wait until humidity can be read */
