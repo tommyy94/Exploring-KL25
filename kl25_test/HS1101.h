@@ -1,54 +1,26 @@
+/**
+ * HS1101.h
+ * This header declares all HS1101 related functions.
+ */
 #pragma once
 
+/* System headers */
+#include <stdbool.h>
+#include <stdint.h>
+
+/* Device vendor headers */
+#include "MKL25Z4.h"
+
 /* User headers */
-#include "analog.h"
+#include "defines.h"
+
+/* Global defines */
+
+/* Global variables */
+extern volatile uint32_t g_HS1101_value;
+extern volatile bool g_HS1101_flag;
 
 
-/**
- * This function simply set ports output & writes high to memory 
- * so multiplexing pins sets pin high.
- */
-__INLINE void HS1101_Init(void)
-{
-    FGPIOE->PDDR |= MASK(HUMID_SENSOR_PIN);
-    FGPIOE->PSOR |= MASK(HUMID_SENSOR_PIN);
-}
-
-
-/**
- * This function is written in assembly to minimize time between enabling CMP0
- * and starting TMP1 to get most accurate timer value possible.
- * 
- * TODO: Calibrate humidity sensor
- */
-__INLINE void HS1101_SendSignal(void)
-{
-    __ASM(
-        /* Initialize hw registers first */
-        /* Initialize registers to set pin as GPIO */
-        "ldr    r0, =0x4004D000\n\t"                /* Load PORTE base address to register */
-        "mov    r1, #0x80\n\t"                      /* Can load only 8-bit values */
-        "lsl    r1, r1, #1\n\t"                     /* Shift left once to generate 16-bit value (ALT1) */
-    
-        /* Initialize registers for starting TPM1 */
-        "ldr    r3, =0x40039000\n\t"                /* Load TPM1 base address to register */
-        "ldr    r2, [r3]\n\t"
-        "ldr    r3, =0x40039000\n\t"
-        "mov    r4, #8\n\t"
-        "orr    r2, r4\n\t"
-    
-        /* Initialize registers to set pin as CMP0 input */
-        "ldr   r5, =0x4004D000\n\t"                 /* Load PORTE base address to register */
-        "mov   r6, #0\n\t"                          /* Reset register by writing 0 */
-        
-        /* Do work here */
-        /* Set pin as GPIO charging HS1101 */
-        "str    r1, [r0, #0x74]\n\t"                /* Store result to peripheral address + offset 4 * 29 = 116 = 0x74 */
-        
-        /* Start timer */
-        "str    r2, [r3]\n\t"                       /* Write value to peripheral address */
-        
-        /* Select CMP0 input for pin */
-        "str   r6, [r5, #0x74]"                     /* Write value to peripheral address */
-    );
-}
+void HS1101_Init(void);
+void HS1101_SendSignal(void);
+uint32_t HS1101_ReadHumidity(void);

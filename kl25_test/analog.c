@@ -6,6 +6,7 @@
 #define CMP0_OUT_PIN        (0UL)
 
 
+/* Function descriptions */
 void ADC0_Init(void)
 {
     /* Enable clock to ADC0 & PORTB */
@@ -67,18 +68,22 @@ void CMP0_Init(void)
     /* Select pin multiplexer for CMP0 */
     PORTE->PCR[CMP0_OUT_PIN] |= PORT_PCR_MUX(ALT5); 
     
+    /* Hysteresis level 1 */
+    CMP0->CR0 = CMP_CR0_HYSTCTR(1);
+    
     /**
      * Enable comparator
      * Enable output pin
+     * Invert comparator output
      */
-    CMP0->CR1 = CMP_CR1_EN(1) | CMP_CR1_OPE(1);
+    CMP0->CR1 = CMP_CR1_EN(1) | CMP_CR1_OPE(1) | CMP_CR1_INV(1);
     
     /**
      * Select input channels
-     * Plus: DAC is channel 7 (internally connected)
-     * Minus: channel 5 on PORTE29
+     * Plus: channel 5 on PORTE29
+     * Minus: DAC is channel 7 (internally connected)
      */
-    CMP0->MUXCR |= CMP_MUXCR_PSEL(7) | CMP_MUXCR_MSEL(5);
+    CMP0->MUXCR |= CMP_MUXCR_PSEL(5) | CMP_MUXCR_MSEL(7);
     
     /**
      * Enable 6-bit DAC

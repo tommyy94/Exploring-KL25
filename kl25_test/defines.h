@@ -8,6 +8,11 @@
 #define SIGNAL_SHIFT (5)
 #define MASK(pin) (1UL << (pin))
 
+/* Sensor pins */
+#define TEMP_SENSOR_PIN     (0UL)   /* TMP36GT */
+#define MOIST_SENSOR_PIN    (1UL)   /* YL-69 */
+#define HUMID_SENSOR_PIN    (29UL)  /* HS1101 */
+
 /* Sensor formulas */
 
 /**

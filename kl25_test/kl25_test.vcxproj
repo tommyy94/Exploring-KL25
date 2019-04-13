@@ -138,6 +138,7 @@
     <ClCompile Include="comm.c" />
     <ClCompile Include="dma.c" />
     <ClCompile Include="gpio.c" />
+    <ClCompile Include="HS1101.c" />
     <ClCompile Include="main.c">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">Pedantic</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Pedantic</WarningLevel>

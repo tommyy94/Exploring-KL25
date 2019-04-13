@@ -33,11 +33,6 @@
 #define ADC_SC3_AVGS_16SAMPLES                  (0x02)          /* 16 samples averaged */
 #define ADC_SC3_AVGS_32SAMPLES                  (0x03)          /* 32 samples averaged */
 
-/* Sensor pins */
-#define TEMP_SENSOR_PIN     (0UL)   /* TMP36GT */
-#define MOIST_SENSOR_PIN    (1UL)   /* YL-69 */
-#define HUMID_SENSOR_PIN    (29UL)  /* HS1101 */
-
 
 enum ADC_Channels
 {
@@ -87,4 +82,3 @@ struct ADC_Values
 void ADC0_Init(void);
 uint16_t ADC0_ReadPolling(const uint8_t channel);
 void CMP0_Init(void);
-void HS1101_SendSignal(void);
