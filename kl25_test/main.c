@@ -14,6 +14,7 @@
 void main(void)
 {
     struct ADC_Values adc;
+    uint32_t humid = 0;
     
     //GPIO_Init();
     //ADC0_Init();
@@ -30,6 +31,7 @@ void main(void)
     while (1)
     {
         HS1101_SendSignal();
+        humid = HS1101_ReadHumidity();
         
 //        RF_SetTransmissionMode();
 //

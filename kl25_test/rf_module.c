@@ -21,6 +21,7 @@ enum OperationalModes
 static volatile uint8_t gs_CurrentMode;
 
 
+/* Function descriptions */
 /**
  * Initialize pins used for RF module.
  * Enables PORTE clock.

@@ -1,6 +1,7 @@
 #include "dma.h"
 
 
+/* Function descriptions */
 void DMA0_Init(uint32_t *dstAddr)
 {
     /* Turn on clock to DMA0 & DMAMUX */

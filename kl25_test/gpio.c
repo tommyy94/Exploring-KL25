@@ -1,6 +1,7 @@
 #include "gpio.h"
 
 
+/* Function descriptions */
 void GPIO_Init(void)
 {
     /* Enable clock to PORTD */

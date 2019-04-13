@@ -7,9 +7,9 @@
 
 /* Global variables */
 volatile uint32_t g_sTicks = 0; /* Store second ticks */
-volatile uint32_t g_TPM1_value = 0;
 
 
+/* Function descriptions */
 /* Configures SysTick to use 3 MHz clock */
 void SysTick_Init(void)
 {
@@ -51,6 +51,7 @@ void SysTick_Handler(void)
 }
 
 
+/* Inaccurate when SysTick rolls over */
 void DelayUs(const uint32_t us)
 {
     /**
@@ -58,10 +59,10 @@ void DelayUs(const uint32_t us)
      * SysTick configured to use 3 MHz clock => multiply delay by 3 to achieve 1 MHz = 1 us
      * NOTE: SysTick is decrementing timer
      */
-    static const uint8_t clockMultiplier = 3;
+    static const uint8_t s_clockMultiplier = 3;
     uint32_t delta = SysTick->VAL;
     
-    while ((delta - SysTick->VAL) < (clockMultiplier * us)) 
+    while ((delta - SysTick->VAL) < (s_clockMultiplier * us)) 
     {
         ; /*  Wait until time passed */
     }
@@ -107,6 +108,7 @@ void TPM1_IRQHandler(void)
 {
     static uint32_t s_overflows = 0;
     
+    /* Check for counter overflows */
     if (TPM1->STATUS & TPM_STATUS_TOF_MASK)
     {
         s_overflows++;
@@ -117,11 +119,13 @@ void TPM1_IRQHandler(void)
         /* Stop counter */
         TPM1->SC |= TPM_SC_CMOD(0);
         
-        g_TPM1_value = TPM1->CONTROLS[1].CnV;
+        /* TODO: Convert this capacitor value to humidity */
+        g_HS1101_value = TPM1->CONTROLS[1].CnV;
         
         /* Reset counter */
         TPM1->CNT = 0;
         s_overflows = 0;
+        g_HS1101_flag = true;
     }
     
     /* Reset all flags */

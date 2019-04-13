@@ -110,6 +110,9 @@
     <ClCompile Include="rf_module.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
+    <ClCompile Include="HS1101.c">
+      <Filter>Source files\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes.h">
