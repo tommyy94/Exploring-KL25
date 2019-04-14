@@ -113,6 +113,9 @@
     <ClCompile Include="HS1101.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
+    <ClCompile Include="crc.c">
+      <Filter>Source files\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes.h">
@@ -140,6 +143,9 @@
       <Filter>Source files\Inc</Filter>
     </ClInclude>
     <ClInclude Include="HS1101.h">
+      <Filter>Source files\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="crc.h">
       <Filter>Source files\Inc</Filter>
     </ClInclude>
   </ItemGroup>

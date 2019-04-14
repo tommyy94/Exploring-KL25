@@ -116,8 +116,8 @@ void TPM1_IRQHandler(void)
     
     if (TPM1->STATUS & TPM_STATUS_CH1F_MASK)
     {
-        /* Stop counter */
-        TPM1->SC |= TPM_SC_CMOD(0);
+        /* Stop TPM1 */
+        TPM1->SC &= ~TPM_SC_CMOD_MASK;
         
         /* TODO: Convert this capacitor value to humidity */
         g_HS1101_value = TPM1->CONTROLS[1].CnV;

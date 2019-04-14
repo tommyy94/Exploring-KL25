@@ -65,7 +65,6 @@ void RF_SetIdleMode(void)
 /* Power consumption 11.5 mA */
 void RF_SetTransmissionMode(void)
 {
-    /* 11.5 mA */
     if (gs_CurrentMode == POWERDOWN_MODE)
     {
         FGPIOE->PSOR |= MASK(ENABLE);
@@ -76,7 +75,6 @@ void RF_SetTransmissionMode(void)
     else if (gs_CurrentMode == IDLE_MODE)
     {
         /* No action needed as DATA_IN is driven high during transmission */
-        
     }
     else if (gs_CurrentMode == RECEIVER_MODE)
     {

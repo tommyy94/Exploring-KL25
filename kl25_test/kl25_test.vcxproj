@@ -136,6 +136,7 @@
   <ItemGroup>
     <ClCompile Include="analog.c" />
     <ClCompile Include="comm.c" />
+    <ClCompile Include="crc.c" />
     <ClCompile Include="dma.c" />
     <ClCompile Include="gpio.c" />
     <ClCompile Include="HS1101.c" />
@@ -151,6 +152,7 @@
     <ClCompile Include="timers.c" />
     <ClInclude Include="analog.h" />
     <ClInclude Include="comm.h" />
+    <ClInclude Include="crc.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="dma.h" />
     <ClInclude Include="gpio.h" />
