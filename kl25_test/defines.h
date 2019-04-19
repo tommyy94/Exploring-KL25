@@ -10,17 +10,19 @@
 
 /* Sensor pins */
 #define TEMP_SENSOR_PIN     (0UL)   /* TMP36GT */
-#define MOIST_SENSOR_PIN    (1UL)   /* YL-69 */
+#define MOIST_SENSOR_PIN    (1UL)   /* SEN0193 */
 #define HUMID_SENSOR_PIN    (29UL)  /* HS1101 */
 
 /* Sensor formulas */
 
 /**
- * steps = 2^16 = 0xFFFF
  * multiplier = 100
- * moisturity = (ADC * multiplier) / steps
+ * calibratedSteps = 50000 - 25000
+ * moisture = (ADC * multiplier) / calibratedSteps
+ * Sensor value is inverted, fix by subtracting ADC from 100
  */
-#define SOIL_MOISTURE(adc)          ((adc) * 100 / 0xFFFF)
+#define SOIL_MOISTURE(adc)          (100 - ((adc) - 25000) * 100 / (50000 - 25000))
+
 
 /**
  * steps = 2^16 = 0xFFFF
