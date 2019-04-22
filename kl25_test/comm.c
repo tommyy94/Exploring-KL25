@@ -7,7 +7,6 @@
 
 
 __STATIC_INLINE void UART0_TransmitByte(const char byte);
-__STATIC_INLINE void UART0_TransmitPolling(const char *data);
 
 
 /* Function descriptions */
@@ -75,7 +74,7 @@ __STATIC_INLINE void UART0_TransmitByte(const char byte)
 }
 
 
-__STATIC_INLINE void UART0_TransmitPolling(const char *data)
+void UART0_TransmitPolling(const char *data)
 {
     /* Find size of array */
     uint16_t dataLen = (uint16_t)strlen(data);

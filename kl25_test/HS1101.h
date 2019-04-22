@@ -22,5 +22,4 @@ extern volatile bool g_HS1101_flag;
 
 
 void HS1101_Init(void);
-void HS1101_SendSignal(void);
 uint32_t HS1101_ReadHumidity(void);

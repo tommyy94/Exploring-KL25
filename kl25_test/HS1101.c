@@ -9,6 +9,7 @@ volatile uint32_t g_HS1101_value = 0;
 volatile bool g_HS1101_flag = false;
 
 /* Local function prototypes */
+static void HS1101_SendSignal(void);
 
 /* Function descriptions */
 /**
@@ -30,7 +31,7 @@ void HS1101_Init(void)
  * TODO: Figure CPU register usage
  * TODO: Figure out parameters to inline assembly
  */
-void HS1101_SendSignal(void)
+static void HS1101_SendSignal(void)
 {
     __ASM(
         /* Initialize hw registers first */
@@ -66,6 +67,8 @@ void HS1101_SendSignal(void)
 uint32_t HS1101_ReadHumidity(void)
 {
     uint32_t humid = 0;
+    
+    HS1101_SendSignal();
     
     /* TODO: Add timeout */
     while (!g_HS1101_flag)

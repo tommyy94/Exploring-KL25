@@ -17,11 +17,11 @@
 
 /**
  * multiplier = 100
- * calibratedSteps = 50000 - 25000
+ * calibratedSteps = 51000 - 25000
  * moisture = (ADC * multiplier) / calibratedSteps
  * Sensor value is inverted, fix by subtracting ADC from 100
  */
-#define SOIL_MOISTURE(adc)          (100 - ((adc) - 25000) * 100 / (50000 - 25000))
+#define SOIL_MOISTURE(adc)          (100 - ((adc) - 25000) * 100 / (51000 - 25000))
 
 
 /**

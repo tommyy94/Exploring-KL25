@@ -70,11 +70,13 @@ enum ADC_Channels
 };
 
 
-struct ADC_Values
+struct Sensor_Values
 {
-    volatile uint16_t CH8_Result;
-    volatile uint16_t CH9_Result;
-    volatile uint16_t CH12_Result;
+    /* TODO: Figure out why volatile keyword is needed */
+    volatile uint32_t temperature;
+    volatile uint32_t humidity;
+    volatile uint32_t soil_moisture;
+    volatile uint32_t potentiometer;
 };
 
 
