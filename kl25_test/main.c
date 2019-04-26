@@ -17,6 +17,7 @@ void main(void)
     char frame[MAX_FRAME_SIZE];
     
     volatile uint32_t crc32 = 0;
+    bool nak = false; /* Negative acknowledgement */
     
     //GPIO_Init();
 //    ADC0_Init();
@@ -24,17 +25,15 @@ void main(void)
     //SPI1_Init();
     //WDT_Init();
     SysTick_Init();
-    //RF_Init();
+    RF_Init();
     //    
     //    TPM1_Init();
     //    CMP0_Init();
     //    HS1101_Init();
 
-    //crcInit();
+    crcInit();
     
     //RF_SetReceiverMode();
-    
-    volatile uint8_t retval;
     
     while (1)
     {
@@ -60,13 +59,36 @@ void main(void)
         
                 //Service_COP_WDT();
         
-        /* Retransmit frame if checksum doesn't match */
-        if(!strncmp((const char *)g_rxData, "NAK", UART0_RX_BUFSIZ))
+        
+        /* Build the frame with checksum */
+        snprintf(frame, MAX_FRAME_SIZE, "abc");
+        crc32 = crcFast((uint8_t *)frame, strlen(frame));
+        
+        while (!nak)
         {
-            ; /* Retransmit frame here */
+            /* Transmit the frame */
+            RF_SetTransmissionMode();
+            UART0_TransmitPolling(frame + crc32);
+            RF_SetReceiverMode();
+        
+            while (!rxFlag)
+            {
+                ; /* Wait until message received, loop only for testing */
+            }
+        
+            rxFlag = false;
+            
+            /* Retransmit frame if checksum doesn't match */
+            if (!strncmp((const char *)g_rxData, "NAK", UART0_RX_BUFSIZ))
+            {
+                nak = true;
+            }
         }
         
-        //DelayUs(10000);
+        nak = false;
+        
+        RF_SetPowerdownMode();
+        DelayUs(10000);
     }
 }
 

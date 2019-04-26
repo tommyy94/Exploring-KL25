@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdbool.h>
 
 /* Device vendor headers */
 #include "MKL25Z4.h"
@@ -25,6 +26,7 @@
 
 /* Global variables */
 extern uint8_t g_rxData[UART0_RX_BUFSIZ];
+extern bool rxFlag;
 
 
 /* Global function prototypes */

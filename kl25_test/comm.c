@@ -6,6 +6,7 @@
 #define UART0_MAX_MSG_LEN       (128UL)
 uint8_t g_rxData[UART0_RX_BUFSIZ];
 volatile uint8_t g_rxIndex = 0;
+bool rxFlag = false;
 
 
 __STATIC_INLINE void UART0_TransmitByte(const char byte);
@@ -103,6 +104,7 @@ void UART0_IRQHandler(void)
     if (UART0->S1 & UART_S1_RDRF_MASK)
     {
         g_rxData[g_rxIndex++] = UART0->D;
+        rxFlag = true;
         if (g_rxIndex >= UART0_RX_BUFSIZ)
         {
             g_rxIndex = 0;
