@@ -20,9 +20,16 @@
 /* Global defines */
 #define MAX_FRAME_SIZE          (32UL)
 #define UART0_TX_PIN            (20UL)
+#define UART0_RX_PIN            (21UL)
+#define UART0_RX_BUFSIZ         (5UL)
+
+/* Global variables */
+extern uint8_t g_rxData[UART0_RX_BUFSIZ];
+
 
 /* Global function prototypes */
 void UART0_Init(const uint32_t baudrate);
+uint32_t UART0_ReadPolling(void);
 void UART0_printf(const char *p_fmt, ...);
 void UART0_TransmitPolling(const char *data);
 void UART0_TransmitInterrupt(const char *data);

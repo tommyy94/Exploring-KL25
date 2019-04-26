@@ -19,43 +19,54 @@ void main(void)
     volatile uint32_t crc32 = 0;
     
     //GPIO_Init();
-    ADC0_Init();
+//    ADC0_Init();
     UART0_Init(9600);
     //SPI1_Init();
     //WDT_Init();
     SysTick_Init();
-    RF_Init();
-    
-    TPM1_Init();
-    CMP0_Init();
-    HS1101_Init();
+    //RF_Init();
+    //    
+    //    TPM1_Init();
+    //    CMP0_Init();
+    //    HS1101_Init();
 
     //crcInit();
     
+    //RF_SetReceiverMode();
+    
+    volatile uint8_t retval;
+    
     while (1)
     {
-        /* Read all sensor values */
-        sensor.humidity = HS1101_ReadHumidity();
-        sensor.temperature = CELSIUS_TEMPERATURE(ADC0_ReadPolling(ADC_CH_AD8));
-        sensor.soil_moisture = SOIL_MOISTURE(ADC0_ReadPolling(ADC_CH_AD9));
-        sensor.potentiometer = ADC0_ReadPolling(ADC_CH_AD12); /* Not printed */
+        //        /* Read all sensor values */
+        //        sensor.humidity = HS1101_ReadHumidity();
+        //        sensor.temperature = CELSIUS_TEMPERATURE(ADC0_ReadPolling(ADC_CH_AD8));
+        //        sensor.soil_moisture = SOIL_MOISTURE(ADC0_ReadPolling(ADC_CH_AD9));
+        //        sensor.potentiometer = ADC0_ReadPolling(ADC_CH_AD12); /* Not printed */
+        //        
+        //        /* Build the frame with checksum */
+        //        snprintf(frame, MAX_FRAME_SIZE, "hum=%lutem=%lumst=%lutim=%lu", sensor.humidity, sensor.temperature, sensor.soil_moisture, g_sTicks);
+        //        //crc = crcFast((uint8_t *)frame, strlen(frame));
+        //        
+        //        /* Transmit the frame */
+        //        RF_SetTransmissionMode();
+        //        UART0_TransmitPolling(frame); /* Add CRC32 to the end */
+        //        RF_SetReceiverMode();
+        //        
+        //        /* Wait for ACK */
+        //        /* If NACK -> retransmit */
+        //        
+        //        RF_SetPowerdownMode();
         
-        /* Build the frame with checksum */
-        snprintf(frame, MAX_FRAME_SIZE, "hum=%lutem=%lumst=%lutim=%lu", sensor.humidity, sensor.temperature, sensor.soil_moisture, g_sTicks);
-        //crc = crcFast((uint8_t *)frame, strlen(frame));
+                //Service_COP_WDT();
         
-        /* Transmit the frame */
-        RF_SetTransmissionMode();
-        UART0_TransmitPolling(frame); /* Add CRC32 to the end */
-        RF_SetReceiverMode();
+        /* Retransmit frame if checksum doesn't match */
+        if(!strncmp((const char *)g_rxData, "NAK", UART0_RX_BUFSIZ))
+        {
+            ; /* Retransmit frame here */
+        }
         
-        /* Wait for ACK */
-        /* If NACK -> retransmit */
-        
-        RF_SetPowerdownMode();
-        
-        //Service_COP_WDT();
-        DelayUs(10000);
+        //DelayUs(10000);
     }
 }
 

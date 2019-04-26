@@ -34,10 +34,10 @@ void RF_Init(void)
     /* Select GPIO for pins */
     PORTE->PCR[ENABLE] = PORT_PCR_MUX(ALT1);
     PORTE->PCR[TXRX] = PORT_PCR_MUX(ALT1);
-    PORTE->PCR[DATA_OUT] = PORT_PCR_MUX(ALT1);
+    //PORTE->PCR[DATA_OUT] = PORT_PCR_MUX(ALT1);
     PORTE->PCR[DATA_IN] = PORT_PCR_MUX(ALT1);
     
-    FGPIOE->PDDR &= ~MASK(DATA_OUT);
+    //FGPIOE->PDDR &= ~MASK(DATA_OUT);
     FGPIOE->PDDR |= MASK(ENABLE) | MASK(TXRX);
     
     RF_SetIdleMode();
