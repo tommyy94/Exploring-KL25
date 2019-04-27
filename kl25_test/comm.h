@@ -19,14 +19,14 @@
 #include "defines.h"
 
 /* Global defines */
-#define MAX_FRAME_SIZE          (32UL)
+#define MAX_FRAME_SIZE          (64UL)
 #define UART0_TX_PIN            (20UL)
 #define UART0_RX_PIN            (21UL)
-#define UART0_RX_BUFSIZ         (5UL)
+#define UART0_RX_BUFSIZ         (3UL)
 
 /* Global variables */
 extern uint8_t g_rxData[UART0_RX_BUFSIZ];
-extern bool rxFlag;
+extern bool g_rxFlag;
 
 
 /* Global function prototypes */
@@ -35,5 +35,4 @@ uint32_t UART0_ReadPolling(void);
 void UART0_printf(const char *p_fmt, ...);
 void UART0_TransmitPolling(const char *data);
 void UART0_TransmitInterrupt(const char *data);
-void SPI1_Init(void);
-void SPI1_TransmitPolling(const char *data);
+

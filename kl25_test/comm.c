@@ -4,9 +4,11 @@
 /* Local defines */
 #define UART0_OVERSAMPLE_RATE   (16UL)
 #define UART0_MAX_MSG_LEN       (128UL)
+
+/* Global variables */
 uint8_t g_rxData[UART0_RX_BUFSIZ];
+bool g_rxFlag = false;
 volatile uint8_t g_rxIndex = 0;
-bool rxFlag = false;
 
 
 __STATIC_INLINE void UART0_TransmitByte(const char byte);
@@ -104,10 +106,10 @@ void UART0_IRQHandler(void)
     if (UART0->S1 & UART_S1_RDRF_MASK)
     {
         g_rxData[g_rxIndex++] = UART0->D;
-        rxFlag = true;
         if (g_rxIndex >= UART0_RX_BUFSIZ)
         {
             g_rxIndex = 0;
+            g_rxFlag = true;
         }
     }
 }
@@ -146,77 +148,11 @@ void UART0_printf(const char *p_fmt, ...)
     /* Initialize variable arguments */
     va_start(xArgp, p_fmt);
 
-    /* Format string */
+    /* Format and send string */
     if (vsprintf(string, p_fmt, xArgp) > 0)
     {
         UART0_TransmitPolling(string);
     }
 
     va_end(xArgp);
-}
-
-
-void SPI1_Init(void)
-{
-    /* Enable clock to SPI1 */
-    SIM->SCGC4 |= SIM_SCGC4_SPI1_MASK;
-    SIM->SCGC5 |= SIM_SCGC5_PORTE_MASK;
-    
-    /* Disable SPI during configuration */
-    SPI1->C1 &= ~SPI_C1_SPE_MASK;
-    
-    /* Set PTE2 as SPI1_SCK -- ALT2 */
-    PORTE->PCR[2] &= ~PORT_PCR_MUX_MASK;
-    PORTE->PCR[2] |= PORT_PCR_MUX(ALT2);
-    
-    /* Set PTE3 as SPI1_MOSI -- ALT5 */
-    PORTE->PCR[3] &= ~PORT_PCR_MUX_MASK;
-    PORTE->PCR[3] |= PORT_PCR_MUX(ALT5);
-    
-    /* Set PTE1 as SPI1_Miso -- ALT5 */
-    PORTE->PCR[1] &= ~PORT_PCR_MUX_MASK;
-    PORTE->PCR[1] |= PORT_PCR_MUX(ALT5);
-    
-    /* Set PTE4 as SPI1_pcs0 -- ALT2 */
-    PORTE->PCR[4] &= ~PORT_PCR_MUX_MASK;
-    PORTE->PCR[4] |= PORT_PCR_MUX(ALT2);
-    
-    /**
-     * Select master mode
-     * Enable SS
-     */
-    SPI1->C1 = SPI_C1_MSTR_MASK | SPI_C1_SSOE_MASK;
-    SPI1->C2 = SPI_C2_MODFEN_MASK;
-    
-    /**
-     * Select active high clock
-     * First edge sample
-     */
-    SPI1->C1 &= ~SPI_C1_CPHA_MASK;
-    SPI1->C1 &= ~SPI_C1_CPOL_MASK;
-    
-    /* Baudrate = Bus clock / ((SPPR + 1) * 2^^(SPR+1)) */
-    SPI1->BR = SPI_BR_SPPR(2) | SPI_BR_SPR(1);
-    
-    /* Enable SPI1 */
-    SPI1->C1 |= SPI_C1_SPE_MASK;
-}
-
-
-void SPI1_TransmitPolling(const  char *data)
-{
-    /* Find size of array */
-    uint16_t dataLen = (uint16_t)strlen(data);
-    
-    /* Send the array of characters */
-    for (uint16_t i = 0; i < dataLen; i++)
-    {
-        while (!(SPI1->S  & SPI_S_SPTEF_MASK))
-        {
-            ; /* Wait until TX buffer empty */
-        }
-    
-        /* Send character */
-        SPI1->D = data[i];
-    }
 }
