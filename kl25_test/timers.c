@@ -27,23 +27,6 @@ void SysTick_Init(void)
 }
 
 
-void WDT_Init(void)
-{
-    /**  
-     * 1 kHz clock
-     * 1024 cycle timeout
-     */
-    SIM->COPC = SIM_COPC_COPT(3) & ~SIM_COPC_COPCLKS_MASK & ~SIM_COPC_COPW_MASK;
-}
-
-
-void Service_COP_WDT(void)
-{
-    SIM->SRVCOP = 0x55;
-    SIM->SRVCOP = 0xAA;
-}
-
-
 void SysTick_Handler(void)
 {
     /* Count seconds since CPU boot */

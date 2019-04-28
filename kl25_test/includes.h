@@ -1,8 +1,9 @@
 #pragma once
 
-#include  <stdio.h>
-#include  <stdlib.h>
-#include  <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
 
 #include "MKL25Z4.h"
 #include "timers.h"
