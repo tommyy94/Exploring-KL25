@@ -66,7 +66,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
     <ClCompile>
       <CLanguageStandard>GNU99</CLanguageStandard>
-      <AdditionalIncludeDirectories>.;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;FreeRTOS;FreeRTOS/config/KL25Z4/gcc;FreeRTOS/include;FreeRTOS/port/gcc;FreeRTOS/src;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DEBUG=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>
       </AdditionalOptions>
@@ -138,6 +138,18 @@
     <ClCompile Include="comm.c" />
     <ClCompile Include="crc.c" />
     <ClCompile Include="dma.c" />
+    <ClCompile Include="FreeRTOS\port\gcc\port.c" />
+    <ClCompile Include="FreeRTOS\src\croutine.c" />
+    <ClCompile Include="FreeRTOS\src\event_groups.c" />
+    <ClCompile Include="FreeRTOS\src\heap_1.c" />
+    <ClCompile Include="FreeRTOS\src\heap_2.c" />
+    <ClCompile Include="FreeRTOS\src\heap_3.c" />
+    <ClCompile Include="FreeRTOS\src\heap_4.c" />
+    <ClCompile Include="FreeRTOS\src\heap_5.c" />
+    <ClCompile Include="FreeRTOS\src\list.c" />
+    <ClCompile Include="FreeRTOS\src\queue.c" />
+    <ClCompile Include="FreeRTOS\src\tasks.c" />
+    <ClCompile Include="FreeRTOS\src\timers.c" />
     <ClCompile Include="gpio.c" />
     <ClCompile Include="HS1101.c" />
     <ClCompile Include="main.c">
@@ -149,17 +161,33 @@
       <InlineFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</InlineFunctions>
     </ClCompile>
     <ClCompile Include="rf_module.c" />
-    <ClCompile Include="timers.c" />
+    <ClCompile Include="hw_timers.c" />
     <ClInclude Include="analog.h" />
     <ClInclude Include="comm.h" />
     <ClInclude Include="crc.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="dma.h" />
+    <ClInclude Include="FreeRTOS\config\KL25Z4\gcc\FreeRTOSConfig.h" />
+    <ClInclude Include="FreeRTOS\include\croutine.h" />
+    <ClInclude Include="FreeRTOS\include\deprecated_definitions.h" />
+    <ClInclude Include="FreeRTOS\include\event_groups.h" />
+    <ClInclude Include="FreeRTOS\include\FreeRTOS.h" />
+    <ClInclude Include="FreeRTOS\include\list.h" />
+    <ClInclude Include="FreeRTOS\include\mpu_wrappers.h" />
+    <ClInclude Include="FreeRTOS\include\portable.h" />
+    <ClInclude Include="FreeRTOS\include\projdefs.h" />
+    <ClInclude Include="FreeRTOS\include\queue.h" />
+    <ClInclude Include="FreeRTOS\include\semphr.h" />
+    <ClInclude Include="FreeRTOS\include\StackMacros.h" />
+    <ClInclude Include="FreeRTOS\include\task.h" />
+    <ClInclude Include="FreeRTOS\include\timers.h" />
+    <ClInclude Include="FreeRTOS\port\gcc\portmacro.h" />
+    <ClInclude Include="FreeRTOS\port\gcc\portTicks.h" />
     <ClInclude Include="gpio.h" />
     <ClInclude Include="HS1101.h" />
     <ClInclude Include="includes.h" />
     <ClInclude Include="rf_module.h" />
-    <ClInclude Include="timers.h" />
+    <ClInclude Include="hw_timers.h" />
     <None Include="kinetis.props" />
     <ClCompile Include="$(BSP_ROOT)\KL25Z4\StartupFiles\startup.c" />
     <ClCompile Include="$(BSP_ROOT)\KL25Z4\StartupFiles\vectors_KL25Z4.c" />
@@ -182,5 +210,8 @@
   </ItemGroup>
   <ItemGroup>
     <LinkerScript Include="MKL25Z128xxx4_flash.lds" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="FreeRTOS\src\FreeRTOS_license.txt" />
   </ItemGroup>
 </Project>

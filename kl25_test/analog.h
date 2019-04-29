@@ -9,10 +9,12 @@
 
 /* Device vendor headers */
 #include "MKL25Z4.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
 /* User headers */
 #include "defines.h"
-#include "timers.h"
+#include "hw_timers.h"
 
 /* Global defines */
 /* ADC0 trigger sources */
@@ -84,3 +86,5 @@ struct Sensor_Values
 void ADC0_Init(void);
 uint16_t ADC0_ReadPolling(const uint8_t channel);
 void CMP0_Init(void);
+void AnalogTask(void * const param);
+

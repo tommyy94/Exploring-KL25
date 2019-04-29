@@ -14,6 +14,8 @@
 
 /* Device vendor headers */
 #include "MKL25Z4.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
 /* User headers */
 #include "defines.h"
@@ -34,5 +36,5 @@ void UART0_Init(const uint32_t baudrate);
 uint32_t UART0_ReadPolling(void);
 void UART0_printf(const char *p_fmt, ...);
 void UART0_TransmitPolling(const char *data);
-void UART0_TransmitInterrupt(const char *data);
+void CommTask(void * const param);
 

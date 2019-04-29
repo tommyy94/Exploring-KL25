@@ -91,3 +91,25 @@ void CMP0_Init(void)
      */
     CMP0->DACCR = CMP_DACCR_DACEN(1) | CMP_DACCR_VOSEL(6);
 }
+
+
+void AnalogTask(void * const param)
+{
+    (void)param;
+    struct Sensor_Values sensor;
+    
+    ADC0_Init();
+    TPM1_Init();
+    CMP0_Init();
+    HS1101_Init();
+    
+    for (;;)
+    {
+        /* read all sensor values */
+        sensor.humidity = HS1101_ReadHumidity();
+        sensor.temperature = CELSIUS_TEMPERATURE(ADC0_ReadPolling(ADC_CH_AD8));
+        sensor.soil_moisture = SOIL_MOISTURE(ADC0_ReadPolling(ADC_CH_AD9));
+        sensor.potentiometer = ADC0_ReadPolling(ADC_CH_AD12); /* not printed */
+        vTaskDelay(MSEC_TO_TICK(500));
+    }
+}

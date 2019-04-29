@@ -12,7 +12,7 @@
 
 /* User headers */
 #include "defines.h"
-#include "timers.h"
+#include "hw_timers.h"
 #include "comm.h"
 
 /* Global variables */

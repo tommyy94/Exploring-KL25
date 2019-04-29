@@ -28,6 +28,12 @@
     <Filter Include="Source files\Src">
       <UniqueIdentifier>{cfdd8833-0c39-4928-a070-56fdaedd4f9f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header files\Device-specific files\FreeRTOS">
+      <UniqueIdentifier>{a9805512-bc9b-4037-becb-57795b683dce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Device-specific files\FreeRTOS">
+      <UniqueIdentifier>{bc31cfba-845d-4513-8d97-ddd204cf4433}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="kinetis.props">
@@ -92,9 +98,6 @@
     <ClCompile Include="main.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
-    <ClCompile Include="timers.c">
-      <Filter>Source files\Src</Filter>
-    </ClCompile>
     <ClCompile Include="analog.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
@@ -116,15 +119,51 @@
     <ClCompile Include="crc.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
+    <ClCompile Include="hw_timers.c">
+      <Filter>Source files\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeRTOS\port\gcc\port.c">
+      <Filter>Source files\Device-specific files\FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeRTOS\src\croutine.c">
+      <Filter>Source files\Device-specific files\FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeRTOS\src\event_groups.c">
+      <Filter>Source files\Device-specific files\FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeRTOS\src\heap_1.c">
+      <Filter>Source files\Device-specific files\FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeRTOS\src\heap_2.c">
+      <Filter>Source files\Device-specific files\FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeRTOS\src\heap_3.c">
+      <Filter>Source files\Device-specific files\FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeRTOS\src\heap_4.c">
+      <Filter>Source files\Device-specific files\FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeRTOS\src\heap_5.c">
+      <Filter>Source files\Device-specific files\FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeRTOS\src\list.c">
+      <Filter>Source files\Device-specific files\FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeRTOS\src\queue.c">
+      <Filter>Source files\Device-specific files\FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeRTOS\src\tasks.c">
+      <Filter>Source files\Device-specific files\FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeRTOS\src\timers.c">
+      <Filter>Source files\Device-specific files\FreeRTOS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes.h">
       <Filter>Source files\Inc</Filter>
     </ClInclude>
     <ClInclude Include="defines.h">
-      <Filter>Source files\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="timers.h">
       <Filter>Source files\Inc</Filter>
     </ClInclude>
     <ClInclude Include="analog.h">
@@ -148,10 +187,66 @@
     <ClInclude Include="crc.h">
       <Filter>Source files\Inc</Filter>
     </ClInclude>
+    <ClInclude Include="hw_timers.h">
+      <Filter>Source files\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeRTOS\include\croutine.h">
+      <Filter>Header files\Device-specific files\FreeRTOS</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeRTOS\include\deprecated_definitions.h">
+      <Filter>Header files\Device-specific files\FreeRTOS</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeRTOS\include\event_groups.h">
+      <Filter>Header files\Device-specific files\FreeRTOS</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeRTOS\include\FreeRTOS.h">
+      <Filter>Header files\Device-specific files\FreeRTOS</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeRTOS\include\list.h">
+      <Filter>Header files\Device-specific files\FreeRTOS</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeRTOS\include\mpu_wrappers.h">
+      <Filter>Header files\Device-specific files\FreeRTOS</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeRTOS\include\portable.h">
+      <Filter>Header files\Device-specific files\FreeRTOS</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeRTOS\include\projdefs.h">
+      <Filter>Header files\Device-specific files\FreeRTOS</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeRTOS\include\queue.h">
+      <Filter>Header files\Device-specific files\FreeRTOS</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeRTOS\include\semphr.h">
+      <Filter>Header files\Device-specific files\FreeRTOS</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeRTOS\include\StackMacros.h">
+      <Filter>Header files\Device-specific files\FreeRTOS</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeRTOS\include\task.h">
+      <Filter>Header files\Device-specific files\FreeRTOS</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeRTOS\include\timers.h">
+      <Filter>Header files\Device-specific files\FreeRTOS</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeRTOS\config\KL25Z4\gcc\FreeRTOSConfig.h">
+      <Filter>Header files\Device-specific files\FreeRTOS</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeRTOS\port\gcc\portmacro.h">
+      <Filter>Header files\Device-specific files\FreeRTOS</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeRTOS\port\gcc\portTicks.h">
+      <Filter>Header files\Device-specific files\FreeRTOS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <LinkerScript Include="MKL25Z128xxx4_flash.lds">
       <Filter>Source files</Filter>
     </LinkerScript>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="FreeRTOS\src\FreeRTOS_license.txt">
+      <Filter>Source files\Device-specific files\FreeRTOS</Filter>
+    </Text>
   </ItemGroup>
 </Project>

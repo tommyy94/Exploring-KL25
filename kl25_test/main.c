@@ -11,34 +11,41 @@
 #include <includes.h>
 
 
-void main(void)
+
+int main(void)
 {
-    struct Sensor_Values sensor;
+    TaskHandle_t task_func_task_handler;
+    
     char frame[MAX_FRAME_SIZE];
     char crc32Frame[MAX_FRAME_SIZE];
     uint32_t crc32 = 0;
     bool nak = false; /* Negative acknowledgement */
     
 //    GPIO_Init();
-//    ADC0_Init();
-    UART0_Init(9600);
     //SPI1_Init();
-    SysTick_Init();
-    RF_Init();
+    //SysTick_Init();
+//    RF_Init();
 //        
-//    TPM1_Init();
-//    CMP0_Init();
-//    HS1101_Init();
 
     crcInit();
     
+    if (xTaskCreate(AnalogTask, (const char *)"AnalogTask", ANALOGTASKSIZE / sizeof(portSTACK_TYPE), 0, ANALOGTASKPRIORITY, &task_func_task_handler) != pdPASS)
+    {
+        __BKPT();
+    }
+    
+    if (xTaskCreate(CommTask, (const char *)"AnalogTask", COMMTASKSIZE / sizeof(portSTACK_TYPE), 0, COMMTASKPRIORITY, &task_func_task_handler) != pdPASS)
+    {
+        __BKPT();
+    }
+    
+    vTaskStartScheduler();
+    
+    
+    
+    
     while (1)
     {   
-//        /* Read all sensor values */
-//        sensor.humidity = HS1101_ReadHumidity();
-//        sensor.temperature = CELSIUS_TEMPERATURE(ADC0_ReadPolling(ADC_CH_AD8));
-//        sensor.soil_moisture = SOIL_MOISTURE(ADC0_ReadPolling(ADC_CH_AD9));
-//        sensor.potentiometer = ADC0_ReadPolling(ADC_CH_AD12); /* Not printed */
 
         /* Build the frame with checksum */
         snprintf(frame, MAX_FRAME_SIZE, "abcdefgh0123456789");
@@ -70,8 +77,6 @@ void main(void)
         nak = false;
         
         RF_SetPowerdownMode();
-        
-        DelayUs(10000);
     }
 }
 
@@ -90,3 +95,4 @@ void _Error_Handler(char *file,
     {
     }
 }
+

@@ -156,3 +156,17 @@ void UART0_printf(const char *p_fmt, ...)
 
     va_end(xArgp);
 }
+
+
+void CommTask(void * const param)
+{
+    (void)param;
+    
+    UART0_Init(9600);
+    
+    for (;;)
+    {
+        UART0_TransmitPolling("CommTask");
+        vTaskDelay(MSEC_TO_TICK(500));
+    }
+}

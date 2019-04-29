@@ -6,7 +6,11 @@
 #include <string.h>
 
 #include "MKL25Z4.h"
-#include "timers.h"
+#include "FreeRTOS.h"
+#include "task.h"
+
+#include "defines.h"
+#include "hw_timers.h"
 #include "analog.h"
 #include "comm.h"
 #include "gpio.h"

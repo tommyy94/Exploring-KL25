@@ -68,9 +68,9 @@ void RF_SetTransmissionMode(void)
     if (gs_CurrentMode == POWERDOWN_MODE)
     {
         FGPIOE->PSOR |= MASK(ENABLE);
-        DelayUs(20);
+        vTaskDelay(20);
         FGPIOE->PSOR |= MASK(TXRX);
-        DelayUs(400);
+        vTaskDelay(400);
     }
     else if (gs_CurrentMode == IDLE_MODE)
     {
@@ -79,7 +79,7 @@ void RF_SetTransmissionMode(void)
     else if (gs_CurrentMode == RECEIVER_MODE)
     {
         FGPIOE->PSOR |= MASK(TXRX);
-        DelayUs(400);
+        vTaskDelay(400);
     }
     else
     {
@@ -97,15 +97,15 @@ void RF_SetReceiverMode(void)
     if (gs_CurrentMode == POWERDOWN_MODE)
     {
         FGPIOE->PSOR |= MASK(ENABLE);
-        DelayUs(20);
+        vTaskDelay(20);
         FGPIOE->PSOR |= MASK(TXRX);
-        DelayUs(200);
+        vTaskDelay(200);
         FGPIOE->PCOR |= MASK(TXRX);
-        DelayUs(40);
+        vTaskDelay(40);
         FGPIOE->PCOR |= MASK(ENABLE);
-        DelayUs(20);
+        vTaskDelay(20);
         FGPIOE->PSOR |= MASK(ENABLE);
-        DelayUs(200);
+        vTaskDelay(200);
     }
     else if (gs_CurrentMode == IDLE_MODE)
     {
@@ -115,14 +115,14 @@ void RF_SetReceiverMode(void)
     else if (gs_CurrentMode == TRANSMISSION_MODE)
     {
         /* Make sure TX is done */
-        DelayUs(3000);
+        vTaskDelay(3000);
         
         FGPIOE->PCOR |= MASK(TXRX);
-        DelayUs(40);
+        vTaskDelay(40);
         FGPIOE->PCOR |= MASK(ENABLE);
-        DelayUs(20);
+        vTaskDelay(20);
         FGPIOE->PSOR |= MASK(ENABLE);
-        DelayUs(200);
+        vTaskDelay(200);
     }
     else
     {

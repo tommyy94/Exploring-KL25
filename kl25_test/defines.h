@@ -50,4 +50,16 @@ enum AlternativeFunctions
     RESET
 };
 
+
+#define MSEC_TO_TICK(msec)  (((uint32_t)(msec)+500uL/(uint32_t)configTICK_RATE_HZ) \
+                             *(uint32_t)configTICK_RATE_HZ/1000uL)
+#define TICKS_TO_MSEC(tick) ((tick)*1000uL/(uint32_t)configTICK_RATE_HZ)
+    
+#define ANALOGTASKSIZE 512
+#define ANALOGTASKPRIORITY 1
+    
+#define COMMTASKSIZE 512
+#define COMMTASKPRIORITY 2
+    
+
 void _Error_Handler(char *file, int line);
