@@ -93,6 +93,7 @@
     <None Include="kinetis.xml">
       <Filter>VisualGDB settings</Filter>
     </None>
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FreeRTOS\port\gcc\port.c">
