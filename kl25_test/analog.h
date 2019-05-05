@@ -11,6 +11,7 @@
 #include "MKL25Z4.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "queue.h"
 
 /* User headers */
 #include "defines.h"
@@ -72,7 +73,7 @@ enum ADC_Channels
 };
 
 
-struct Sensor_Values
+struct Sensor
 {
     /* TODO: Figure out why volatile keyword is needed */
     volatile uint32_t temperature;
@@ -80,6 +81,8 @@ struct Sensor_Values
     volatile uint32_t soil_moisture;
     volatile uint32_t potentiometer;
 };
+
+extern QueueHandle_t analogQueue;
 
 
 /* Global function prototypes */

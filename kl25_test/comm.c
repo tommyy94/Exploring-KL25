@@ -10,6 +10,8 @@ uint8_t g_rxData[UART0_RX_BUFSIZ];
 bool g_rxFlag = false;
 volatile uint8_t g_rxIndex = 0;
 
+QueueHandle_t commQueue;
+
 
 __STATIC_INLINE void UART0_TransmitByte(const char byte);
 
@@ -158,15 +160,80 @@ void UART0_printf(const char *p_fmt, ...)
 }
 
 
-void CommTask(void * const param)
+struct AMessage
+{
+    char ucFrameID;
+    char ucFrame[MAX_FRAME_SIZE];
+} xMessage;
+
+
+void CommTask(void *const param)
 {
     (void)param;
+    struct AMessage *pxMessage;
     
     UART0_Init(9600);
     
     for (;;)
     {
-        UART0_TransmitPolling("CommTask");
+        if (xQueueReceive(commQueue, &(pxMessage), (TickType_t) 10))
+        {
+            UART0_TransmitPolling(pxMessage->ucFrame);
+        }
+        else
+        {
+            UART0_TransmitPolling("Error receiving from commQueue!\004");
+        }
+        
+        vTaskDelay(MSEC_TO_TICK(100));
+    }
+}
+
+
+void CrcTask(void *const param)
+{
+    (void)param;
+    struct Sensor *sensor;
+    crc crc32;
+    char crc32Frame[MAX_FRAME_SIZE];
+    
+    struct AMessage *pxMessage;
+    pxMessage = & xMessage;
+    strncpy(xMessage.ucFrame, "Test", 4);
+    
+    commQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(char *));
+    if (commQueue == NULL)
+    {
+        __BKPT();
+    }
+
+    CRC_Init();
+    
+    for (;;)
+    {
+        if (analogQueue != 0)
+        {
+            if (xQueueReceive(analogQueue, &sensor, (TickType_t)10))
+            {
+                /* Build the frame with checksum */
+                //snprintf(pxMessage->ucData, MAX_FRAME_SIZE, "abcdefgh0123456789"); /* For test purposes */
+                snprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%luhum=%lumst=%lu", sensor->temperature, sensor->humidity, sensor->soil_moisture);
+            }
+            else
+            {
+                strncpy(pxMessage->ucFrame, "Error receiving from analogQueue!", 27);
+            }
+            
+            crc32 = CRC_Fast((uint8_t *)pxMessage->ucFrame, strlen(pxMessage->ucFrame));
+            snprintf(crc32Frame, MAX_FRAME_SIZE, "crc32:%x\004", (unsigned int)crc32);
+            strncat(pxMessage->ucFrame, crc32Frame, strlen(crc32Frame));
+            
+            if (xQueueSend(commQueue, (void *)&pxMessage, (TickType_t)10) != pdPASS)
+            {
+                __BKPT();
+            }
+        }
+        
         vTaskDelay(MSEC_TO_TICK(500));
     }
 }

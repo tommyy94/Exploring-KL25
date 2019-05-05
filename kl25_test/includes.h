@@ -1,6 +1,5 @@
 #pragma once
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
@@ -17,3 +16,4 @@
 #include "rf_module.h"
 #include "HS1101.h"
 #include "crc.h"
+#include "printf-stdarg.h"

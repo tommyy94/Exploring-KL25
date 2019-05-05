@@ -55,11 +55,16 @@ enum AlternativeFunctions
                              *(uint32_t)configTICK_RATE_HZ/1000uL)
 #define TICKS_TO_MSEC(tick) ((tick)*1000uL/(uint32_t)configTICK_RATE_HZ)
     
-#define ANALOGTASKSIZE 512
+#define ANALOGTASKSIZE 1024
 #define ANALOGTASKPRIORITY 1
     
-#define COMMTASKSIZE 512
+#define COMMTASKSIZE 1024
 #define COMMTASKPRIORITY 2
+    
+#define CRCTASKSIZE 1024
+#define CRCTASKPRIORITY 3
+    
+#define MAX_QUEUE_SIZE 32
     
 
 void _Error_Handler(char *file, int line);

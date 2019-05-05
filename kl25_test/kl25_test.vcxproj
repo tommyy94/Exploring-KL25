@@ -160,6 +160,7 @@
       <InlineFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">false</InlineFunctions>
       <InlineFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</InlineFunctions>
     </ClCompile>
+    <ClCompile Include="printf-stdarg.c" />
     <ClCompile Include="rf_module.c" />
     <ClCompile Include="hw_timers.c" />
     <ClInclude Include="analog.h" />
@@ -186,6 +187,7 @@
     <ClInclude Include="gpio.h" />
     <ClInclude Include="HS1101.h" />
     <ClInclude Include="includes.h" />
+    <ClInclude Include="printf-stdarg.h" />
     <ClInclude Include="rf_module.h" />
     <ClInclude Include="hw_timers.h" />
     <None Include="kinetis.props" />

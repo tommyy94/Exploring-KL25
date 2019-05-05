@@ -158,6 +158,9 @@
     <ClCompile Include="FreeRTOS\src\timers.c">
       <Filter>Source files\Device-specific files\FreeRTOS</Filter>
     </ClCompile>
+    <ClCompile Include="printf-stdarg.c">
+      <Filter>Source files\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes.h">
@@ -237,6 +240,9 @@
     </ClInclude>
     <ClInclude Include="FreeRTOS\port\gcc\portTicks.h">
       <Filter>Header files\Device-specific files\FreeRTOS</Filter>
+    </ClInclude>
+    <ClInclude Include="printf-stdarg.h">
+      <Filter>Source files\Inc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

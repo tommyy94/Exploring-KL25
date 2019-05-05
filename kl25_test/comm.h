@@ -6,7 +6,6 @@
 #pragma once
 
 /* System headers */
-#include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdarg.h>
@@ -16,9 +15,13 @@
 #include "MKL25Z4.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "queue.h"
 
 /* User headers */
 #include "defines.h"
+#include "analog.h"
+#include "crc.h"
+#include "printf-stdarg.h"
 
 /* Global defines */
 #define MAX_FRAME_SIZE          (64UL)
@@ -36,5 +39,5 @@ void UART0_Init(const uint32_t baudrate);
 uint32_t UART0_ReadPolling(void);
 void UART0_printf(const char *p_fmt, ...);
 void UART0_TransmitPolling(const char *data);
-void CommTask(void * const param);
-
+void CommTask(void *const param);
+void CrcTask(void *const param);

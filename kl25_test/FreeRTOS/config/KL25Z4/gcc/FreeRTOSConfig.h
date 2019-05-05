@@ -214,5 +214,6 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 /* Normal assert() semantics without relying on the provision of an assert.h header file. */
 #define configASSERT(x) if((x)==0) { taskDISABLE_INTERRUPTS(); for( ;; ); }
 
-#endif /* FREERTOS_CONFIG_H */
+#define portINLINE __inline
 
+#endif /* FREERTOS_CONFIG_H */
