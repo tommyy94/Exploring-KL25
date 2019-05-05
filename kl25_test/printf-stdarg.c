@@ -59,12 +59,16 @@ struct SStringBuf
  */
 BaseType_t xApplicationMemoryPermissions(uint32_t aAddress)
 {
+    /* Supress -Wunused-parameter */
+    (void)aAddress;
     return 3;
 }
 
 void vOutputChar(const char cChar, const TickType_t xTicksToWait)
 {
-    
+    /* Supress -Wunused-parameter */
+    (void)cChar;
+    (void)xTicksToWait;
 }
 
 static void strbuf_init( struct SStringBuf *apStr, char *apBuf, const char *apMaxStr )
@@ -601,7 +605,7 @@ int vsnprintf( char *apBuf, size_t aMaxLen, const char *apFmt, va_list args )
 }
 /*-----------------------------------------------------------*/
 
-int snprintf( char *apBuf, size_t aMaxLen, const char *apFmt, ... )
+int ussnprintf( char *apBuf, size_t aMaxLen, const char *apFmt, ... )
 {
 	va_list args;
 
@@ -657,19 +661,19 @@ size_t gb, mb, kb, sb;
 	sb = aSize;
 	if( gb )
 	{
-		snprintf (apBuf, aLen, "%u.%02u GB", ( unsigned ) gb, ( unsigned ) ( ( 100 * mb ) / 1024ul ) );
+		ussnprintf (apBuf, aLen, "%u.%02u GB", ( unsigned ) gb, ( unsigned ) ( ( 100 * mb ) / 1024ul ) );
 	}
 	else if( mb )
 	{
-		snprintf (apBuf, aLen, "%u.%02u MB", ( unsigned ) mb, ( unsigned ) ( ( 100 * kb) / 1024ul ) );
+		ussnprintf (apBuf, aLen, "%u.%02u MB", ( unsigned ) mb, ( unsigned ) ( ( 100 * kb) / 1024ul ) );
 	}
 	else if( kb != 0ul )
 	{
-		snprintf (apBuf, aLen, "%u.%02u KB", ( unsigned ) kb, ( unsigned ) ( ( 100 * sb) / 1024ul ) );
+		ussnprintf (apBuf, aLen, "%u.%02u KB", ( unsigned ) kb, ( unsigned ) ( ( 100 * sb) / 1024ul ) );
 	}
 	else
 	{
-		snprintf (apBuf, aLen, "%u bytes", ( unsigned ) sb);
+		ussnprintf (apBuf, aLen, "%u bytes", ( unsigned ) sb);
 	}
 	return apBuf;
 }

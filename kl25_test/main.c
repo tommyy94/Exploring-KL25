@@ -7,8 +7,6 @@
 
 int main(void)
 {
-    //    bool nak = false; /* Negative acknowledgement */
-    
     vSystemInit();
     vCreateTasks();
     vCreateQueues();
@@ -19,32 +17,34 @@ int main(void)
         ; /* Should not get here! */
     }
     
+    //    bool nak = false; /* Negative acknowledgement */
+    
     //    while (1)
     //    {
     //        
     //        while (!nak)
     //        {
     //            /* Transmit the frame */
-    //            RF_SetTransmissionMode();
-    //            UART0_TransmitPolling(frame);
-    //            RF_SetReceiverMode();
+    //            RF_vSetTransmissionMode();
+    //            UART0_vTransmitPolling(frame);
+    //            RF_vSetReceiverMode();
     //        
-    //            while (!g_rxFlag)
+    //            while (!ucRxFlag)
     //            {
     //                ; /* Wait until message received, loop only for testing */
     //            }
     //        
-    //            g_rxFlag = false;
+    //            ucRxFlag = FALSE;
     //            
     //            /* Retransmit frame if checksum doesn't match */
-    //            if (!strncmp((const char *)g_rxData, "NAK", UART0_RX_BUFSIZ))
+    //            if (!strncmp((const char *)ucRxFlag, "NAK", UART0_RX_BUFSIZ))
     //            {
-    //                nak = true;
+    //                nak = TRUE;
     //            }
     //        }
     //        
-    //        nak = false;
+    //        nak = FALSE;
     //        
-    //        RF_SetPowerdownMode();
+    //        RF_vSetPowerdownMode();
     //    }
 }

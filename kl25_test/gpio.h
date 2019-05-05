@@ -17,4 +17,4 @@
 
 
 /* Global function prototypes */
-void GPIO_Init(void);
+void GPIO_vInit(void);

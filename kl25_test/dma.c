@@ -2,7 +2,7 @@
 
 
 /* Function descriptions */
-void DMA0_Init(uint32_t *dstAddr)
+void DMA0_vInit(uint32_t *dstAddr)
 {
     /* Turn on clock to DMA0 & DMAMUX */
     SIM->SCGC7 |= SIM_SCGC7_DMA_MASK;

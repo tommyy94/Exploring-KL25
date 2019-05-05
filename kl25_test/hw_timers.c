@@ -4,55 +4,10 @@
 /* Local defines*/
 #define TPM1_IC_PIN (13UL)
 
-
 /* Global variables */
-volatile uint32_t g_sTicks = 0; /* Store second ticks */
 
 
-/* Function descriptions */
-/* Configures SysTick to use 3 MHz clock */
-//void SysTick_Init(void)
-//{
-//    /* Set reload to trigger interrupt every 1 second */
-//    SysTick->LOAD = (SystemCoreClock / 16);
-//
-//    /* Set interrupt priority */
-//    NVIC_SetPriority(SysTick_IRQn, 4);
-//
-//    /* Force load of reload value */
-//    SysTick->VAL = 0;
-//
-//    /* Enable SysTick timer */
-//    SysTick->CTRL = SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
-//}
-//
-//
-//void SysTick_Handler(void)
-//{
-//    /* Count seconds since CPU boot */
-//    g_sTicks++;
-//}
-//
-//
-///* Inaccurate when SysTick rolls over */
-//void DelayUs(const uint32_t us)
-//{
-//    /**
-//     * Get delta of SysTick and compare to delay parameter
-//     * SysTick configured to use 3 MHz clock => multiply delay by 3 to achieve 1 MHz = 1 us
-//     * NOTE: SysTick is decrementing timer
-//     */
-//    static const uint8_t s_clockMultiplier = 3;
-//    uint32_t delta = SysTick->VAL;
-//    
-//    while ((delta - SysTick->VAL) < (s_clockMultiplier * us)) 
-//    {
-//        ; /*  Wait until time passed */
-//    }
-//}
-
-
-void TPM1_Init(void)
+void TPM1_vInit(void)
 {
     /* Turn on clock gating for TPM1 and PORTA */
     SIM->SCGC6 |= SIM_SCGC6_TPM1(1);
@@ -89,12 +44,12 @@ void TPM1_Init(void)
 
 void TPM1_IRQHandler(void)
 {
-    static uint32_t s_overflows = 0;
+    static uint32_t ulOverflows = 0;
     
     /* Check for counter overflows */
     if (TPM1->STATUS & TPM_STATUS_TOF_MASK)
     {
-        s_overflows++;
+        ulOverflows++;
     }
     
     if (TPM1->STATUS & TPM_STATUS_CH1F_MASK)
@@ -103,12 +58,12 @@ void TPM1_IRQHandler(void)
         TPM1->SC &= ~TPM_SC_CMOD_MASK;
         
         /* TODO: Convert this capacitor value to humidity */
-        g_HS1101_value = TPM1->CONTROLS[1].CnV;
+        ulHS1101_value = TPM1->CONTROLS[1].CnV;
         
         /* Reset counter */
         TPM1->CNT = 0;
-        s_overflows = 0;
-        g_HS1101_flag = true;
+        ulOverflows = 0;
+        ulHS1101_flag = TRUE;
     }
     
     /* Reset all flags */

@@ -7,7 +7,6 @@
 
 /* System headers */
 #include <stdint.h>
-#include <stdbool.h>
 
 /* Device vendor headers */
 #include "MKL25Z4.h"
@@ -19,9 +18,6 @@
 /* Global defines */
 
 /* Global variables */
-extern volatile uint32_t g_sTicks; /* Store second ticks */
 
 /* Global function prototypes */
-void SysTick_Init(void);
-void DelayUs(uint32_t us);
-void TPM1_Init(void);
+void TPM1_vInit(void);

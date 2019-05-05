@@ -151,7 +151,7 @@ crc  crcTable[256];
  *
  *********************************************************************/
 void
-CRC_Init(void)
+CRC_vInit(void)
 {
     crc			   remainder;
 	int			   dividend;
@@ -206,7 +206,7 @@ CRC_Init(void)
  * Returns:		The CRC of the message.
  *
  *********************************************************************/
-crc CRC_Fast(unsigned char const message[], int nBytes)
+crc CRC_xFast(unsigned char const message[], int nBytes)
 {
     crc	           remainder = INITIAL_REMAINDER;
     unsigned char  data;

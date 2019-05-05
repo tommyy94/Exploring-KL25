@@ -6,10 +6,11 @@
 
 
 /* Global variables */
+QueueHandle_t xAnalogQueue;
 
 
 /* Function descriptions */
-void ADC0_Init(void)
+void ADC0_vInit(void)
 {
     /* Enable clock to ADC0 & PORTB */
     SIM->SCGC6 |= SIM_SCGC6_ADC0(1);
@@ -44,7 +45,7 @@ void ADC0_Init(void)
 
         
 /* Read frequency 10 Hz */
-uint16_t ADC0_ReadPolling(const uint8_t channel)
+uint16_t ADC0_usReadPolling(const uint8_t channel)
 {
     /* Start conversion on selected channel */
     ADC0->SC1[0] = ADC_SC1_ADCH(channel);
@@ -59,7 +60,7 @@ uint16_t ADC0_ReadPolling(const uint8_t channel)
 }
 
 
-void CMP0_Init(void)
+void CMP0_vInit(void)
 {
     /* Enable clock to comparator */
     SIM->SCGC4 |= SIM_SCGC4_CMP(1);
@@ -95,7 +96,6 @@ void CMP0_Init(void)
 }
 
 
-QueueHandle_t xAnalogQueue;
 void vSensorTask(void *const param)
 {
     (void)param;
@@ -105,10 +105,10 @@ void vSensorTask(void *const param)
     for (;;)
     {
         /* Read all sensor values */
-        xSensor.ulHumidity = HS1101_ReadHumidity();
-        xSensor.ulTemperature = CELSIUS_TEMPERATURE(ADC0_ReadPolling(ADC_CH_AD8));
-        xSensor.ulSoilMoisture = SOIL_MOISTURE(ADC0_ReadPolling(ADC_CH_AD9));
-        xSensor.ulPotentiometer = ADC0_ReadPolling(ADC_CH_AD12); /* Not printed */
+        xSensor.ulHumidity = HS1101_ulReadHumidity();
+        xSensor.ulTemperature = CELSIUS_TEMPERATURE(ADC0_usReadPolling(ADC_CH_AD8));
+        xSensor.ulSoilMoisture = SOIL_MOISTURE(ADC0_usReadPolling(ADC_CH_AD9));
+        xSensor.ulPotentiometer = ADC0_usReadPolling(ADC_CH_AD12); /* Not printed */
         
         if (xAnalogQueue != 0)
         {

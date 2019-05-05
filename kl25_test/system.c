@@ -4,17 +4,17 @@
 void vSystemInit(void)
 {
     /* Analog functionalities */
-    ADC0_Init();
-    TPM1_Init();
-    CMP0_Init();
-    HS1101_Init();
+    ADC0_vInit();
+    TPM1_vInit();
+    CMP0_vInit();
+    HS1101_vInit();
     
     /* Communications */
-    UART0_Init(9600);
-    CRC_Init();
-//    RF_Init();
+    UART0_vInit(9600);
+    CRC_vInit();
+//    RF_vInit();
     
-//    GPIO_Init();
+//    GPIO_vInit();
 }
 
 

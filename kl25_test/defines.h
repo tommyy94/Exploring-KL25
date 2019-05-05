@@ -5,8 +5,13 @@
 
 #pragma once
 
-#define SIGNAL_SHIFT (5)
-#define MASK(pin) (1UL << (pin))
+/* Bit shifting */
+#define SIGNAL_SHIFT        (5)
+#define MASK(pin)           (1UL << (pin))
+
+/* Boolean logic */
+#define FALSE               (0UL)
+#define TRUE                (!FALSE)
 
 /* Sensor pins */
 #define TEMP_SENSOR_PIN     (0UL)   /* TMP36GT */

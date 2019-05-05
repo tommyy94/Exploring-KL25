@@ -2,7 +2,7 @@
 
 
 /* Function descriptions */
-void GPIO_Init(void)
+void GPIO_vInit(void)
 {
     /* Enable clock to PORTD */
     SIM->SCGC5 |= SIM_SCGC5_PORTD_MASK;

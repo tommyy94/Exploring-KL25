@@ -18,8 +18,8 @@
 /* Global variables */
 
 /* Global function prototypes */
-void RF_Init(void);
-void RF_SetPowerdownMode(void);
-void RF_SetIdleMode(void);
-void RF_SetTransmissionMode(void);
-void RF_SetReceiverMode(void);
+void RF_vInit(void);
+void RF_vSetPowerdownMode(void);
+void RF_vSetIdleMode(void);
+void RF_vSetTransmissionMode(void);
+void RF_vSetReceiverMode(void);

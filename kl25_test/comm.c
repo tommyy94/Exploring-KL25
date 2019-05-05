@@ -7,7 +7,7 @@
 
 /* Global variables */
 uint8_t ucRxData[UART0_RX_BUFSIZ];
-uint8_t ucRxFlag = false;
+uint8_t ucRxFlag = FALSE;
 volatile uint8_t ucRxIndex = 0;
 QueueHandle_t xCommQueue;
 
@@ -21,7 +21,7 @@ struct AMessage
 
 
 /* Function descriptions */
-void UART0_Init(const uint32_t baudrate)
+void UART0_vInit(const uint32_t baudrate)
 {
     register uint16_t sbr;
     
@@ -87,7 +87,7 @@ void UART0_Init(const uint32_t baudrate)
 }
 
 
-uint32_t UART0_ReadPolling(void)
+uint32_t UART0_ulReadPolling(void)
 {
     while (!(UART0->S1 & UART0_S1_RDRF_MASK))
     {
@@ -115,13 +115,13 @@ void UART0_IRQHandler(void)
         if (ucRxIndex >= UART0_RX_BUFSIZ)
         {
             ucRxIndex = 0;
-            ucRxFlag = true;
+            ucRxFlag = TRUE;
         }
     }
 }
 
 
-void UART0_TransmitByte(const char byte)
+void UART0_vTransmitByte(const char byte)
 {
     while (!(UART0->S1 & UART0_S1_TDRE_MASK))
     {
@@ -133,7 +133,7 @@ void UART0_TransmitByte(const char byte)
 }
 
 
-void UART0_TransmitPolling(const char *data)
+void UART0_vTransmitPolling(const char *data)
 {
     /* Find size of array */
     uint16_t dataLen = (uint16_t)strlen(data);
@@ -141,7 +141,7 @@ void UART0_TransmitPolling(const char *data)
     /* Send the array of characters */
     for (uint16_t i = 0; i < dataLen; i++)
     {
-        UART0_TransmitByte(data[i]);
+        UART0_vTransmitByte(data[i]);
     }
 }
 
@@ -155,11 +155,11 @@ void vCommTask(void *const param)
     {
         if (xQueueReceive(xCommQueue, &(pxMessage), (TickType_t) 10))
         {
-            UART0_TransmitPolling(pxMessage->ucFrame);
+            UART0_vTransmitPolling(pxMessage->ucFrame);
         }
         else
         {
-            UART0_TransmitPolling("Error receiving from commQueue!\004");
+            UART0_vTransmitPolling("Error receiving from commQueue!\004");
         }
         
         vTaskDelay(MSEC_TO_TICK(100));
@@ -182,15 +182,15 @@ void vCrcTask(void *const param)
             {
                 /* Build the frame with checksum */
                 //snprintf(pxMessage->ucData, MAX_FRAME_SIZE, "abcdefgh0123456789"); /* For test purposes */
-                snprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%luhum=%lumst=%lu", pxSensor->ulTemperature, pxSensor->ulHumidity, pxSensor->ulSoilMoisture);
+                ussnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%luhum=%lumst=%lu", pxSensor->ulTemperature, pxSensor->ulHumidity, pxSensor->ulSoilMoisture);
             }
             else
             {
                 strncpy(pxMessage->ucFrame, "Error receiving from analogQueue!", 27);
             }
             
-            pxMessage->ulCrc32 = CRC_Fast((uint8_t *)pxMessage->ucFrame, strlen(pxMessage->ucFrame));
-            snprintf(pxMessage->ucCrc32Frame, MAX_FRAME_SIZE, "crc32:%x\004", (unsigned int)pxMessage->ulCrc32);
+            pxMessage->ulCrc32 = CRC_xFast((uint8_t *)pxMessage->ucFrame, strlen(pxMessage->ucFrame));
+            ussnprintf(pxMessage->ucCrc32Frame, MAX_FRAME_SIZE, "crc32:%x\004", (unsigned int)pxMessage->ulCrc32);
             strncat(pxMessage->ucFrame, pxMessage->ucCrc32Frame, strlen(pxMessage->ucCrc32Frame));
             
             if (xQueueSend(xCommQueue, (void *)&pxMessage, (TickType_t)10) != pdPASS)

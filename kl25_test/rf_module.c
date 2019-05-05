@@ -18,7 +18,7 @@ enum OperationalModes
 };
 
 
-static volatile uint8_t gs_CurrentMode;
+static uint8_t ucCurrentMode;
 
 
 /* Function descriptions */
@@ -26,7 +26,7 @@ static volatile uint8_t gs_CurrentMode;
  * Initialize pins used for RF module.
  * Enables PORTE clock.
  */
-void RF_Init(void)
+void RF_vInit(void)
 {
     /* Enable clock to PORTE */
     SIM->SCGC5 |= SIM_SCGC5_PORTE_MASK;
@@ -40,43 +40,43 @@ void RF_Init(void)
     //FGPIOE->PDDR &= ~MASK(DATA_OUT);
     FGPIOE->PDDR |= MASK(ENABLE) | MASK(TXRX);
     
-    RF_SetIdleMode();
+    RF_vSetIdleMode();
 }
 
 
 /* Power consumption 1.2 uA */
-void RF_SetPowerdownMode(void)
+void RF_vSetPowerdownMode(void)
 {
     FGPIOE->PCOR |= MASK(TXRX) | MASK(ENABLE);
-    gs_CurrentMode = POWERDOWN_MODE;
+    ucCurrentMode = POWERDOWN_MODE;
 }
 
 
 /* Power consumption 4.7  mA */
-void RF_SetIdleMode(void)
+void RF_vSetIdleMode(void)
 {
     PORTE->PCR[DATA_IN] &= ~PORT_PCR_MUX(ALT1);
     FGPIOE->PSOR |= MASK(ENABLE) | MASK(TXRX);
     FGPIOE->PCOR |= MASK(DATA_IN);
-    gs_CurrentMode = IDLE_MODE;
+    ucCurrentMode = IDLE_MODE;
 }
 
 
 /* Power consumption 11.5 mA */
-void RF_SetTransmissionMode(void)
+void RF_vSetTransmissionMode(void)
 {
-    if (gs_CurrentMode == POWERDOWN_MODE)
+    if (ucCurrentMode == POWERDOWN_MODE)
     {
         FGPIOE->PSOR |= MASK(ENABLE);
         vTaskDelay(20);
         FGPIOE->PSOR |= MASK(TXRX);
         vTaskDelay(400);
     }
-    else if (gs_CurrentMode == IDLE_MODE)
+    else if (ucCurrentMode == IDLE_MODE)
     {
         /* No action needed as DATA_IN is driven high during transmission */
     }
-    else if (gs_CurrentMode == RECEIVER_MODE)
+    else if (ucCurrentMode == RECEIVER_MODE)
     {
         FGPIOE->PSOR |= MASK(TXRX);
         vTaskDelay(400);
@@ -87,14 +87,14 @@ void RF_SetTransmissionMode(void)
     }
     
     PORTE->PCR[UART0_TX_PIN] = PORT_PCR_MUX(ALT4);
-    gs_CurrentMode = TRANSMISSION_MODE;
+    ucCurrentMode = TRANSMISSION_MODE;
 }
 
 
 /* Power consumption 6.8 mA */
-void RF_SetReceiverMode(void)
+void RF_vSetReceiverMode(void)
 {
-    if (gs_CurrentMode == POWERDOWN_MODE)
+    if (ucCurrentMode == POWERDOWN_MODE)
     {
         FGPIOE->PSOR |= MASK(ENABLE);
         vTaskDelay(20);
@@ -107,12 +107,12 @@ void RF_SetReceiverMode(void)
         FGPIOE->PSOR |= MASK(ENABLE);
         vTaskDelay(200);
     }
-    else if (gs_CurrentMode == IDLE_MODE)
+    else if (ucCurrentMode == IDLE_MODE)
     {
         FGPIOE->PCOR |= MASK(TXRX);
         FGPIOE->PSOR |= MASK(ENABLE);
     }
-    else if (gs_CurrentMode == TRANSMISSION_MODE)
+    else if (ucCurrentMode == TRANSMISSION_MODE)
     {
         /* Make sure TX is done */
         vTaskDelay(3000);
@@ -130,5 +130,5 @@ void RF_SetReceiverMode(void)
     }
     
     PORTE->PCR[DATA_IN] = PORT_PCR_MUX(ALT1);
-    gs_CurrentMode = RECEIVER_MODE;
+    ucCurrentMode = RECEIVER_MODE;
 }

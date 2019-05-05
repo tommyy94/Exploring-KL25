@@ -87,8 +87,7 @@ extern QueueHandle_t xAnalogQueue;
 
 
 /* Global function prototypes */
-void ADC0_Init(void);
-uint16_t ADC0_ReadPolling(const uint8_t channel);
-void CMP0_Init(void);
+void ADC0_vInit(void);
+uint16_t ADC0_usReadPolling(const uint8_t channel);
+void CMP0_vInit(void);
 void vSensorTask(void * const param);
-

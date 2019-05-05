@@ -5,8 +5,8 @@
 #define HUMIDITY_FORMULA(x) ((x))
 
 /* Local variables */
-volatile uint32_t g_HS1101_value = 0;
-volatile bool g_HS1101_flag = false;
+volatile uint32_t ulHS1101_value = 0;
+volatile uint8_t ulHS1101_flag = FALSE;
 
 /* Local function prototypes */
 static void HS1101_SendSignal(void);
@@ -16,7 +16,7 @@ static void HS1101_SendSignal(void);
  * This function simply sets ports output & writes high to memory 
  * so multiplexing pins sets pin high.
  */
-void HS1101_Init(void)
+void HS1101_vInit(void)
 {
     FGPIOE->PDDR |= MASK(HUMID_SENSOR_PIN);
     FGPIOE->PSOR |= MASK(HUMID_SENSOR_PIN);
@@ -64,21 +64,21 @@ static void HS1101_SendSignal(void)
 }
 
 
-uint32_t HS1101_ReadHumidity(void)
+uint32_t HS1101_ulReadHumidity(void)
 {
     uint32_t humid = 0;
     
     HS1101_SendSignal();
     
     /* TODO: Add timeout */
-    while (!g_HS1101_flag)
+    while (!ulHS1101_flag)
     {
         ; /* Wait until humidity can be read */
     }
     
-    g_HS1101_flag = false;
+    ulHS1101_flag = FALSE;
     
-    humid = HUMIDITY_FORMULA(g_HS1101_value);
+    humid = HUMIDITY_FORMULA(ulHS1101_value);
     
     return (humid);
 }

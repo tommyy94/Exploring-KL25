@@ -30,13 +30,13 @@
 
 /* Global variables */
 extern uint8_t ucRxData[UART0_RX_BUFSIZ];
-uint8_t ucRxFlag;
+extern uint8_t ucRxFlag;
 
 
 /* Global function prototypes */
-void UART0_Init(const uint32_t baudrate);
-uint32_t UART0_ReadPolling(void);
-void UART0_TransmitByte(const char byte);
-void UART0_TransmitPolling(const char *data);
+void UART0_vInit(const uint32_t baudrate);
+uint32_t UART0_ulReadPolling(void);
+void UART0_vTransmitByte(const char byte);
+void UART0_vTransmitPolling(const char *data);
 void vCommTask(void *const param);
 void vCrcTask(void *const param);

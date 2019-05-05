@@ -16,9 +16,13 @@
 #ifndef _crc_h
 #define _crc_h
 
-
+#ifndef FALSE
 #define FALSE	0
+#endif
+#ifndef TRUE
 #define TRUE	!FALSE
+#endif
+
 
 /*
  * Select the CRC standard from the list that follows.
@@ -69,9 +73,9 @@ typedef unsigned long  crc;
 #endif
 
 
-void  CRC_Init(void);
-crc   CRC_Slow(unsigned char const message[], int nBytes);
-crc   CRC_Fast(unsigned char const message[], int nBytes);
+void  CRC_vInit(void);
+crc   CRC_xSlow(unsigned char const message[], int nBytes);
+crc   CRC_xFast(unsigned char const message[], int nBytes);
 
 
 #endif /* _crc_h */
