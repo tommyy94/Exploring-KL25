@@ -161,6 +161,9 @@
     <ClCompile Include="printf-stdarg.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
+    <ClCompile Include="system.c">
+      <Filter>Source files\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes.h">
@@ -242,6 +245,9 @@
       <Filter>Header files\Device-specific files\FreeRTOS</Filter>
     </ClInclude>
     <ClInclude Include="printf-stdarg.h">
+      <Filter>Source files\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="system.h">
       <Filter>Source files\Inc</Filter>
     </ClInclude>
   </ItemGroup>

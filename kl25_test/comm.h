@@ -9,7 +9,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdarg.h>
-#include <stdbool.h>
 
 /* Device vendor headers */
 #include "MKL25Z4.h"
@@ -30,14 +29,14 @@
 #define UART0_RX_BUFSIZ         (3UL)
 
 /* Global variables */
-extern uint8_t g_rxData[UART0_RX_BUFSIZ];
-extern bool g_rxFlag;
+extern uint8_t ucRxData[UART0_RX_BUFSIZ];
+uint8_t ucRxFlag;
 
 
 /* Global function prototypes */
 void UART0_Init(const uint32_t baudrate);
 uint32_t UART0_ReadPolling(void);
-void UART0_printf(const char *p_fmt, ...);
+void UART0_TransmitByte(const char byte);
 void UART0_TransmitPolling(const char *data);
-void CommTask(void *const param);
-void CrcTask(void *const param);
+void vCommTask(void *const param);
+void vCrcTask(void *const param);

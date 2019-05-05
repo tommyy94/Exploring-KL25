@@ -6,7 +6,6 @@
 
 
 /* Global variables */
-QueueHandle_t analogQueue;
 
 
 /* Function descriptions */
@@ -96,36 +95,26 @@ void CMP0_Init(void)
 }
 
 
-void AnalogTask(void *const param)
+QueueHandle_t xAnalogQueue;
+void vSensorTask(void *const param)
 {
     (void)param;
-    struct Sensor sensor;
-    struct Sensor *p_sensor = &sensor;
-    
-    analogQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(struct Sensor));
-    if (analogQueue == NULL)
-    {
-        __BKPT();
-    }
-    
-    ADC0_Init();
-    TPM1_Init();
-    CMP0_Init();
-    HS1101_Init();
+    struct Sensor xSensor;
+    struct Sensor *pxSensor = &xSensor;
     
     for (;;)
     {
         /* Read all sensor values */
-        sensor.humidity = HS1101_ReadHumidity();
-        sensor.temperature = CELSIUS_TEMPERATURE(ADC0_ReadPolling(ADC_CH_AD8));
-        sensor.soil_moisture = SOIL_MOISTURE(ADC0_ReadPolling(ADC_CH_AD9));
-        sensor.potentiometer = ADC0_ReadPolling(ADC_CH_AD12); /* Not printed */
+        xSensor.ulHumidity = HS1101_ReadHumidity();
+        xSensor.ulTemperature = CELSIUS_TEMPERATURE(ADC0_ReadPolling(ADC_CH_AD8));
+        xSensor.ulSoilMoisture = SOIL_MOISTURE(ADC0_ReadPolling(ADC_CH_AD9));
+        xSensor.ulPotentiometer = ADC0_ReadPolling(ADC_CH_AD12); /* Not printed */
         
-        if (analogQueue != 0)
+        if (xAnalogQueue != 0)
         {
-            if (xQueueSend(analogQueue, (void *)&p_sensor, (TickType_t)10) != pdPASS)
+            if (xQueueSend(xAnalogQueue, (void *)&pxSensor, (TickType_t)10) != pdPASS)
             {
-                __BKPT();
+                vErrorHandler(__FILE__, __LINE__);
             }
         }
         

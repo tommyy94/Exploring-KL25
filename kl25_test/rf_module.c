@@ -83,7 +83,7 @@ void RF_SetTransmissionMode(void)
     }
     else
     {
-        _Error_Handler(__FILE__, __LINE__);
+        vErrorHandler(__FILE__, __LINE__);
     }
     
     PORTE->PCR[UART0_TX_PIN] = PORT_PCR_MUX(ALT4);
@@ -126,7 +126,7 @@ void RF_SetReceiverMode(void)
     }
     else
     {
-        _Error_Handler(__FILE__, __LINE__);
+        vErrorHandler(__FILE__, __LINE__);
     }
     
     PORTE->PCR[DATA_IN] = PORT_PCR_MUX(ALT1);

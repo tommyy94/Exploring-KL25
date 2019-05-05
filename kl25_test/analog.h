@@ -15,6 +15,7 @@
 
 /* User headers */
 #include "defines.h"
+#include "system.h"
 #include "hw_timers.h"
 
 /* Global defines */
@@ -76,18 +77,18 @@ enum ADC_Channels
 struct Sensor
 {
     /* TODO: Figure out why volatile keyword is needed */
-    volatile uint32_t temperature;
-    volatile uint32_t humidity;
-    volatile uint32_t soil_moisture;
-    volatile uint32_t potentiometer;
+    volatile uint32_t ulTemperature;
+    volatile uint32_t ulHumidity;
+    volatile uint32_t ulSoilMoisture;
+    volatile uint32_t ulPotentiometer;
 };
 
-extern QueueHandle_t analogQueue;
+extern QueueHandle_t xAnalogQueue;
 
 
 /* Global function prototypes */
 void ADC0_Init(void);
 uint16_t ADC0_ReadPolling(const uint8_t channel);
 void CMP0_Init(void);
-void AnalogTask(void * const param);
+void vSensorTask(void * const param);
 

@@ -163,6 +163,7 @@
     <ClCompile Include="printf-stdarg.c" />
     <ClCompile Include="rf_module.c" />
     <ClCompile Include="hw_timers.c" />
+    <ClCompile Include="system.c" />
     <ClInclude Include="analog.h" />
     <ClInclude Include="comm.h" />
     <ClInclude Include="crc.h" />
@@ -190,6 +191,7 @@
     <ClInclude Include="printf-stdarg.h" />
     <ClInclude Include="rf_module.h" />
     <ClInclude Include="hw_timers.h" />
+    <ClInclude Include="system.h" />
     <None Include="kinetis.props" />
     <ClCompile Include="$(BSP_ROOT)\KL25Z4\StartupFiles\startup.c" />
     <ClCompile Include="$(BSP_ROOT)\KL25Z4\StartupFiles\vectors_KL25Z4.c" />

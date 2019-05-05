@@ -6,14 +6,18 @@
 #define UART0_MAX_MSG_LEN       (128UL)
 
 /* Global variables */
-uint8_t g_rxData[UART0_RX_BUFSIZ];
-bool g_rxFlag = false;
-volatile uint8_t g_rxIndex = 0;
+uint8_t ucRxData[UART0_RX_BUFSIZ];
+uint8_t ucRxFlag = false;
+volatile uint8_t ucRxIndex = 0;
+QueueHandle_t xCommQueue;
 
-QueueHandle_t commQueue;
+struct AMessage
+{
+    uint32_t ulCrc32;
+    char ucCrc32Frame[MAX_FRAME_SIZE];
+    char ucFrame[MAX_FRAME_SIZE];
+} xMessage;
 
-
-__STATIC_INLINE void UART0_TransmitByte(const char byte);
 
 
 /* Function descriptions */
@@ -107,17 +111,17 @@ void UART0_IRQHandler(void)
     
     if (UART0->S1 & UART_S1_RDRF_MASK)
     {
-        g_rxData[g_rxIndex++] = UART0->D;
-        if (g_rxIndex >= UART0_RX_BUFSIZ)
+        ucRxData[ucRxIndex++] = UART0->D;
+        if (ucRxIndex >= UART0_RX_BUFSIZ)
         {
-            g_rxIndex = 0;
-            g_rxFlag = true;
+            ucRxIndex = 0;
+            ucRxFlag = true;
         }
     }
 }
 
 
-__STATIC_INLINE void UART0_TransmitByte(const char byte)
+void UART0_TransmitByte(const char byte)
 {
     while (!(UART0->S1 & UART0_S1_TDRE_MASK))
     {
@@ -142,41 +146,14 @@ void UART0_TransmitPolling(const char *data)
 }
 
 
-void UART0_printf(const char *p_fmt, ...)
-{
-    char string[UART0_MAX_MSG_LEN];
-    va_list xArgp;
-
-    /* Initialize variable arguments */
-    va_start(xArgp, p_fmt);
-
-    /* Format and send string */
-    if (vsprintf(string, p_fmt, xArgp) > 0)
-    {
-        UART0_TransmitPolling(string);
-    }
-
-    va_end(xArgp);
-}
-
-
-struct AMessage
-{
-    char ucFrameID;
-    char ucFrame[MAX_FRAME_SIZE];
-} xMessage;
-
-
-void CommTask(void *const param)
+void vCommTask(void *const param)
 {
     (void)param;
     struct AMessage *pxMessage;
     
-    UART0_Init(9600);
-    
     for (;;)
     {
-        if (xQueueReceive(commQueue, &(pxMessage), (TickType_t) 10))
+        if (xQueueReceive(xCommQueue, &(pxMessage), (TickType_t) 10))
         {
             UART0_TransmitPolling(pxMessage->ucFrame);
         }
@@ -190,47 +167,35 @@ void CommTask(void *const param)
 }
 
 
-void CrcTask(void *const param)
+void vCrcTask(void *const param)
 {
     (void)param;
-    struct Sensor *sensor;
-    crc crc32;
-    char crc32Frame[MAX_FRAME_SIZE];
-    
+    struct Sensor *pxSensor;
     struct AMessage *pxMessage;
-    pxMessage = & xMessage;
-    strncpy(xMessage.ucFrame, "Test", 4);
-    
-    commQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(char *));
-    if (commQueue == NULL)
-    {
-        __BKPT();
-    }
-
-    CRC_Init();
+    pxMessage = &xMessage;
     
     for (;;)
     {
-        if (analogQueue != 0)
+        if (xAnalogQueue != 0)
         {
-            if (xQueueReceive(analogQueue, &sensor, (TickType_t)10))
+            if (xQueueReceive(xAnalogQueue, &pxSensor, (TickType_t)10))
             {
                 /* Build the frame with checksum */
                 //snprintf(pxMessage->ucData, MAX_FRAME_SIZE, "abcdefgh0123456789"); /* For test purposes */
-                snprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%luhum=%lumst=%lu", sensor->temperature, sensor->humidity, sensor->soil_moisture);
+                snprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%luhum=%lumst=%lu", pxSensor->ulTemperature, pxSensor->ulHumidity, pxSensor->ulSoilMoisture);
             }
             else
             {
                 strncpy(pxMessage->ucFrame, "Error receiving from analogQueue!", 27);
             }
             
-            crc32 = CRC_Fast((uint8_t *)pxMessage->ucFrame, strlen(pxMessage->ucFrame));
-            snprintf(crc32Frame, MAX_FRAME_SIZE, "crc32:%x\004", (unsigned int)crc32);
-            strncat(pxMessage->ucFrame, crc32Frame, strlen(crc32Frame));
+            pxMessage->ulCrc32 = CRC_Fast((uint8_t *)pxMessage->ucFrame, strlen(pxMessage->ucFrame));
+            snprintf(pxMessage->ucCrc32Frame, MAX_FRAME_SIZE, "crc32:%x\004", (unsigned int)pxMessage->ulCrc32);
+            strncat(pxMessage->ucFrame, pxMessage->ucCrc32Frame, strlen(pxMessage->ucCrc32Frame));
             
-            if (xQueueSend(commQueue, (void *)&pxMessage, (TickType_t)10) != pdPASS)
+            if (xQueueSend(xCommQueue, (void *)&pxMessage, (TickType_t)10) != pdPASS)
             {
-                __BKPT();
+                vErrorHandler(__FILE__, __LINE__);
             }
         }
         
