@@ -1,6 +1,9 @@
 #include "system.h"
 
 
+TimerHandle_t timerHndl1Sec;
+
+
 void vSystemInit(void)
 {
     /* Analog functionalities */
@@ -15,7 +18,7 @@ void vSystemInit(void)
     CRC_vInit();
 //    RF_vInit();
     
-//    GPIO_vInit();
+    GPIO_vInit();
 }
 
 
@@ -49,7 +52,7 @@ void vCreateTasks(void)
         vErrorHandler(__FILE__, __LINE__);
     }
     
-    if (xTaskCreate(vCommTask, (const char *)"Communication", COMMTASKSIZE / sizeof(portSTACK_TYPE), 0, COMMTASKPRIORITY, &xHandle) != pdPASS)
+    if (xTaskCreate(vCommTask, (const char *)"Commu", COMMTASKSIZE / sizeof(portSTACK_TYPE), 0, COMMTASKPRIORITY, &xHandle) != pdPASS)
     {
         vErrorHandler(__FILE__, __LINE__);
     }
@@ -58,6 +61,28 @@ void vCreateTasks(void)
     {
         vErrorHandler(__FILE__, __LINE__);
     }
+}
+
+
+void vCreateTimers(void)
+{
+    timerHndl1Sec = xTimerCreate("timer1Sec", pdMS_TO_TICKS(1000), pdTRUE, (void*)0, vTimerCallback1SecExpired);
+    if (timerHndl1Sec == NULL)
+    {
+        vErrorHandler(__FILE__, __LINE__);
+    }
+    
+    if (xTimerStart(timerHndl1Sec, 0) != pdPASS)
+    {
+        vErrorHandler(__FILE__, __LINE__);
+    }
+}
+
+
+void vTimerCallback1SecExpired(TimerHandle_t pxTimer)
+{
+    (void)pxTimer;
+    FGPIOD->PTOR = MASK(SIGNAL_SHIFT);
 }
 
 
@@ -70,7 +95,7 @@ void vErrorHandler(char *file, int line)
     /* Use debug view to read variables */
     __BKPT(255);
 
-    while (1)
+    for (;;)
     {
     }
 }

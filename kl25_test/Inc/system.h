@@ -7,11 +7,13 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "timers.h"
 
 /* User headers */
 #include "analog.h"
 #include "crc.h"
 #include "comm.h"
+#include "gpio.h"
 
 
 /* Global defines */
@@ -37,10 +39,13 @@
 /* Global variables */
 extern QueueHandle_t xCommQueue;
 extern QueueHandle_t xAnalogQueue;
+extern TimerHandle_t timerHndl1Sec;
     
 
 /* Global function prototypes */
 void vSystemInit();
 void vCreateQueues(void);
 void vCreateTasks(void);
+void vCreateTimers(void);
 void vErrorHandler(char *file, int line);
+void vTimerCallback1SecExpired(TimerHandle_t pxTimer);

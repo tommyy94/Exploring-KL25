@@ -8,6 +8,7 @@
 /* Global variables */
 
 
+/* TODO: Figure out correct/adjustable duty cycle and period */
 /* Initialized to PWM mode. */
 void TPM0_vInit(uint16_t usPeriod)
 {
@@ -119,6 +120,7 @@ void TPM1_IRQHandler(void)
 }
 
 
+/* TODO: Add FreeRTOS software timers */
 /* TODO: Disable TMP0 when not used */
 void vMotorTask(void *const param)
 {

@@ -1,8 +1,4 @@
-﻿/**
- * Display uptime, soil moisture, humidity and temperature in LCD.
- * Send the data to database/web server.
- */
-#include <includes.h>
+﻿#include <includes.h>
 
 
 int main(void)
@@ -10,9 +6,10 @@ int main(void)
     vSystemInit();
     vCreateTasks();
     vCreateQueues();
+    vCreateTimers();
     vTaskStartScheduler();
     
-    while (1)
+    for (;;)
     {
         ; /* Should not get here! */
     }
