@@ -5,6 +5,7 @@ void vSystemInit(void)
 {
     /* Analog functionalities */
     ADC0_vInit();
+    TPM0_vInit(4800);
     TPM1_vInit();
     CMP0_vInit();
     HS1101_vInit();
@@ -49,6 +50,11 @@ void vCreateTasks(void)
     }
     
     if (xTaskCreate(vCommTask, (const char *)"Communication", COMMTASKSIZE / sizeof(portSTACK_TYPE), 0, COMMTASKPRIORITY, &xHandle) != pdPASS)
+    {
+        vErrorHandler(__FILE__, __LINE__);
+    }
+    
+    if (xTaskCreate(vMotorTask, (const char *)"Motor", MOTORTASKSIZE / sizeof(portSTACK_TYPE), 0, MOTORTASKPRIORITY, &xHandle) != pdPASS)
     {
         vErrorHandler(__FILE__, __LINE__);
     }

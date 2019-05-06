@@ -62,6 +62,7 @@ void RF_vSetIdleMode(void)
 }
 
 
+/* NOTE: Scheduler must be started before using these functions */
 /* Power consumption 11.5 mA */
 void RF_vSetTransmissionMode(void)
 {
