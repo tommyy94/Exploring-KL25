@@ -3,10 +3,13 @@
 
 int main(void)
 {
+    static TimerHandle_t xMotorTimers[MOTOR_COUNT];
+    
     vSystemInit();
-    vCreateTasks();
     vCreateQueues();
-    vCreateTimers();
+    vCreateEvents();
+    vCreateTimers(xMotorTimers);
+    vCreateTasks(xMotorTimers);
     vTaskStartScheduler();
     
     for (;;)

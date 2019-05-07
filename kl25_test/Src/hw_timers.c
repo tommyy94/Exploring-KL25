@@ -42,15 +42,52 @@ void TPM0_vInit(uint16_t usPeriod)
 }
 
 
-void TPM0_vStartPWM(uint8_t channel)
+void TPM0_vStartPWM(uint8_t ucChannel, TimerHandle_t *pxMotorTimers)
 {
-    PORTD->PCR[channel] |= PORT_PCR_MUX(ALT4);
+    /* Start software timer */
+    if (xTimerStart(pxMotorTimers[ucChannel], (TickType_t)0) != pdPASS)
+    {
+        vErrorHandler(__FILE__, __LINE__);
+    }
+    
+    /* Enable PWM output on channel */
+    PORTD->PCR[ucChannel] |= PORT_PCR_MUX(ALT4);
 }
 
 
-void TPM0_vStopPWM(uint8_t channel)
+void TPM0_vStopPWM(uint8_t ucChannel, TimerHandle_t *pxMotorTimers)
 {
-    PORTD->PCR[channel] &= ~PORT_PCR_MUX(ALT4);
+    /* Stop software timer */
+    if (xTimerStop(pxMotorTimers[ucChannel], (TickType_t)0) != pdPASS)
+    {
+        vErrorHandler(__FILE__, __LINE__);
+    }
+    
+    /* Disable PWM output on channel */
+    PORTD->PCR[ucChannel] &= ~PORT_PCR_MUX(ALT4);
+}
+
+
+/* TODO: Remove polling implementation of getting event bits */
+void vMotorTask(void *const vMotorTimers)
+{
+    EventBits_t uxBits;
+    const TickType_t xTicksToWait = 100 / portTICK_PERIOD_MS;
+    EventBits_t xMotorId = 0; /* Get from queue */
+    
+    TPM0_vStartPWM(TPM0_CH0_PWM_PIN, (TimerHandle_t *)vMotorTimers);
+    for (;;)
+    {
+        /* Get xMotorId from queue here */
+        
+        uxBits = xEventGroupWaitBits(xMotorEventGroup, MASK(xMotorId), pdTRUE, pdFALSE, xTicksToWait);
+        if (uxBits & (MASK(0) == MASK(0)))
+        {
+            TPM0_vStopPWM(0, (TimerHandle_t *)vMotorTimers);
+        }
+        
+        vTaskDelay(MSEC_TO_TICK(100));
+    }
 }
 
 
@@ -117,20 +154,4 @@ void TPM1_IRQHandler(void)
     /* Reset all flags */
     TPM1->STATUS |= TPM_STATUS_TOF_MASK | TPM_STATUS_CH1F_MASK;
     TPM1->CONTROLS[1].CnSC |= TPM_CnSC_CHF(1);
-}
-
-
-/* TODO: Add FreeRTOS software timers */
-/* TODO: Disable TMP0 when not used */
-void vMotorTask(void *const param)
-{
-    (void)param;
-    
-    for (;;)
-    {
-        TPM0_vStartPWM(TPM0_CH0_PWM_PIN);
-        vTaskDelay(MSEC_TO_TICK(500));
-        TPM0_vStopPWM(TPM0_CH0_PWM_PIN);
-        vTaskDelay(MSEC_TO_TICK(500));
-    }
 }

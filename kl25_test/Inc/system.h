@@ -8,8 +8,10 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "timers.h"
+#include "event_groups.h"
 
 /* User headers */
+#include "defines.h"
 #include "analog.h"
 #include "crc.h"
 #include "comm.h"
@@ -30,7 +32,7 @@
 #define COMMTASKSIZE 1024
 #define COMMTASKPRIORITY 3
     
-#define MOTORTASKSIZE 256
+#define MOTORTASKSIZE 1024
 #define MOTORTASKPRIORITY 4
 
 #define MAX_QUEUE_SIZE      (32UL)
@@ -39,13 +41,14 @@
 /* Global variables */
 extern QueueHandle_t xCommQueue;
 extern QueueHandle_t xAnalogQueue;
-extern TimerHandle_t timerHndl1Sec;
+extern EventGroupHandle_t xMotorEventGroup;
     
 
 /* Global function prototypes */
 void vSystemInit();
 void vCreateQueues(void);
-void vCreateTasks(void);
-void vCreateTimers(void);
+void vCreateEvents(void);
+void vCreateTasks(void *pvParameters);
+void vCreateTimers(TimerHandle_t *pxTimers);
 void vErrorHandler(char *file, int line);
-void vTimerCallback1SecExpired(TimerHandle_t pxTimer);
+void vTimerCallback(TimerHandle_t xTimer);

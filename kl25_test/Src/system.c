@@ -1,9 +1,6 @@
 #include "system.h"
 
 
-TimerHandle_t timerHndl1Sec;
-
-
 void vSystemInit(void)
 {
     /* Analog functionalities */
@@ -18,7 +15,7 @@ void vSystemInit(void)
     CRC_vInit();
 //    RF_vInit();
     
-    GPIO_vInit();
+//    GPIO_vInit();
 }
 
 
@@ -38,7 +35,18 @@ void vCreateQueues(void)
 }
 
 
-void vCreateTasks(void)
+EventGroupHandle_t xMotorEventGroup;
+void vCreateEvents(void)
+{
+    xMotorEventGroup = xEventGroupCreate();
+    if (xMotorEventGroup == NULL)
+    {
+        vErrorHandler(__FILE__, __LINE__);
+    }
+}
+
+
+void vCreateTasks(void *pvParameters)
 {
     TaskHandle_t xHandle;
     
@@ -57,32 +65,37 @@ void vCreateTasks(void)
         vErrorHandler(__FILE__, __LINE__);
     }
     
-    if (xTaskCreate(vMotorTask, (const char *)"Motor", MOTORTASKSIZE / sizeof(portSTACK_TYPE), 0, MOTORTASKPRIORITY, &xHandle) != pdPASS)
+    if (xTaskCreate(vMotorTask, (const char *)"Motor", MOTORTASKSIZE / sizeof(portSTACK_TYPE), pvParameters, MOTORTASKPRIORITY, &xHandle) != pdPASS)
     {
         vErrorHandler(__FILE__, __LINE__);
     }
 }
 
 
-void vCreateTimers(void)
+void vCreateTimers(TimerHandle_t *pxTimers)
 {
-    timerHndl1Sec = xTimerCreate("timer1Sec", pdMS_TO_TICKS(1000), pdTRUE, (void*)0, vTimerCallback1SecExpired);
-    if (timerHndl1Sec == NULL)
+    for (uint32_t i = 0; i < MOTOR_COUNT; i++)
     {
-        vErrorHandler(__FILE__, __LINE__);
+        /* TODO: Format timer names */
+        pxTimers[i] = xTimerCreate("Motor Timer", pdMS_TO_TICKS(100), pdTRUE, (void *)i, vTimerCallback);
+        if (pxTimers[i] == NULL)
+        {
+            vErrorHandler(__FILE__, __LINE__);
+        }
     }
+}
+
+
+void vTimerCallback(TimerHandle_t xTimer)
+{
+    EventBits_t uxBits;
+    const uint32_t xTimerId = (uint32_t)pvTimerGetTimerID(xTimer);
     
-    if (xTimerStart(timerHndl1Sec, 0) != pdPASS)
+    uxBits = xEventGroupSetBits(xMotorEventGroup, MASK(xTimerId));
+    if (uxBits & (MASK(xTimerId) != MASK(xTimerId)))
     {
         vErrorHandler(__FILE__, __LINE__);
     }
-}
-
-
-void vTimerCallback1SecExpired(TimerHandle_t pxTimer)
-{
-    (void)pxTimer;
-    FGPIOD->PTOR = MASK(SIGNAL_SHIFT);
 }
 
 

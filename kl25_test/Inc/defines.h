@@ -54,3 +54,7 @@ enum AlternativeFunctions
     ALT7,
     RESET
 };
+
+
+/* Motors */
+#define MOTOR_COUNT (1UL)
