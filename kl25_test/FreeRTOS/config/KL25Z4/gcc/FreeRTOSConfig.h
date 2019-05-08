@@ -116,7 +116,7 @@
 #define configUSE_TRACE_FACILITY                  0
 #define configUSE_TRACE_HOOKS                     0 /* not using Percepio Trace hooks */
 #define configUSE_STATS_FORMATTING_FUNCTIONS      (configUSE_TRACE_FACILITY || configGENERATE_RUN_TIME_STATS)
-#define configUSE_16_BIT_TICKS                    0
+#define configUSE_16_BIT_TICKS                    1
 #define configIDLE_SHOULD_YIELD                   1
 #define configUSE_CO_ROUTINES                     0
 #define configUSE_MUTEXES                         1

@@ -19,6 +19,9 @@
 #include "hw_timers.h"
 
 /* Global defines */
+#define SOIL_MOISTURE_SENSOR_COUNT              (1UL)
+#define SOIL_MOISTURE_THRESHOLD                 (30UL)
+
 /* ADC0 trigger sources */
 #define SIM_SOPT7_ADC0TRGSEL_EXTRG_IN   	    (0x00)       	/* External trigger pin input (EXTRG_IN) */	
 #define SIM_SOPT7_ADC0TRGSEL_CMP0_OUT   	    (0x01)       	/* CMP0 output */
@@ -79,7 +82,7 @@ struct Sensor
     /* TODO: Figure out why volatile keyword is needed */
     volatile uint32_t ulTemperature;
     volatile uint32_t ulHumidity;
-    volatile uint32_t ulSoilMoisture;
+    volatile uint32_t ulSoilMoisture[SOIL_MOISTURE_SENSOR_COUNT];
     volatile uint32_t ulPotentiometer;
 };
 

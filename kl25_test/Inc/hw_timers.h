@@ -22,6 +22,11 @@
 /* Global defines */
 
 /* Global variables */
+struct Motor_States
+{
+    uint8_t ucMotorState[MOTOR_COUNT];
+    uint8_t ucMotorRunTime[MOTOR_COUNT];
+};
 
 /* Global function prototypes */
 void TPM0_vInit(uint16_t usPeriod);

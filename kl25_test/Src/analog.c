@@ -7,6 +7,7 @@
 
 /* Global variables */
 QueueHandle_t xAnalogQueue;
+QueueHandle_t xMotorQueue;
 
 
 /* Function descriptions */
@@ -101,18 +102,47 @@ void vSensorTask(void *const param)
     (void)param;
     struct Sensor xSensor;
     struct Sensor *pxSensor = &xSensor;
+
+    struct Motor_States xMotors;
+    struct Motor_States *pxMotors = &xMotors;
+    
+    /* TODO: Figure out why static is must */
+    static uint8_t ucSoilMoistureChannels[] = {ADC_CH_AD9};
     
     for (;;)
     {
         /* Read all sensor values */
+        xSensor.ulPotentiometer = ADC0_usReadPolling(ADC_CH_AD12); /* Not printed */
         xSensor.ulHumidity = HS1101_ulReadHumidity();
         xSensor.ulTemperature = CELSIUS_TEMPERATURE(ADC0_usReadPolling(ADC_CH_AD8));
-        xSensor.ulSoilMoisture = SOIL_MOISTURE(ADC0_usReadPolling(ADC_CH_AD9));
-        xSensor.ulPotentiometer = ADC0_usReadPolling(ADC_CH_AD12); /* Not printed */
+        for (uint8_t i = 0; i < SOIL_MOISTURE_SENSOR_COUNT; i++)
+        {
+            /* TODO: Figure out why volatile is must */
+            volatile uint8_t ch = ucSoilMoistureChannels[i];
+            xSensor.ulSoilMoisture[i] = SOIL_MOISTURE(ADC0_usReadPolling(ch));
+        }
         
         if (xAnalogQueue != 0)
         {
             if (xQueueSend(xAnalogQueue, (void *)&pxSensor, (TickType_t)10) != pdPASS)
+            {
+                vErrorHandler(__FILE__, __LINE__);
+            }
+        }
+        
+        for (uint8_t i = 0; i < SOIL_MOISTURE_SENSOR_COUNT; i++)
+        {
+            if (xSensor.ulSoilMoisture[i] < SOIL_MOISTURE_THRESHOLD)
+            {
+                xMotors.ucMotorState[i] = TRUE;
+                
+                /* Compute motor run time here */
+            }
+        }
+        
+        if (xMotorQueue != 0)
+        {
+            if (xQueueSend(xMotorQueue, (void *)&pxMotors, (TickType_t)10) != pdPASS)
             {
                 vErrorHandler(__FILE__, __LINE__);
             }

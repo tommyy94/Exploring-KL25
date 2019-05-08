@@ -1,6 +1,10 @@
 #include "system.h"
 
 
+/* Global variables */
+EventGroupHandle_t xMotorEventGroup;
+
+
 void vSystemInit(void)
 {
     /* Analog functionalities */
@@ -32,10 +36,18 @@ void vCreateQueues(void)
     {
         vErrorHandler(__FILE__, __LINE__);
     }
+    
+    xMotorQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(char *));
+    if (xMotorQueue == NULL)
+    {
+        vErrorHandler(__FILE__, __LINE__);
+    }
 }
 
 
-EventGroupHandle_t xMotorEventGroup;
+/**
+ * Creates 8-bit Event Groups.
+ */
 void vCreateEvents(void)
 {
     xMotorEventGroup = xEventGroupCreate();

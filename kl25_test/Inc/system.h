@@ -24,16 +24,16 @@
 #define TICKS_TO_MSEC(tick) ((tick)*1000uL/(uint32_t)configTICK_RATE_HZ)
     
 #define ANALOGTASKSIZE 1024
-#define ANALOGTASKPRIORITY 1
+#define ANALOGTASKPRIORITY 2
     
 #define CRCTASKSIZE 1024
-#define CRCTASKPRIORITY 2
+#define CRCTASKPRIORITY 3
     
 #define COMMTASKSIZE 1024
-#define COMMTASKPRIORITY 3
+#define COMMTASKPRIORITY 4
     
 #define MOTORTASKSIZE 1024
-#define MOTORTASKPRIORITY 4
+#define MOTORTASKPRIORITY 1
 
 #define MAX_QUEUE_SIZE      (32UL)
 
@@ -41,6 +41,7 @@
 /* Global variables */
 extern QueueHandle_t xCommQueue;
 extern QueueHandle_t xAnalogQueue;
+extern QueueHandle_t xMotorQueue;
 extern EventGroupHandle_t xMotorEventGroup;
     
 

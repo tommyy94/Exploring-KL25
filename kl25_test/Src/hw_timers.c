@@ -6,6 +6,7 @@
 #define TPM1_IC_PIN         (13UL)
 
 /* Global variables */
+QueueHandle_t xMotorQueue;
 
 
 /* TODO: Figure out correct/adjustable duty cycle and period */
@@ -68,22 +69,33 @@ void TPM0_vStopPWM(uint8_t ucChannel, TimerHandle_t *pxMotorTimers)
 }
 
 
-/* TODO: Remove polling implementation of getting event bits */
 void vMotorTask(void *const vMotorTimers)
 {
     EventBits_t uxBits;
-    const TickType_t xTicksToWait = 100 / portTICK_PERIOD_MS;
-    EventBits_t xMotorId = 0; /* Get from queue */
+    const TickType_t xTicksToWait = 10 / portTICK_PERIOD_MS;
+    struct Motor_States *pxMotors;
     
-    TPM0_vStartPWM(TPM0_CH0_PWM_PIN, (TimerHandle_t *)vMotorTimers);
     for (;;)
     {
-        /* Get xMotorId from queue here */
-        
-        uxBits = xEventGroupWaitBits(xMotorEventGroup, MASK(xMotorId), pdTRUE, pdFALSE, xTicksToWait);
-        if (uxBits & (MASK(0) == MASK(0)))
+        if (xQueueReceive(xMotorQueue, &pxMotors, (TickType_t)10))
         {
-            TPM0_vStopPWM(0, (TimerHandle_t *)vMotorTimers);
+            for (uint8_t i = 0; i < MOTOR_COUNT; i++)
+            {
+                if (pxMotors->ucMotorState[i] == TRUE)
+                {
+                    TPM0_vStartPWM(i, (TimerHandle_t *)vMotorTimers);
+                }
+            }
+        }
+        
+        uxBits = xEventGroupWaitBits(xMotorEventGroup, 0xF, pdTRUE, pdFALSE, xTicksToWait);
+        for (uint8_t i = 0; i < MOTOR_COUNT; i++)
+        {
+            if (uxBits & (MASK(i) == MASK(i)))
+            {
+                pxMotors->ucMotorState[i] = FALSE;
+                TPM0_vStopPWM(i, (TimerHandle_t *)vMotorTimers);
+            }
         }
         
         vTaskDelay(MSEC_TO_TICK(100));
