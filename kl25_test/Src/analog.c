@@ -107,7 +107,7 @@ void vSensorTask(void *const param)
     struct Motor_States *pxMotors = &xMotors;
     
     /* TODO: Figure out why static is must */
-    static uint8_t ucSoilMoistureChannels[] = {ADC_CH_AD9};
+    uint8_t ucSoilMoistureChannels[] = {ADC_CH_AD9};
     
     for (;;)
     {
@@ -118,8 +118,7 @@ void vSensorTask(void *const param)
         for (uint8_t i = 0; i < SOIL_MOISTURE_SENSOR_COUNT; i++)
         {
             /* TODO: Figure out why volatile is must */
-            volatile uint8_t ch = ucSoilMoistureChannels[i];
-            xSensor.ulSoilMoisture[i] = SOIL_MOISTURE(ADC0_usReadPolling(ch));
+            xSensor.ulSoilMoisture[i] = SOIL_MOISTURE(ADC0_usReadPolling(ucSoilMoistureChannels[i]));
         }
         
         if (xAnalogQueue != 0)
