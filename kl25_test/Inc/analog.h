@@ -19,7 +19,6 @@
 #include "hw_timers.h"
 
 /* Global defines */
-#define SOIL_MOISTURE_SENSOR_COUNT              (1UL)
 #define SOIL_MOISTURE_THRESHOLD                 (30UL)
 
 /* ADC0 trigger sources */
@@ -90,6 +89,6 @@ extern QueueHandle_t xAnalogQueue;
 
 /* Global function prototypes */
 void ADC0_vInit(void);
-uint16_t ADC0_usReadPolling(const uint8_t channel);
+uint16_t ADC0_usReadPolling(const uint8_t ucChannel);
 void CMP0_vInit(void);
-void vSensorTask(void * const param);
+void vSensorTask(void * const pvParam);

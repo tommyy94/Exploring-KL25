@@ -9,8 +9,14 @@
 QueueHandle_t xMotorQueue;
 
 
-/* TODO: Figure out correct/adjustable duty cycle and period */
-/* Initialized to PWM mode. */
+/**
+ * @brief   Initialize TPM0 to PWM.
+ * 
+ * @param   usPeriod    PWM period
+ * 
+ * @return  None
+ * @todo    Figure out correct/adjustable duty cycle and period.
+ */
 void TPM0_vInit(uint16_t usPeriod)
 {
     /* Turn on clock gating for TPM0 and PORTD */
@@ -21,7 +27,10 @@ void TPM0_vInit(uint16_t usPeriod)
     SIM->SOPT2 |= SIM_SOPT2_TPMSRC(1) | SIM_SOPT2_PLLFLLSEL_MASK;
 
     /* Select pin multiplexer for TPM0 */
-    PORTD->PCR[TPM0_CH0_PWM_PIN] |= PORT_PCR_MUX(ALT4);
+    for (uint8_t i = 0; i < MOTOR_COUNT; i++)
+    {
+        PORTD->PCR[i] |= PORT_PCR_MUX(ALT4);
+    }
     
     /* Load counter */
     TPM0->MOD |= usPeriod - 1;
@@ -43,6 +52,14 @@ void TPM0_vInit(uint16_t usPeriod)
 }
 
 
+/**
+ * @brief   Starts PWM on target channel.
+ * 
+ * @param   ucChannel       PWM channel
+ * @param   pxMotorTimers   Pointer to FreeRTOS software timers.
+ * 
+ * @return  None
+ */
 void TPM0_vStartPWM(uint8_t ucChannel, TimerHandle_t *pxMotorTimers)
 {
     /* Start software timer */
@@ -55,7 +72,14 @@ void TPM0_vStartPWM(uint8_t ucChannel, TimerHandle_t *pxMotorTimers)
     PORTD->PCR[ucChannel] |= PORT_PCR_MUX(ALT4);
 }
 
-
+/**
+ * @brief   Stops PWM on target channel.
+ * 
+ * @param   ucChannel       PWM channel
+ * @param   pxMotorTimers   Pointer to FreeRTOS software timers.
+ * 
+ * @return  None
+ */
 void TPM0_vStopPWM(uint8_t ucChannel, TimerHandle_t *pxMotorTimers)
 {
     /* Stop software timer */
@@ -69,7 +93,14 @@ void TPM0_vStopPWM(uint8_t ucChannel, TimerHandle_t *pxMotorTimers)
 }
 
 
-void vMotorTask(void *const vMotorTimers)
+/**
+ * @brief   Starts PWM on target channel.
+ * 
+ * @param   vMotorTimers   Pointer to FreeRTOS software timers.
+ * 
+ * @return  None
+ */
+void vMotorTask(void *const pvMotorTimers)
 {
     EventBits_t uxBits;
     const TickType_t xTicksToWait = 10 / portTICK_PERIOD_MS;
@@ -83,7 +114,7 @@ void vMotorTask(void *const vMotorTimers)
             {
                 if (pxMotors->ucMotorState[i] == TRUE)
                 {
-                    TPM0_vStartPWM(i, (TimerHandle_t *)vMotorTimers);
+                    TPM0_vStartPWM(i, (TimerHandle_t *)pvMotorTimers);
                 }
             }
         }
@@ -94,7 +125,7 @@ void vMotorTask(void *const vMotorTimers)
             if (uxBits & (MASK(i) == MASK(i)))
             {
                 pxMotors->ucMotorState[i] = FALSE;
-                TPM0_vStopPWM(i, (TimerHandle_t *)vMotorTimers);
+                TPM0_vStopPWM(i, (TimerHandle_t *)pvMotorTimers);
             }
         }
         
@@ -103,7 +134,13 @@ void vMotorTask(void *const vMotorTimers)
 }
 
 
-/* Initialized to Input Capture mode. */
+/**
+ * @brief   Initialize TPM1 to Input Capture mode.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
 void TPM1_vInit(void)
 {
     /* Turn on clock gating for TPM1 and PORTA */
@@ -139,6 +176,14 @@ void TPM1_vInit(void)
 }
 
 
+/**
+ * @brief   TPM1 IRQ Handler used to capture CMP0 output.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ * @todo    Convert capacitor value (ulHS1101_value) to humidity.
+ */
 void TPM1_IRQHandler(void)
 {
     static uint32_t ulOverflows = 0;
@@ -154,7 +199,7 @@ void TPM1_IRQHandler(void)
         /* Stop TPM1 */
         TPM1->SC &= ~TPM_SC_CMOD_MASK;
         
-        /* TODO: Convert this capacitor value to humidity */
+        /* Read humidity */
         ulHS1101_value = TPM1->CONTROLS[1].CnV;
         
         /* Reset counter */

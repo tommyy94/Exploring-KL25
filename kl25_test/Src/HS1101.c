@@ -9,12 +9,18 @@ volatile uint32_t ulHS1101_value = 0;
 volatile uint8_t ulHS1101_flag = FALSE;
 
 /* Local function prototypes */
-static void HS1101_SendSignal(void);
+static void HS1101_vSendSignal(void);
+
 
 /* Function descriptions */
+
 /**
- * This function simply sets ports output & writes high to memory 
- * so multiplexing pins sets pin high.
+ * @brief   This function simply sets ports output & writes high to memory so
+ * multiplexing pins sets pin high.
+ * 
+ * @param   None
+ * 
+ * @return  None
  */
 void HS1101_vInit(void)
 {
@@ -24,14 +30,19 @@ void HS1101_vInit(void)
 
 
 /**
- * This function is written in assembly to minimize time between sending
+ * @brief   This function is written in assembly to minimize time between sending
  * start signal and starting TMP1 to get most accurate timer value as possible.
  * 
- * TODO: Calibrate humidity sensor
- * TODO: Figure CPU register usage
- * TODO: Figure out parameters to inline assembly
+ * @param   None
+ * 
+ * @return  None
+ * 
+ * @todo    Calibrate humidity sensor
+ * @todo    Figure CPU register usage
+ * @todo    Figure out parameters to inline assembly
+ * @todo    Fix this shit
  */
-static void HS1101_SendSignal(void)
+static void HS1101_vSendSignal(void)
 {
 //    __ASM(
 //        /* Initialize hw registers first */
@@ -68,11 +79,18 @@ static void HS1101_SendSignal(void)
 }
 
 
+/**
+ * @brief   Read variable capacitor HS1101 using CMP0 and TMP0.
+ * 
+ * @param   None
+ * 
+ * @return  ulHumid     Air humidity value.
+ */
 uint32_t HS1101_ulReadHumidity(void)
 {
-    uint32_t humid = 0;
+    uint32_t ulHumid = 0;
     
-    HS1101_SendSignal();
+    HS1101_vSendSignal();
     
     /* TODO: Add timeout */
     while (!ulHS1101_flag)
@@ -82,7 +100,7 @@ uint32_t HS1101_ulReadHumidity(void)
     
     ulHS1101_flag = FALSE;
     
-    humid = HUMIDITY_FORMULA(ulHS1101_value);
+    ulHumid = HUMIDITY_FORMULA(ulHS1101_value);
     
-    return (humid);
+    return (ulHumid);
 }

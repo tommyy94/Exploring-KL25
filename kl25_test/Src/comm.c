@@ -21,7 +21,15 @@ struct AMessage
 
 
 /* Function descriptions */
-void UART0_vInit(const uint32_t baudrate)
+
+/**
+ * @brief   Initialize UART0 peripheral.
+ * 
+ * @param   ulBaudrate      Used baud rate
+ * 
+ * @return  None
+ */
+void UART0_vInit(const uint32_t ulBaudrate)
 {
     register uint16_t sbr;
     
@@ -44,7 +52,7 @@ void UART0_vInit(const uint32_t baudrate)
      * Set baudrate
      * Set oversampling ratio
      */
-    sbr = (uint16_t)(SystemCoreClock / (baudrate * UART0_OVERSAMPLE_RATE));
+    sbr = (uint16_t)(SystemCoreClock / (ulBaudrate * UART0_OVERSAMPLE_RATE));
     UART0->BDH &= ~UART0_BDH_SBR_MASK;
     UART0->BDH |= UART0_BDH_SBR(sbr >> 8);
     UART0->BDL = UART0_BDL_SBR(sbr);
@@ -87,6 +95,14 @@ void UART0_vInit(const uint32_t baudrate)
 }
 
 
+/**
+ * @brief   Read character from serial port by polling.
+ * 
+ * @param   None
+ * 
+ * @return  Character received from serial port.
+ * @note    Unused.
+ */
 uint32_t UART0_ulReadPolling(void)
 {
     while (!(UART0->S1 & UART0_S1_RDRF_MASK))
@@ -98,6 +114,13 @@ uint32_t UART0_ulReadPolling(void)
 }
 
 
+/**
+ * @brief   UART0 IRQ Handler triggered by RX.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
 void UART0_IRQHandler(void)
 {
     if (UART0->S1 & (UART_S1_OR_MASK | UART_S1_NF_MASK | UART_S1_FE_MASK | UART_S1_PF_MASK))
@@ -121,7 +144,14 @@ void UART0_IRQHandler(void)
 }
 
 
-void UART0_vTransmitByte(const char byte)
+/**
+ * @brief   Send character to UART0 serial port by polling.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+void UART0_vTransmitByte(const char ucByte)
 {
     while (!(UART0->S1 & UART0_S1_TDRE_MASK))
     {
@@ -129,26 +159,40 @@ void UART0_vTransmitByte(const char byte)
     } 
         
     /* Send character */
-    UART0->D = byte;
+    UART0->D = ucByte;
 }
 
 
-void UART0_vTransmitPolling(const char *data)
+/**
+ * @brief   Send string to UART0 serial port by polling.
+ * 
+ * @param   pcData      String to send
+ * 
+ * @return  None
+ */
+void UART0_vTransmitPolling(const char *pcData)
 {
     /* Find size of array */
-    uint16_t dataLen = (uint16_t)strlen(data);
+    uint16_t dataLen = (uint16_t)strlen(pcData);
     
     /* Send the array of characters */
     for (uint16_t i = 0; i < dataLen; i++)
     {
-        UART0_vTransmitByte(data[i]);
+        UART0_vTransmitByte(pcData[i]);
     }
 }
 
 
-void vCommTask(void *const param)
+/**
+ * @brief   FreeRTOS communication task.
+ * 
+ * @param   pvParam     Unused.
+ * 
+ * @return  None
+ */
+void vCommTask(void *const pvParam)
 {
-    (void)param;
+    (void)pvParam;
     struct AMessage *pxMessage;
     
     for (;;)
@@ -167,9 +211,16 @@ void vCommTask(void *const param)
 }
 
 
-void vCrcTask(void *const param)
+/**
+ * @brief   FreeRTOS Cyclic Redundancy Check task.
+ * 
+ * @param   pvParam     Unused.
+ * 
+ * @return  None
+ */
+void vCrcTask(void *const pvParam)
 {
-    (void)param;
+    (void)pvParam;
     struct Sensor *pxSensor;
     struct AMessage *pxMessage;
     pxMessage = &xMessage;

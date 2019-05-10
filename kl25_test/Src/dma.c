@@ -2,7 +2,15 @@
 
 
 /* Function descriptions */
-void DMA0_vInit(uint32_t *dstAddr)
+
+/**
+ * @brief   Initialize DMA for ADC0. Unused.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+void DMA0_vInit(uint32_t *pulDstAddr)
 {
     /* Turn on clock to DMA0 & DMAMUX */
     SIM->SCGC7 |= SIM_SCGC7_DMA_MASK;
@@ -24,7 +32,7 @@ void DMA0_vInit(uint32_t *dstAddr)
     
     /* Initialize src & dst pointers */
     DMA0->DMA[0].SAR = DMA_SAR_SAR((uint32_t)(&(ADC0->R[0])));
-    DMA0->DMA[0].DAR = DMA_DAR_DAR((uint32_t)dstAddr);
+    DMA0->DMA[0].DAR = DMA_DAR_DAR((uint32_t)pulDstAddr);
     
     /* Byte count */
     DMA0->DMA[0].DSR_BCR = DMA_DSR_BCR_BCR(2);
@@ -42,6 +50,13 @@ void DMA0_vInit(uint32_t *dstAddr)
 }
 
 
+/**
+ * @brief   DMA0 IRQ Handler for transfer completion.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
 void DMA0_IRQHandler(void)
 {
     NVIC_ClearPendingIRQ(DMA0_IRQn);

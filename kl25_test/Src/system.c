@@ -5,6 +5,13 @@
 EventGroupHandle_t xMotorEventGroup;
 
 
+/**
+ * @brief   Initialize system hardware.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
 void vSystemInit(void)
 {
     /* Analog functionalities */
@@ -23,6 +30,13 @@ void vSystemInit(void)
 }
 
 
+/**
+ * @brief   Create FreeRTOS queues.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
 void vCreateQueues(void)
 {
     xAnalogQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(struct Sensor));
@@ -46,7 +60,11 @@ void vCreateQueues(void)
 
 
 /**
- * Creates 8-bit Event Groups.
+ * @brief   Create 8-bit FreeRTOS Event Groups.
+ * 
+ * @param   None
+ * 
+ * @return  None
  */
 void vCreateEvents(void)
 {
@@ -58,6 +76,13 @@ void vCreateEvents(void)
 }
 
 
+/**
+ * @brief   Create FreeRTOS tasks.
+ * 
+ * @param   pvParameters    FreeRTOS software timers for Motor Task.
+ * 
+ * @return  None
+ */
 void vCreateTasks(void *pvParameters)
 {
     TaskHandle_t xHandle;
@@ -84,11 +109,18 @@ void vCreateTasks(void *pvParameters)
 }
 
 
+/**
+ * @brief   Create FreeRTOS software timers.
+ * 
+ * @param   pxTimers    Pointer to FreeRTOS software timers.
+ * 
+ * @return  None
+ * @todo    Format timer names
+ */
 void vCreateTimers(TimerHandle_t *pxTimers)
 {
     for (uint32_t i = 0; i < MOTOR_COUNT; i++)
     {
-        /* TODO: Format timer names */
         pxTimers[i] = xTimerCreate("Motor Timer", pdMS_TO_TICKS(100), pdTRUE, (void *)i, vTimerCallback);
         if (pxTimers[i] == NULL)
         {
@@ -98,6 +130,13 @@ void vCreateTimers(TimerHandle_t *pxTimers)
 }
 
 
+/**
+ * @brief   FreeRTOS software timer callback.
+ * 
+ * @param   xTimer  Handle to callee software timer.
+ * 
+ * @return  None
+ */
 void vTimerCallback(TimerHandle_t xTimer)
 {
     EventBits_t uxBits;
@@ -111,6 +150,14 @@ void vTimerCallback(TimerHandle_t xTimer)
 }
 
 
+/**
+ * @brief   System error handler.
+ * 
+ * @param   file    File name where error occurred
+ * @param   line    Line where error occurred
+ * 
+ * @return  None
+ */
 void vErrorHandler(char *file, int line)
 {
     /* Supress -Wunused-parameter */

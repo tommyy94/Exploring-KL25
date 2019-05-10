@@ -33,4 +33,4 @@ void TPM0_vInit(uint16_t usPeriod);
 void TPM0_vStartPWM(uint8_t ucChannel, TimerHandle_t *pxMotorTimers);
 void TPM0_vStopPWM(uint8_t ucChannel, TimerHandle_t *pxMotorTimers);
 void TPM1_vInit(void);
-void vMotorTask(void *const param);
+void vMotorTask(void *const pvMotorTimers);

@@ -2,6 +2,14 @@
 
 
 /* Function descriptions */
+
+/**
+ * @brief   Mainly used for debugging purposes.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
 void GPIO_vInit(void)
 {
     /* Enable clock to PORTD */
