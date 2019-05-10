@@ -79,11 +79,10 @@ enum ADC_Channels
 
 struct Sensor
 {
-    /* TODO: Figure out why volatile keyword is needed */
-    volatile uint32_t ulTemperature;
-    volatile uint32_t ulHumidity;
-    volatile uint32_t ulSoilMoisture[SOIL_MOISTURE_SENSOR_COUNT];
-    volatile uint32_t ulPotentiometer;
+    uint32_t ulTemperature;
+    uint32_t ulHumidity;
+    uint32_t ulSoilMoisture[SOIL_MOISTURE_SENSOR_COUNT];
+    uint32_t ulPotentiometer;
 };
 
 extern QueueHandle_t xAnalogQueue;

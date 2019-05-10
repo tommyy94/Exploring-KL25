@@ -106,18 +106,20 @@ void vSensorTask(void *const param)
     struct Motor_States xMotors;
     struct Motor_States *pxMotors = &xMotors;
     
-    /* TODO: Figure out why static is must */
-    uint8_t ucSoilMoistureChannels[] = {ADC_CH_AD9};
+    uint8_t ucSoilMoistureChannels[] = {ADC_CH_AD9, ADC_CH_AD10};
+    
+    volatile uint32_t tmp;
     
     for (;;)
     {
         /* Read all sensor values */
         xSensor.ulPotentiometer = ADC0_usReadPolling(ADC_CH_AD12); /* Not printed */
         xSensor.ulHumidity = HS1101_ulReadHumidity();
-        xSensor.ulTemperature = CELSIUS_TEMPERATURE(ADC0_usReadPolling(ADC_CH_AD8));
+        //xSensor.ulTemperature = CELSIUS_TEMPERATURE(ADC0_usReadPolling(ADC_CH_AD8));
+        tmp = ADC0_usReadPolling(ADC_CH_AD8);
+        xSensor.ulTemperature = CELSIUS_TEMPERATURE(tmp);
         for (uint8_t i = 0; i < SOIL_MOISTURE_SENSOR_COUNT; i++)
         {
-            /* TODO: Figure out why volatile is must */
             xSensor.ulSoilMoisture[i] = SOIL_MOISTURE(ADC0_usReadPolling(ucSoilMoistureChannels[i]));
         }
         
