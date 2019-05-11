@@ -19,7 +19,6 @@ struct AMessage
 } xMessage;
 
 
-
 /* Function descriptions */
 
 /**
@@ -235,11 +234,11 @@ void vCrcTask(void *const pvParam)
             {
                 /* Build the frame with checksum */
                 //snprintf(pxMessage->ucData, MAX_FRAME_SIZE, "abcdefgh0123456789"); /* For test purposes */
-                ussnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%luhum=%lumst=%lu", pxSensor->ulTemperature, pxSensor->ulHumidity, pxSensor->ulSoilMoisture);
+                ussnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%ldhum=%lumst=%lu", pxSensor->lTemperature, pxSensor->ulHumidity, pxSensor->ulSoilMoisture);
             }
             else
             {
-                strncpy(pxMessage->ucFrame, "Error receiving from analogQueue!", 27);
+                strncpy(pxMessage->ucFrame, "Error receiving from analogQueue!", MAX_FRAME_SIZE);
             }
             
             pxMessage->ulCrc32 = CRC_xFast((uint8_t *)pxMessage->ucFrame, strlen(pxMessage->ucFrame));

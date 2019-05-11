@@ -22,6 +22,12 @@
 #define SOIL_MOISTURE_SENSOR_COUNT      (2UL)
 #define MOTOR_COUNT                     (2UL)
 
+/* Sensor thresholds */
+#define MIN_TEMPERATURE                 (-40L)
+#define MAX_TEMPERATURE                 (125L)
+#define MAX_HUMIDITY                    (100UL)
+#define MAX_SOIL_MOISTURE                    (100UL)
+
 /* Sensor formulas */
 
 /**

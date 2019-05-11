@@ -142,11 +142,17 @@ void vSensorTask(void *const pvParam)
     {
         /* Read all sensor values */
         xSensor.ulPotentiometer = ADC0_usReadPolling(ADC_CH_AD12); /* Not printed */
+        
         xSensor.ulHumidity = HS1101_ulReadHumidity();
-        xSensor.ulTemperature = CELSIUS_TEMPERATURE(ADC0_usReadPolling(ADC_CH_AD8));
+        //configASSERT(xSensor.ulHumidity <= MAX_HUMIDITY); /* Calibrate sensor first */
+        
+        xSensor.lTemperature = CELSIUS_TEMPERATURE(ADC0_usReadPolling(ADC_CH_AD8));
+        configASSERT(xSensor.lTemperature >= MIN_TEMPERATURE && (xSensor.lTemperature <= MAX_TEMPERATURE));
+        
         for (uint8_t i = 0; i < SOIL_MOISTURE_SENSOR_COUNT; i++)
         {
             xSensor.ulSoilMoisture[i] = SOIL_MOISTURE(ADC0_usReadPolling(ucSoilMoistureChannels[i]));
+            configASSERT(xSensor.ulSoilMoisture[i] <= MAX_SOIL_MOISTURE);
         }
         
         if (xAnalogQueue != 0)

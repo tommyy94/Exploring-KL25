@@ -129,7 +129,12 @@ void vTimerCallback(TimerHandle_t xTimer)
     const uint32_t xTimerId = (uint32_t)pvTimerGetTimerID(xTimer);
     
     uxBits = xEventGroupSetBits(xMotorEventGroup, MASK(xTimerId));
-    configASSERT(uxBits & (MASK(xTimerId) != MASK(xTimerId)));
+    
+    /* Check if correct bit was set */
+    configASSERT(uxBits & (MASK(xTimerId) == MASK(xTimerId)));
+    
+    /* Check if false bits were set */
+    configASSERT(uxBits <= MASK(MOTOR_COUNT));
 }
 
 

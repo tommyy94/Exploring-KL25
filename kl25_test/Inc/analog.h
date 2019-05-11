@@ -78,7 +78,7 @@ enum ADC_Channels
 
 struct Sensor
 {
-    uint32_t ulTemperature;
+    int32_t lTemperature;
     uint32_t ulHumidity;
     uint32_t ulSoilMoisture[SOIL_MOISTURE_SENSOR_COUNT];
     uint32_t ulPotentiometer;
