@@ -5,6 +5,10 @@
 EventGroupHandle_t xMotorEventGroup;
 
 
+/* Local defines */
+#define TIMER_NAME_LEN      (32UL)
+
+
 /**
  * @brief   Initialize system hardware.
  * 
@@ -40,22 +44,13 @@ void vSystemInit(void)
 void vCreateQueues(void)
 {
     xAnalogQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(struct Sensor));
-    if (xAnalogQueue == NULL)
-    {
-        vErrorHandler(__FILE__, __LINE__);
-    }
+    configASSERT(xAnalogQueue);
     
     xCommQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(char *));
-    if (xCommQueue == NULL)
-    {
-        vErrorHandler(__FILE__, __LINE__);
-    }
+    configASSERT(xCommQueue);
     
     xMotorQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(char *));
-    if (xMotorQueue == NULL)
-    {
-        vErrorHandler(__FILE__, __LINE__);
-    }
+    configASSERT(xMotorQueue);
 }
 
 
@@ -69,10 +64,7 @@ void vCreateQueues(void)
 void vCreateEvents(void)
 {
     xMotorEventGroup = xEventGroupCreate();
-    if (xMotorEventGroup == NULL)
-    {
-        vErrorHandler(__FILE__, __LINE__);
-    }
+    configASSERT(xMotorEventGroup);
 }
 
 
@@ -86,26 +78,21 @@ void vCreateEvents(void)
 void vCreateTasks(void *pvParameters)
 {
     TaskHandle_t xHandle;
+    BaseType_t xAssert;
     
-    if (xTaskCreate(vCrcTask, (const char *)"CRC", CRCTASKSIZE / sizeof(portSTACK_TYPE), 0, CRCTASKPRIORITY, &xHandle) != pdPASS)
-    {
-        vErrorHandler(__FILE__, __LINE__);
-    }
+    configASSERT((uint32_t) pvParameters);
     
-    if (xTaskCreate(vSensorTask, (const char *)"Sensor", ANALOGTASKSIZE / sizeof(portSTACK_TYPE), 0, ANALOGTASKPRIORITY, &xHandle) != pdPASS)
-    {
-        vErrorHandler(__FILE__, __LINE__);
-    }
+    xAssert = xTaskCreate(vCrcTask, (const char *)"CRC", CRCTASKSIZE / sizeof(portSTACK_TYPE), 0, CRCTASKPRIORITY, &xHandle);
+    configASSERT(xAssert);
     
-    if (xTaskCreate(vCommTask, (const char *)"Commu", COMMTASKSIZE / sizeof(portSTACK_TYPE), 0, COMMTASKPRIORITY, &xHandle) != pdPASS)
-    {
-        vErrorHandler(__FILE__, __LINE__);
-    }
+    xAssert = xTaskCreate(vSensorTask, (const char *)"Sensor", ANALOGTASKSIZE / sizeof(portSTACK_TYPE), 0, ANALOGTASKPRIORITY, &xHandle);
+    configASSERT(xAssert);
     
-    if (xTaskCreate(vMotorTask, (const char *)"Motor", MOTORTASKSIZE / sizeof(portSTACK_TYPE), pvParameters, MOTORTASKPRIORITY, &xHandle) != pdPASS)
-    {
-        vErrorHandler(__FILE__, __LINE__);
-    }
+    xAssert = xTaskCreate(vCommTask, (const char *)"Comm", COMMTASKSIZE / sizeof(portSTACK_TYPE), 0, COMMTASKPRIORITY, &xHandle);
+    configASSERT(xAssert);
+    
+    xAssert = xTaskCreate(vMotorTask, (const char *)"Motor", MOTORTASKSIZE / sizeof(portSTACK_TYPE), pvParameters, MOTORTASKPRIORITY, &xHandle);
+    configASSERT(xAssert);
 }
 
 
@@ -115,17 +102,16 @@ void vCreateTasks(void *pvParameters)
  * @param   pxTimers    Pointer to FreeRTOS software timers.
  * 
  * @return  None
- * @todo    Format timer names
  */
 void vCreateTimers(TimerHandle_t *pxTimers)
 {
+    char ucMotorTimerName[TIMER_NAME_LEN];
+    
     for (uint32_t i = 0; i < MOTOR_COUNT; i++)
     {
-        pxTimers[i] = xTimerCreate("Motor Timer", pdMS_TO_TICKS(100), pdTRUE, (void *)i, vTimerCallback);
-        if (pxTimers[i] == NULL)
-        {
-            vErrorHandler(__FILE__, __LINE__);
-        }
+        ussnprintf(ucMotorTimerName, TIMER_NAME_LEN, "Motor Timer %u", i + 1);
+        pxTimers[i] = xTimerCreate(ucMotorTimerName, pdMS_TO_TICKS(100), pdTRUE, (void *)i, vTimerCallback);
+        configASSERT(pxTimers[i]);
     }
 }
 
@@ -143,10 +129,7 @@ void vTimerCallback(TimerHandle_t xTimer)
     const uint32_t xTimerId = (uint32_t)pvTimerGetTimerID(xTimer);
     
     uxBits = xEventGroupSetBits(xMotorEventGroup, MASK(xTimerId));
-    if (uxBits & (MASK(xTimerId) != MASK(xTimerId)))
-    {
-        vErrorHandler(__FILE__, __LINE__);
-    }
+    configASSERT(uxBits & (MASK(xTimerId) != MASK(xTimerId)));
 }
 
 
@@ -158,16 +141,20 @@ void vTimerCallback(TimerHandle_t xTimer)
  * 
  * @return  None
  */
-void vErrorHandler(char *file, int line)
+void vAssertCalled(uint32_t ulLine, char *pcFile)
 {
+    volatile uint32_t ulSetToNonZeroInDebuggerToContinue = 0;
+    
     /* Supress -Wunused-parameter */
-    (void)file;
-    (void)line;
+    (void)pcFile;
+    (void)ulLine;
 
-    /* Use debug view to read variables */
-    __BKPT(255);
+    taskENTER_CRITICAL();
 
-    for (;;)
+    while (ulSetToNonZeroInDebuggerToContinue == 0)
     {
+        ;  /* Use debug view to read variables */
     }
+    
+    taskEXIT_CRITICAL();
 }

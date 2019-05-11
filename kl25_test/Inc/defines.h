@@ -20,7 +20,7 @@
 
 /* IC Counts */
 #define SOIL_MOISTURE_SENSOR_COUNT      (2UL)
-#define MOTOR_COUNT                     (1UL)
+#define MOTOR_COUNT                     (2UL)
 
 /* Sensor formulas */
 

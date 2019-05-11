@@ -107,7 +107,7 @@ void RF_vSetTransmissionMode(void)
     }
     else
     {
-        vErrorHandler(__FILE__, __LINE__);
+        vAssertCalled(__LINE__, __FILE__);
     }
     
     PORTE->PCR[UART0_TX_PIN] = PORT_PCR_MUX(ALT4);
@@ -157,7 +157,7 @@ void RF_vSetReceiverMode(void)
     }
     else
     {
-        vErrorHandler(__FILE__, __LINE__);
+        vAssertCalled(__LINE__, __FILE__);
     }
     
     PORTE->PCR[DATA_IN] = PORT_PCR_MUX(ALT1);

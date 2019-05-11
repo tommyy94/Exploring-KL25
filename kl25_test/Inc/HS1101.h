@@ -9,6 +9,8 @@
 
 /* Device vendor headers */
 #include "MKL25Z4.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
 /* User headers */
 #include "defines.h"

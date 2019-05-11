@@ -62,11 +62,11 @@ void TPM0_vInit(uint16_t usPeriod)
  */
 void TPM0_vStartPWM(uint8_t ucChannel, TimerHandle_t *pxMotorTimers)
 {
+    BaseType_t xAssert;
+    
     /* Start software timer */
-    if (xTimerStart(pxMotorTimers[ucChannel], (TickType_t)0) != pdPASS)
-    {
-        vErrorHandler(__FILE__, __LINE__);
-    }
+    xAssert = xTimerStart(pxMotorTimers[ucChannel], (TickType_t)0);
+    configASSERT(xAssert);
     
     /* Enable PWM output on channel */
     PORTD->PCR[ucChannel] |= PORT_PCR_MUX(ALT4);
@@ -82,11 +82,12 @@ void TPM0_vStartPWM(uint8_t ucChannel, TimerHandle_t *pxMotorTimers)
  */
 void TPM0_vStopPWM(uint8_t ucChannel, TimerHandle_t *pxMotorTimers)
 {
+    BaseType_t xAssert;
+    
     /* Stop software timer */
-    if (xTimerStop(pxMotorTimers[ucChannel], (TickType_t)0) != pdPASS)
-    {
-        vErrorHandler(__FILE__, __LINE__);
-    }
+    xAssert = xTimerStop(pxMotorTimers[ucChannel], (TickType_t)0);
+    configASSERT(xAssert);
+        
     
     /* Disable PWM output on channel */
     PORTD->PCR[ucChannel] &= ~PORT_PCR_MUX(ALT4);

@@ -221,6 +221,8 @@ void vCommTask(void *const pvParam)
 void vCrcTask(void *const pvParam)
 {
     (void)pvParam;
+    BaseType_t xAssert;
+    
     struct Sensor *pxSensor;
     struct AMessage *pxMessage;
     pxMessage = &xMessage;
@@ -244,10 +246,8 @@ void vCrcTask(void *const pvParam)
             ussnprintf(pxMessage->ucCrc32Frame, MAX_FRAME_SIZE, "crc32:%x\004", (unsigned int)pxMessage->ulCrc32);
             strncat(pxMessage->ucFrame, pxMessage->ucCrc32Frame, strlen(pxMessage->ucCrc32Frame));
             
-            if (xQueueSend(xCommQueue, (void *)&pxMessage, (TickType_t)10) != pdPASS)
-            {
-                vErrorHandler(__FILE__, __LINE__);
-            }
+            xAssert = xQueueSend(xCommQueue, (void *)&pxMessage, (TickType_t)10);
+            configASSERT(xAssert);
         }
         
         vTaskDelay(MSEC_TO_TICK(500));

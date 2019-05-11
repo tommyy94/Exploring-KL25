@@ -51,5 +51,5 @@ void vCreateQueues(void);
 void vCreateEvents(void);
 void vCreateTasks(void *pvParameters);
 void vCreateTimers(TimerHandle_t *pxTimers);
-void vErrorHandler(char *file, int line);
 void vTimerCallback(TimerHandle_t xTimer);
+void vAssertCalled(uint32_t ulLine, char *pcFile);

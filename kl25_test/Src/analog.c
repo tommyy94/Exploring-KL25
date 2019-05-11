@@ -128,6 +128,8 @@ void CMP0_vInit(void)
 void vSensorTask(void *const pvParam)
 {
     (void)pvParam;
+    BaseType_t xAssert;
+    
     struct Sensor xSensor;
     struct Sensor *pxSensor = &xSensor;
 
@@ -149,10 +151,8 @@ void vSensorTask(void *const pvParam)
         
         if (xAnalogQueue != 0)
         {
-            if (xQueueSend(xAnalogQueue, (void *)&pxSensor, (TickType_t)10) != pdPASS)
-            {
-                vErrorHandler(__FILE__, __LINE__);
-            }
+            xAssert = xQueueSend(xAnalogQueue, (void *)&pxSensor, (TickType_t)10);
+            configASSERT(xAssert);
         }
         
         for (uint8_t i = 0; i < SOIL_MOISTURE_SENSOR_COUNT; i++)
@@ -167,10 +167,8 @@ void vSensorTask(void *const pvParam)
         
         if (xMotorQueue != 0)
         {
-            if (xQueueSend(xMotorQueue, (void *)&pxMotors, (TickType_t)10) != pdPASS)
-            {
-                vErrorHandler(__FILE__, __LINE__);
-            }
+            xAssert = xQueueSend(xMotorQueue, (void *)&pxMotors, (TickType_t)10);
+            configASSERT(xAssert);
         }
         
         vTaskDelay(MSEC_TO_TICK(500));
