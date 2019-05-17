@@ -19,6 +19,8 @@
 #include "hw_timers.h"
 
 /* Global defines */
+#define SOIL_MOISTURE_THRESHOLD                 (30UL)
+
 /* ADC0 trigger sources */
 #define SIM_SOPT7_ADC0TRGSEL_EXTRG_IN   	    (0x00)       	/* External trigger pin input (EXTRG_IN) */	
 #define SIM_SOPT7_ADC0TRGSEL_CMP0_OUT   	    (0x01)       	/* CMP0 output */
@@ -76,11 +78,10 @@ enum ADC_Channels
 
 struct Sensor
 {
-    /* TODO: Figure out why volatile keyword is needed */
-    volatile uint32_t ulTemperature;
-    volatile uint32_t ulHumidity;
-    volatile uint32_t ulSoilMoisture;
-    volatile uint32_t ulPotentiometer;
+    int32_t lTemperature;
+    uint32_t ulHumidity;
+    uint32_t ulSoilMoisture[SOIL_MOISTURE_SENSOR_COUNT];
+    uint32_t ulPotentiometer;
 };
 
 extern QueueHandle_t xAnalogQueue;
@@ -88,6 +89,6 @@ extern QueueHandle_t xAnalogQueue;
 
 /* Global function prototypes */
 void ADC0_vInit(void);
-uint16_t ADC0_usReadPolling(const uint8_t channel);
+uint16_t ADC0_usReadPolling(const uint8_t ucChannel);
 void CMP0_vInit(void);
-void vSensorTask(void * const param);
+void vSensorTask(void * const pvParam);

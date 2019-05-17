@@ -605,7 +605,7 @@ int vsnprintf( char *apBuf, size_t aMaxLen, const char *apFmt, va_list args )
 }
 /*-----------------------------------------------------------*/
 
-int ussnprintf( char *apBuf, size_t aMaxLen, const char *apFmt, ... )
+int csnprintf( char *apBuf, size_t aMaxLen, const char *apFmt, ... )
 {
 	va_list args;
 
@@ -661,19 +661,19 @@ size_t gb, mb, kb, sb;
 	sb = aSize;
 	if( gb )
 	{
-		ussnprintf (apBuf, aLen, "%u.%02u GB", ( unsigned ) gb, ( unsigned ) ( ( 100 * mb ) / 1024ul ) );
+		csnprintf (apBuf, aLen, "%u.%02u GB", ( unsigned ) gb, ( unsigned ) ( ( 100 * mb ) / 1024ul ) );
 	}
 	else if( mb )
 	{
-		ussnprintf (apBuf, aLen, "%u.%02u MB", ( unsigned ) mb, ( unsigned ) ( ( 100 * kb) / 1024ul ) );
+		csnprintf (apBuf, aLen, "%u.%02u MB", ( unsigned ) mb, ( unsigned ) ( ( 100 * kb) / 1024ul ) );
 	}
 	else if( kb != 0ul )
 	{
-		ussnprintf (apBuf, aLen, "%u.%02u KB", ( unsigned ) kb, ( unsigned ) ( ( 100 * sb) / 1024ul ) );
+		csnprintf (apBuf, aLen, "%u.%02u KB", ( unsigned ) kb, ( unsigned ) ( ( 100 * sb) / 1024ul ) );
 	}
 	else
 	{
-		ussnprintf (apBuf, aLen, "%u bytes", ( unsigned ) sb);
+		csnprintf (apBuf, aLen, "%u bytes", ( unsigned ) sb);
 	}
 	return apBuf;
 }

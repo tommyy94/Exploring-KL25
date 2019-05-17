@@ -19,9 +19,16 @@ struct AMessage
 } xMessage;
 
 
-
 /* Function descriptions */
-void UART0_vInit(const uint32_t baudrate)
+
+/**
+ * @brief   Initialize UART0 peripheral.
+ * 
+ * @param   ulBaudrate      Used baud rate
+ * 
+ * @return  None
+ */
+void UART0_vInit(const uint32_t ulBaudrate)
 {
     register uint16_t sbr;
     
@@ -44,7 +51,7 @@ void UART0_vInit(const uint32_t baudrate)
      * Set baudrate
      * Set oversampling ratio
      */
-    sbr = (uint16_t)(SystemCoreClock / (baudrate * UART0_OVERSAMPLE_RATE));
+    sbr = (uint16_t)(SystemCoreClock / (ulBaudrate * UART0_OVERSAMPLE_RATE));
     UART0->BDH &= ~UART0_BDH_SBR_MASK;
     UART0->BDH |= UART0_BDH_SBR(sbr >> 8);
     UART0->BDL = UART0_BDL_SBR(sbr);
@@ -87,6 +94,14 @@ void UART0_vInit(const uint32_t baudrate)
 }
 
 
+/**
+ * @brief   Read character from serial port by polling.
+ * 
+ * @param   None
+ * 
+ * @return  Character received from serial port.
+ * @note    Unused.
+ */
 uint32_t UART0_ulReadPolling(void)
 {
     while (!(UART0->S1 & UART0_S1_RDRF_MASK))
@@ -98,6 +113,13 @@ uint32_t UART0_ulReadPolling(void)
 }
 
 
+/**
+ * @brief   UART0 IRQ Handler triggered by RX.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
 void UART0_IRQHandler(void)
 {
     if (UART0->S1 & (UART_S1_OR_MASK | UART_S1_NF_MASK | UART_S1_FE_MASK | UART_S1_PF_MASK))
@@ -121,7 +143,14 @@ void UART0_IRQHandler(void)
 }
 
 
-void UART0_vTransmitByte(const char byte)
+/**
+ * @brief   Send character to UART0 serial port by polling.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+void UART0_vTransmitByte(const char ucByte)
 {
     while (!(UART0->S1 & UART0_S1_TDRE_MASK))
     {
@@ -129,26 +158,40 @@ void UART0_vTransmitByte(const char byte)
     } 
         
     /* Send character */
-    UART0->D = byte;
+    UART0->D = ucByte;
 }
 
 
-void UART0_vTransmitPolling(const char *data)
+/**
+ * @brief   Send string to UART0 serial port by polling.
+ * 
+ * @param   pcData      String to send
+ * 
+ * @return  None
+ */
+void UART0_vTransmitPolling(const char *pcData)
 {
     /* Find size of array */
-    uint16_t dataLen = (uint16_t)strlen(data);
+    uint16_t dataLen = (uint16_t)strlen(pcData);
     
     /* Send the array of characters */
     for (uint16_t i = 0; i < dataLen; i++)
     {
-        UART0_vTransmitByte(data[i]);
+        UART0_vTransmitByte(pcData[i]);
     }
 }
 
 
-void vCommTask(void *const param)
+/**
+ * @brief   FreeRTOS communication task.
+ * 
+ * @param   pvParam     Unused.
+ * 
+ * @return  None
+ */
+void vCommTask(void *const pvParam)
 {
-    (void)param;
+    (void)pvParam;
     struct AMessage *pxMessage;
     
     for (;;)
@@ -167,9 +210,19 @@ void vCommTask(void *const param)
 }
 
 
-void vCrcTask(void *const param)
+/**
+ * @brief   FreeRTOS Cyclic Redundancy Check task.
+ * 
+ * @param   pvParam     Unused.
+ * 
+ * @return  None
+ */
+void vCrcTask(void *const pvParam)
 {
-    (void)param;
+    (void)pvParam;
+    int8_t cBytesWritten;
+    BaseType_t xAssert;
+    
     struct Sensor *pxSensor;
     struct AMessage *pxMessage;
     pxMessage = &xMessage;
@@ -181,22 +234,22 @@ void vCrcTask(void *const param)
             if (xQueueReceive(xAnalogQueue, &pxSensor, (TickType_t)10))
             {
                 /* Build the frame with checksum */
-                //snprintf(pxMessage->ucData, MAX_FRAME_SIZE, "abcdefgh0123456789"); /* For test purposes */
-                ussnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%luhum=%lumst=%lu", pxSensor->ulTemperature, pxSensor->ulHumidity, pxSensor->ulSoilMoisture);
+                //cBytesWritten = cnprintf(pxMessage->ucData, MAX_FRAME_SIZE, "abcdefgh0123456789"); /* For test purposes */
+                cBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%ldhum=%lumst=%lu", pxSensor->lTemperature, pxSensor->ulHumidity, pxSensor->ulSoilMoisture);
+                configASSERT(cBytesWritten >= 0);
             }
             else
             {
-                strncpy(pxMessage->ucFrame, "Error receiving from analogQueue!", 27);
+                strncpy(pxMessage->ucFrame, "Error receiving from analogQueue!", MAX_FRAME_SIZE);
             }
             
             pxMessage->ulCrc32 = CRC_xFast((uint8_t *)pxMessage->ucFrame, strlen(pxMessage->ucFrame));
-            ussnprintf(pxMessage->ucCrc32Frame, MAX_FRAME_SIZE, "crc32:%x\004", (unsigned int)pxMessage->ulCrc32);
+            cBytesWritten = csnprintf(pxMessage->ucCrc32Frame, MAX_FRAME_SIZE, "crc32:%x\004", (unsigned int)pxMessage->ulCrc32);
+            configASSERT(cBytesWritten >= 0);
             strncat(pxMessage->ucFrame, pxMessage->ucCrc32Frame, strlen(pxMessage->ucCrc32Frame));
             
-            if (xQueueSend(xCommQueue, (void *)&pxMessage, (TickType_t)10) != pdPASS)
-            {
-                vErrorHandler(__FILE__, __LINE__);
-            }
+            xAssert = xQueueSend(xCommQueue, (void *)&pxMessage, (TickType_t)10);
+            configASSERT(xAssert);
         }
         
         vTaskDelay(MSEC_TO_TICK(500));
