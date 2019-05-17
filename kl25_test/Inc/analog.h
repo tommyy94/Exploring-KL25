@@ -91,4 +91,4 @@ extern QueueHandle_t xAnalogQueue;
 void ADC0_vInit(void);
 uint16_t ADC0_usReadPolling(const uint8_t ucChannel);
 void CMP0_vInit(void);
-void vSensorTask(void * const pvParam);
+void vSensorTask(void *const pvParam);

@@ -10,7 +10,7 @@
  * 
  * @return  None
  */
-void DMA0_vInit(uint32_t *pulDstAddr)
+void DMA0_vInit(uint32_t *const pulDstAddr)
 {
     /* Turn on clock to DMA0 & DMAMUX */
     SIM->SCGC7 |= SIM_SCGC7_DMA_MASK;

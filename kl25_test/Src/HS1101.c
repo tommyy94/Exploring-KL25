@@ -5,8 +5,7 @@
 #define HUMIDITY_FORMULA(x) ((x))
 
 /* Local variables */
-volatile uint32_t ulHS1101_value = 0;
-volatile uint8_t ulHS1101_flag = FALSE;
+TaskHandle_t xAnalogNotification = NULL;
 
 /* Local function prototypes */
 static void HS1101_vSendSignal(void);
@@ -56,19 +55,24 @@ static void HS1101_vSendSignal(void)
  */
 uint32_t HS1101_ulReadHumidity(void)
 {
+    BaseType_t xAssert;
+    const TickType_t xTicksToWait = 100 / portTICK_PERIOD_MS;
+    uint32_t HS1101_ulValue = 0;
     uint32_t ulHumid = 0;
     
+    /* No conversion should be in progress */
+    configASSERT(xAnalogNotification == NULL);
+    
+    xAnalogNotification = xTaskGetCurrentTaskHandle();
+    
+    /* Start conversion */
     HS1101_vSendSignal();
     
-    /* TODO: Add timeout */
-    while (!ulHS1101_flag)
-    {
-        ; /* Wait until humidity can be read */
-    }
+    /* Wait until conversion done */
+    xAssert = xTaskNotifyWait(0x00, 0xFFFFFFFF, &HS1101_ulValue, xTicksToWait);
+    configASSERT(xAssert == pdPASS);
     
-    ulHS1101_flag = FALSE;
-    
-    ulHumid = HUMIDITY_FORMULA(ulHS1101_value);
-    
+    /* Convert analog value and return it */
+    ulHumid = HUMIDITY_FORMULA(HS1101_ulValue);
     return (ulHumid);
 }

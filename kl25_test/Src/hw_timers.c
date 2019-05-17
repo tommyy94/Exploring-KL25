@@ -7,6 +7,7 @@
 
 /* Global variables */
 QueueHandle_t xMotorQueue;
+TaskHandle_t xAnalogNotification;
 
 
 /**
@@ -17,7 +18,7 @@ QueueHandle_t xMotorQueue;
  * @return  None
  * @todo    Figure out correct/adjustable duty cycle and period.
  */
-void TPM0_vInit(uint16_t usPeriod)
+void TPM0_vInit(const uint16_t usPeriod)
 {
     /* Turn on clock gating for TPM0 and PORTD */
     SIM->SCGC6 |= SIM_SCGC6_TPM0(1);
@@ -66,7 +67,7 @@ void TPM0_vInit(uint16_t usPeriod)
  * 
  * @return  None
  */
-void TPM0_vStartPWM(uint8_t ucChannel, TimerHandle_t *pxMotorTimers)
+void TPM0_vStartPWM(const uint8_t ucChannel, TimerHandle_t *const pxMotorTimers)
 {
     BaseType_t xAssert;
     
@@ -87,7 +88,7 @@ void TPM0_vStartPWM(uint8_t ucChannel, TimerHandle_t *pxMotorTimers)
  * 
  * @return  None
  */
-void TPM0_vStopPWM(uint8_t ucChannel, TimerHandle_t *pxMotorTimers)
+void TPM0_vStopPWM(const uint8_t ucChannel, TimerHandle_t *const pxMotorTimers)
 {
     BaseType_t xAssert;
     
@@ -190,11 +191,14 @@ void TPM1_vInit(void)
  * @param   None
  * 
  * @return  None
- * @todo    Convert capacitor value (ulHS1101_value) to humidity.
+ * @todo    Convert capacitor value (HS1101_ulValue) to humidity.
  */
 void TPM1_IRQHandler(void)
-{
+{ 
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     static uint32_t ulOverflows = 0;
+    uint32_t HS1101_ulValue = 0;
+    BaseType_t xAssert;
     
     /* Check for counter overflows */
     if (TPM1->STATUS & TPM_STATUS_TOF_MASK)
@@ -208,15 +212,27 @@ void TPM1_IRQHandler(void)
         TPM1->SC &= ~TPM_SC_CMOD_MASK;
         
         /* Read humidity */
-        ulHS1101_value = TPM1->CONTROLS[1].CnV;
+        HS1101_ulValue = TPM1->CONTROLS[1].CnV;
         
-        /* Reset counter */
+        /* Conversion should have been in progress */
+        configASSERT(xAnalogNotification != NULL);
+        
+        /* Notify task */
+        xAssert = xTaskNotifyFromISR(xAnalogNotification, HS1101_ulValue, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+        configASSERT(xAssert == pdPASS);
+        
+        /* No conversion in progress, so no tasks to notify */
+        xAnalogNotification = NULL;
+        
+        /* Reset counters */
         TPM1->CNT = 0;
         ulOverflows = 0;
-        ulHS1101_flag = TRUE;
     }
     
     /* Reset all flags */
     TPM1->STATUS |= TPM_STATUS_TOF_MASK | TPM_STATUS_CH1F_MASK;
     TPM1->CONTROLS[1].CnSC |= TPM_CnSC_CHF(1);
+    
+    /* Force context switch if xHigherPriorityTaskWoken is set to pdTRUE */
+    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }

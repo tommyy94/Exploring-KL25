@@ -14,12 +14,12 @@
 
 /* User headers */
 #include "defines.h"
+#include "system.h"
 
 /* Global defines */
 
 /* Global variables */
-extern volatile uint32_t ulHS1101_value;
-extern volatile uint8_t ulHS1101_flag;
+extern TaskHandle_t xAnalogNotification;
 
 
 void HS1101_vInit(void);

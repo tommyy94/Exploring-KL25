@@ -75,7 +75,7 @@ void vCreateEvents(void)
  * 
  * @return  None
  */
-void vCreateTasks(void *pvParameters)
+void vCreateTasks(void *const pvParameters)
 {
     TaskHandle_t xHandle;
     BaseType_t xAssert;
@@ -103,7 +103,7 @@ void vCreateTasks(void *pvParameters)
  * 
  * @return  None
  */
-void vCreateTimers(TimerHandle_t *pxTimers)
+void vCreateTimers(TimerHandle_t *const pxTimers)
 {
     int8_t cBytesWritten;
     char ucMotorTimerName[TIMER_NAME_LEN];
@@ -125,7 +125,7 @@ void vCreateTimers(TimerHandle_t *pxTimers)
  * 
  * @return  None
  */
-void vTimerCallback(TimerHandle_t xTimer)
+void vTimerCallback(const TimerHandle_t xTimer)
 {
     EventBits_t uxBits;
     const uint32_t xTimerId = (uint32_t)pvTimerGetTimerID(xTimer);
@@ -148,7 +148,7 @@ void vTimerCallback(TimerHandle_t xTimer)
  * 
  * @return  None
  */
-void vAssertCalled(uint32_t ulLine, char *pcFile)
+void vAssertCalled(const uint32_t ulLine, char *const pcFile)
 {
     volatile uint32_t ulSetToNonZeroInDebuggerToContinue = 0;
     
