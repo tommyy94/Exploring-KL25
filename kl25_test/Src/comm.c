@@ -220,6 +220,7 @@ void vCommTask(void *const pvParam)
 void vCrcTask(void *const pvParam)
 {
     (void)pvParam;
+    int8_t cBytesWritten;
     BaseType_t xAssert;
     
     struct Sensor *pxSensor;
@@ -233,8 +234,9 @@ void vCrcTask(void *const pvParam)
             if (xQueueReceive(xAnalogQueue, &pxSensor, (TickType_t)10))
             {
                 /* Build the frame with checksum */
-                //snprintf(pxMessage->ucData, MAX_FRAME_SIZE, "abcdefgh0123456789"); /* For test purposes */
-                ussnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%ldhum=%lumst=%lu", pxSensor->lTemperature, pxSensor->ulHumidity, pxSensor->ulSoilMoisture);
+                //cBytesWritten = cnprintf(pxMessage->ucData, MAX_FRAME_SIZE, "abcdefgh0123456789"); /* For test purposes */
+                cBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%ldhum=%lumst=%lu", pxSensor->lTemperature, pxSensor->ulHumidity, pxSensor->ulSoilMoisture);
+                configASSERT(cBytesWritten >= 0);
             }
             else
             {
@@ -242,7 +244,8 @@ void vCrcTask(void *const pvParam)
             }
             
             pxMessage->ulCrc32 = CRC_xFast((uint8_t *)pxMessage->ucFrame, strlen(pxMessage->ucFrame));
-            ussnprintf(pxMessage->ucCrc32Frame, MAX_FRAME_SIZE, "crc32:%x\004", (unsigned int)pxMessage->ulCrc32);
+            cBytesWritten = csnprintf(pxMessage->ucCrc32Frame, MAX_FRAME_SIZE, "crc32:%x\004", (unsigned int)pxMessage->ulCrc32);
+            configASSERT(cBytesWritten >= 0);
             strncat(pxMessage->ucFrame, pxMessage->ucCrc32Frame, strlen(pxMessage->ucCrc32Frame));
             
             xAssert = xQueueSend(xCommQueue, (void *)&pxMessage, (TickType_t)10);

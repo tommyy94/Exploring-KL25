@@ -41,11 +41,17 @@ void TPM0_vInit(uint16_t usPeriod)
     /* Prescaler 2 */
     TPM0->SC = TPM_SC_CPWMS(1) | TPM_SC_PS(1);
     
-    /* Set channel 0 to center-aligned PWM */
-    TPM0->CONTROLS[0].CnSC = TPM_CnSC_MSB(1) | TPM_CnSC_ELSA(1);
+    /* Set PWM channels to center-aligned PWM */
+    for (uint8_t i = 0; i < MOTOR_COUNT; i++)
+    {
+        TPM0->CONTROLS[i].CnSC = TPM_CnSC_MSB(1) | TPM_CnSC_ELSA(1);
+    }
     
     /* Set duty cycle */
-    TPM0->CONTROLS[0].CnV = 4800;
+    for (uint8_t i = 0; i < MOTOR_COUNT; i++)
+    {
+        TPM0->CONTROLS[i].CnV = 4800;
+    }
     
     /* Start TPM0 */
     TPM0->SC |= TPM_SC_CMOD(1);
@@ -72,6 +78,7 @@ void TPM0_vStartPWM(uint8_t ucChannel, TimerHandle_t *pxMotorTimers)
     PORTD->PCR[ucChannel] |= PORT_PCR_MUX(ALT4);
 }
 
+
 /**
  * @brief   Stops PWM on target channel.
  * 
@@ -88,14 +95,14 @@ void TPM0_vStopPWM(uint8_t ucChannel, TimerHandle_t *pxMotorTimers)
     xAssert = xTimerStop(pxMotorTimers[ucChannel], (TickType_t)0);
     configASSERT(xAssert);
         
-    
     /* Disable PWM output on channel */
     PORTD->PCR[ucChannel] &= ~PORT_PCR_MUX(ALT4);
 }
 
 
 /**
- * @brief   Starts PWM on target channel.
+ * @brief   Drives motors (water pumps) with PWM. PWM is triggered
+ *          by boolean values and stopped by setting event bits.
  * 
  * @param   vMotorTimers   Pointer to FreeRTOS software timers.
  * 

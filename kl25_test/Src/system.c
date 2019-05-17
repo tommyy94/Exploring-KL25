@@ -97,7 +97,7 @@ void vCreateTasks(void *pvParameters)
 
 
 /**
- * @brief   Create FreeRTOS software timers.
+ * @brief   Create FreeRTOS software timers. vTimerCallback is called after 100 ms has passed.
  * 
  * @param   pxTimers    Pointer to FreeRTOS software timers.
  * 
@@ -105,11 +105,13 @@ void vCreateTasks(void *pvParameters)
  */
 void vCreateTimers(TimerHandle_t *pxTimers)
 {
+    int8_t cBytesWritten;
     char ucMotorTimerName[TIMER_NAME_LEN];
     
     for (uint32_t i = 0; i < MOTOR_COUNT; i++)
     {
-        ussnprintf(ucMotorTimerName, TIMER_NAME_LEN, "Motor Timer %u", i + 1);
+        cBytesWritten = csnprintf(ucMotorTimerName, TIMER_NAME_LEN, "Motor Timer %u", i + 1);
+        configASSERT(cBytesWritten >= 0);
         pxTimers[i] = xTimerCreate(ucMotorTimerName, pdMS_TO_TICKS(100), pdTRUE, (void *)i, vTimerCallback);
         configASSERT(pxTimers[i]);
     }
@@ -117,7 +119,7 @@ void vCreateTimers(TimerHandle_t *pxTimers)
 
 
 /**
- * @brief   FreeRTOS software timer callback.
+ * @brief   FreeRTOS software timer callback. Sets event bit for motor.
  * 
  * @param   xTimer  Handle to callee software timer.
  * 
