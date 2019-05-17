@@ -22,9 +22,14 @@ static uint8_t ucCurrentMode;
 
 
 /* Function descriptions */
+
 /**
- * Initialize pins used for RF module.
- * Enables PORTE clock.
+ * @brief   Initialize pins used for RF module.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ * @note    Uses PORTE.
  */
 void RF_vInit(void)
 {
@@ -44,7 +49,13 @@ void RF_vInit(void)
 }
 
 
-/* Power consumption 1.2 uA */
+/**
+ * @brief   Set powerdown mode for RF module (current consumption 1.2 uA).
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
 void RF_vSetPowerdownMode(void)
 {
     FGPIOE->PCOR |= MASK(TXRX) | MASK(ENABLE);
@@ -52,7 +63,13 @@ void RF_vSetPowerdownMode(void)
 }
 
 
-/* Power consumption 4.7  mA */
+/**
+ * @brief   Set idle mode for RF module (current consumption 4.7 mA).
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
 void RF_vSetIdleMode(void)
 {
     PORTE->PCR[DATA_IN] &= ~PORT_PCR_MUX(ALT1);
@@ -62,7 +79,14 @@ void RF_vSetIdleMode(void)
 }
 
 
-/* Power consumption 11.5 mA */
+/**
+ * @brief   Set transmission mode for RF module (current consumption 11.5 mA).
+ * 
+ * @param   None
+ * 
+ * @return  None
+ * @note    FreeRTOS Scheduler must be started before using this function.
+ */
 void RF_vSetTransmissionMode(void)
 {
     if (ucCurrentMode == POWERDOWN_MODE)
@@ -83,7 +107,7 @@ void RF_vSetTransmissionMode(void)
     }
     else
     {
-        vErrorHandler(__FILE__, __LINE__);
+        vAssertCalled(__LINE__, __FILE__);
     }
     
     PORTE->PCR[UART0_TX_PIN] = PORT_PCR_MUX(ALT4);
@@ -91,7 +115,14 @@ void RF_vSetTransmissionMode(void)
 }
 
 
-/* Power consumption 6.8 mA */
+/**
+ * @brief   Set receiver mode for RF module (current consumption 6.8 mA).
+ * 
+ * @param   None
+ * 
+ * @return  None
+ * @note    FreeRTOS Scheduler must be started before using this function.
+ */
 void RF_vSetReceiverMode(void)
 {
     if (ucCurrentMode == POWERDOWN_MODE)
@@ -126,7 +157,7 @@ void RF_vSetReceiverMode(void)
     }
     else
     {
-        vErrorHandler(__FILE__, __LINE__);
+        vAssertCalled(__LINE__, __FILE__);
     }
     
     PORTE->PCR[DATA_IN] = PORT_PCR_MUX(ALT1);

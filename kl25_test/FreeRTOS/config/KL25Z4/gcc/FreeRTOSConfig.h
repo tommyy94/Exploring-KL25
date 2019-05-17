@@ -69,6 +69,7 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
+
 /*-----------------------------------------------------------
  * Application specific definitions.
  *
@@ -116,7 +117,7 @@
 #define configUSE_TRACE_FACILITY                  0
 #define configUSE_TRACE_HOOKS                     0 /* not using Percepio Trace hooks */
 #define configUSE_STATS_FORMATTING_FUNCTIONS      (configUSE_TRACE_FACILITY || configGENERATE_RUN_TIME_STATS)
-#define configUSE_16_BIT_TICKS                    0
+#define configUSE_16_BIT_TICKS                    1
 #define configIDLE_SHOULD_YIELD                   1
 #define configUSE_CO_ROUTINES                     0
 #define configUSE_MUTEXES                         1
@@ -212,7 +213,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY      (configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY<<(8-configPRIO_BITS))
 
 /* Normal assert() semantics without relying on the provision of an assert.h header file. */
-#define configASSERT(x) if((x)==0) { taskDISABLE_INTERRUPTS(); for( ;; ); }
+#define configASSERT( x ) if( ( x ) == 0 ) vAssertCalled( __LINE__, __FILE__ )
 
 #define portINLINE __inline
 

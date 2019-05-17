@@ -34,9 +34,9 @@ extern uint8_t ucRxFlag;
 
 
 /* Global function prototypes */
-void UART0_vInit(const uint32_t baudrate);
+void UART0_vInit(const uint32_t ulBaudrate);
 uint32_t UART0_ulReadPolling(void);
-void UART0_vTransmitByte(const char byte);
-void UART0_vTransmitPolling(const char *data);
-void vCommTask(void *const param);
-void vCrcTask(void *const param);
+void UART0_vTransmitByte(const char ucByte);
+void UART0_vTransmitPolling(const char *pcData);
+void vCommTask(void *const pvParam);
+void vCrcTask(void *const pvpParam);
