@@ -133,7 +133,7 @@ void vTimerCallback(const TimerHandle_t xTimer)
     uxBits = xEventGroupSetBits(xMotorEventGroup, MASK(xTimerId));
     
     /* Check if correct bit was set */
-    configASSERT(uxBits & (MASK(xTimerId) == MASK(xTimerId)));
+    configASSERT(uxBits & (MASK(xTimerId)));
     
     /* Check if false bits were set */
     configASSERT(uxBits <= MASK(MOTOR_COUNT));

@@ -204,7 +204,6 @@
     <None Include="kl25_test-Debug.vgdbsettings" />
     <None Include="kl25_test-Release.vgdbsettings" />
     <None Include="kinetis.xml" />
-    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <LinkerScript Include="MKL25Z128xxx4_flash.lds" />
