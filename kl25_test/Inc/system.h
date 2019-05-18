@@ -43,6 +43,7 @@ extern QueueHandle_t xCommQueue;
 extern QueueHandle_t xAnalogQueue;
 extern QueueHandle_t xMotorQueue;
 extern EventGroupHandle_t xMotorEventGroup;
+extern SemaphoreHandle_t xCommSemaphore;
     
 
 /* Global function prototypes */
@@ -51,5 +52,6 @@ void vCreateQueues(void);
 void vCreateEvents(void);
 void vCreateTasks(void *const pvParameters);
 void vCreateTimers(TimerHandle_t *const pxTimers);
+void vCreateSemaphores(void);
 void vTimerCallback(const TimerHandle_t xTimer);
 void vAssertCalled(const uint32_t ulLine, char *const pcFile);

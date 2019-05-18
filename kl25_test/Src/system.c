@@ -119,6 +119,20 @@ void vCreateTimers(TimerHandle_t *const pxTimers)
 
 
 /**
+ * @brief   Create FreeRTOS semaphores.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+void vCreateSemaphores(void)
+{
+    xCommSemaphore = xSemaphoreCreateMutex();
+    configASSERT(xCommSemaphore != NULL);
+}
+
+
+/**
  * @brief   FreeRTOS software timer callback. Sets event bit for motor.
  * 
  * @param   xTimer  Handle to callee software timer.

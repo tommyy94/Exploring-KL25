@@ -14,6 +14,7 @@ int main(void)
     
     vSystemInit();
     vCreateQueues();
+    vCreateSemaphores();
     vCreateEvents();
     vCreateTimers(xMotorTimers);
     vCreateTasks(xMotorTimers);

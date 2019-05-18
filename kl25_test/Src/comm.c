@@ -10,6 +10,7 @@ uint8_t ucRxData[UART0_RX_BUFSIZ];
 uint8_t ucRxFlag = FALSE;
 volatile uint8_t ucRxIndex = 0;
 QueueHandle_t xCommQueue;
+SemaphoreHandle_t xCommSemaphore;
 
 struct AMessage
 {
@@ -192,20 +193,30 @@ void UART0_vTransmitPolling(const char *pcData)
 void vCommTask(void *const pvParam)
 {
     (void)pvParam;
+    BaseType_t xAssert;
     struct AMessage *pxMessage;
+    const TickType_t xTicksToWait = 100 / portTICK_PERIOD_MS;
     
     for (;;)
     {
         if (xQueueReceive(xCommQueue, &(pxMessage), (TickType_t) 10))
         {
-            UART0_vTransmitPolling(pxMessage->ucFrame);
+            /* Used to guard RF modules state in future */
+            if (xSemaphoreTake(xCommSemaphore, (TickType_t)xTicksToWait))
+            {
+                UART0_vTransmitPolling(pxMessage->ucFrame);
+                
+                /* This call should not fail in any circumstance */
+                xAssert = xSemaphoreGive(xCommSemaphore);
+                configASSERT(xAssert == pdTRUE);
+            }
         }
         else
         {
             UART0_vTransmitPolling("Error receiving from commQueue!\004");
         }
         
-        vTaskDelay(MSEC_TO_TICK(100));
+        vTaskDelay(MSEC_TO_TICK(50));
     }
 }
 
@@ -252,6 +263,6 @@ void vCrcTask(void *const pvParam)
             configASSERT(xAssert);
         }
         
-        vTaskDelay(MSEC_TO_TICK(500));
+        vTaskDelay(MSEC_TO_TICK(100));
     }
 }
