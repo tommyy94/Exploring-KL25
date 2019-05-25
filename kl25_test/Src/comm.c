@@ -83,11 +83,11 @@ void UART0_vInit(const uint32_t ulBaudrate)
      */
     UART0->S2 = UART0_S2_MSBF(0) |UART0_S2_RXINV(0);
     
-    /**
-     * Enable TX & RX
-     * Enable RX interrupts
-     */
-    UART0->C2 |= UART0_C2_TE(1) | UART0_C2_RE(1) |UART0_C2_RIE(1);
+    /* Enable RX DMA */
+    UART0->C5 = UART0_C5_RDMAE(1);
+    
+    /* Enable TX & RX */
+    UART0->C2 |= UART0_C2_TE(1) | UART0_C2_RE(1);
     
     NVIC_SetPriority(UART0_IRQn, 2);
     NVIC_ClearPendingIRQ(UART0_IRQn);
@@ -182,7 +182,6 @@ void UART0_vTransmitPolling(const char *pcData)
     }
 }
 
-
 /**
  * @brief   FreeRTOS communication task.
  * 
@@ -204,18 +203,15 @@ void vCommTask(void *const pvParam)
             /* Used to guard RF modules state in future */
             if (xSemaphoreTake(xCommSemaphore, (TickType_t)xTicksToWait))
             {
-                UART0_vTransmitPolling(pxMessage->ucFrame);
+               // UART0_vTransmitPolling(pxMessage->ucFrame);
                 
                 /* This call should not fail in any circumstance */
                 xAssert = xSemaphoreGive(xCommSemaphore);
                 configASSERT(xAssert == pdTRUE);
             }
         }
-        else
-        {
-            UART0_vTransmitPolling("Error receiving from commQueue!\004");
-        }
         
+        ESP8266_vSendCmd(AT);
         vTaskDelay(MSEC_TO_TICK(50));
     }
 }
@@ -242,16 +238,12 @@ void vCrcTask(void *const pvParam)
     {
         if (xAnalogQueue != 0)
         {
-            if (xQueueReceive(xAnalogQueue, &pxSensor, (TickType_t)10))
+            if (xQueueReceive(xAnalogQueue, &pxSensor, (TickType_t)50))
             {
                 /* Build the frame with checksum */
-                //cBytesWritten = cnprintf(pxMessage->ucData, MAX_FRAME_SIZE, "abcdefgh0123456789"); /* For test purposes */
-                cBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%ldhum=%lumst=%lu", pxSensor->lTemperature, pxSensor->ulHumidity, pxSensor->ulSoilMoisture);
+                cBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "abcdefgh0123456789"); /* For test purposes */
+                //cBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%ldhum=%lumst=%lu", pxSensor->lTemperature, pxSensor->ulHumidity, pxSensor->ulSoilMoisture);
                 configASSERT(cBytesWritten >= 0);
-            }
-            else
-            {
-                strncpy(pxMessage->ucFrame, "Error receiving from analogQueue!", MAX_FRAME_SIZE);
             }
             
             pxMessage->ulCrc32 = CRC_xFast((uint8_t *)pxMessage->ucFrame, strlen(pxMessage->ucFrame));

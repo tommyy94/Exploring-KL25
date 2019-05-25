@@ -4,13 +4,13 @@
 /* Function descriptions */
 
 /**
- * @brief   Initialize DMA for ADC0. Unused.
+ * @brief   Initialize DMA for ADC0.
  * 
  * @param   None
  * 
  * @return  None
  */
-void DMA0_vInit(uint32_t *const pulDstAddr)
+void DMA0_vInit(void)
 {
     /* Turn on clock to DMA0 & DMAMUX */
     SIM->SCGC7 |= SIM_SCGC7_DMA_MASK;
@@ -21,26 +21,30 @@ void DMA0_vInit(uint32_t *const pulDstAddr)
 	
     /**
      * Generate interrupt on completion
-     * Increment address
-     * Transfer 16-bits
+     * Increment destination address
+     * Transfer bytes
      * Enable peripheral request
      */
-    DMA0->DMA[0].DCR = DMA_DCR_EINT(1) | DMA_DCR_SINC(0) | DMA_DCR_SSIZE(2) | DMA_DCR_DSIZE(2) | DMA_DCR_ERQ(1) | DMA_DCR_CS(1);
+    DMA0->DMA[0].DCR = DMA_DCR_EINT(1) | DMA_DCR_ERQ(1) | DMA_DCR_CS(1) | DMA_DCR_SSIZE(1) | DMA_DCR_DINC(1) | DMA_DCR_DSIZE(1);
     
-    /* Enable DMA0 MUX channel with ADC0 complete as trigger */
-    DMAMUX0->CHCFG[0] = DMAMUX_CHCFG_SOURCE(DMAMUX_CHCFG_SOURCE_ADC0); 
-    
-    /* Initialize src & dst pointers */
-    DMA0->DMA[0].SAR = DMA_SAR_SAR((uint32_t)(&(ADC0->R[0])));
-    DMA0->DMA[0].DAR = DMA_DAR_DAR((uint32_t)pulDstAddr);
-    
-    /* Byte count */
-    DMA0->DMA[0].DSR_BCR = DMA_DSR_BCR_BCR(2);
+    /* Enable DMA0 MUX channel with UART0 RX as trigger */
+    DMAMUX0->CHCFG[0] = DMAMUX_CHCFG_SOURCE(DMAMUX_CHCFG_SOURCE_UART0_RX);
     
     /* Set NVIC for DMA ISR */
     NVIC_SetPriority(DMA0_IRQn, 2);
     NVIC_ClearPendingIRQ(DMA0_IRQn); 
     NVIC_EnableIRQ(DMA0_IRQn);
+}
+
+
+void DMA0_vStart(uint32_t *const pulDstAddr, uint32_t ulByteCount)
+{
+    /* Initialize src & dst pointers */
+    DMA0->DMA[0].SAR = DMA_SAR_SAR((uint32_t)(&(UART0->D)));
+    DMA0->DMA[0].DAR = DMA_DAR_DAR((uint32_t)pulDstAddr);
+    
+    /* Byte count */
+    DMA0->DMA[0].DSR_BCR = DMA_DSR_BCR_BCR(ulByteCount);
     
     /* Clear done flag */
     DMA0->DMA[0].DSR_BCR &= ~DMA_DSR_BCR_DONE_MASK;
@@ -51,7 +55,7 @@ void DMA0_vInit(uint32_t *const pulDstAddr)
 
 
 /**
- * @brief   DMA0 IRQ Handler for transfer completion.
+ * @brief   DMA0 IRQ Handler for receive complete.
  * 
  * @param   None
  * 
@@ -60,9 +64,6 @@ void DMA0_vInit(uint32_t *const pulDstAddr)
 void DMA0_IRQHandler(void)
 {
     NVIC_ClearPendingIRQ(DMA0_IRQn);
-    
-    /* Signal interrupt */
-    FGPIOD->PTOR = MASK(SIGNAL_SHIFT);
     
     DMA0->DMA[0].DSR_BCR |= DMA_DSR_BCR_DONE_MASK;
     DMAMUX0->CHCFG[0] &= ~DMAMUX_CHCFG_ENBL_MASK;

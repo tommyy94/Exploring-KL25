@@ -26,11 +26,10 @@ void vSystemInit(void)
     HS1101_vInit();
     
     /* Communications */
-    UART0_vInit(9600);
+    DMA0_vInit();
+    UART0_vInit(115200);
     CRC_vInit();
-//    RF_vInit();
-    
-//    GPIO_vInit();
+    ESP8266_vInit();
 }
 
 

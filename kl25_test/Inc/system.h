@@ -16,6 +16,8 @@
 #include "crc.h"
 #include "comm.h"
 #include "gpio.h"
+#include "esp8266.h"
+#include "dma.h"
 
 
 /* Global defines */
@@ -29,7 +31,7 @@
 #define CRCTASKSIZE 1024
 #define CRCTASKPRIORITY 2
     
-#define COMMTASKSIZE 1024
+#define COMMTASKSIZE 4096
 #define COMMTASKPRIORITY 1
     
 #define MOTORTASKSIZE 1024

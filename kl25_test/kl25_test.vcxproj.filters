@@ -158,10 +158,10 @@
     <ClCompile Include="Src\printf-stdarg.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Src\rf_module.c">
+    <ClCompile Include="Src\system.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Src\system.c">
+    <ClCompile Include="Src\esp8266.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -244,10 +244,10 @@
     <ClInclude Include="Inc\printf-stdarg.h">
       <Filter>Source files\Inc</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\rf_module.h">
+    <ClInclude Include="Inc\system.h">
       <Filter>Source files\Inc</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\system.h">
+    <ClInclude Include="Inc\esp8266.h">
       <Filter>Source files\Inc</Filter>
     </ClInclude>
   </ItemGroup>
