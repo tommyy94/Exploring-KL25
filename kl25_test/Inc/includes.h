@@ -11,7 +11,6 @@
 #include "comm.h"
 #include "gpio.h"
 #include "HS1101.h"
-#include "crc.h"
 #include "printf-stdarg.h"
 #include "system.h"
 #include "esp8266.h"

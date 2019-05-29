@@ -11,13 +11,15 @@
 int main(void)
 {
     static TimerHandle_t xMotorTimers[MOTOR_COUNT];
+    static TimerHandle_t xTimeoutTimers[TIMEOUT_TIMER_COUNT];
     
-    vSystemInit();
+    vSystemInit(xTimeoutTimers);
     vCreateQueues();
     vCreateSemaphores();
     vCreateEvents();
-    vCreateTimers(xMotorTimers);
-    vCreateTasks(xMotorTimers);
+    vCreateMotorTimers(xMotorTimers);
+    vCreateTimeoutTimers(xTimeoutTimers);
+    vCreateTasks(xMotorTimers, xTimeoutTimers);
     vTaskStartScheduler();
     
     for (;;)

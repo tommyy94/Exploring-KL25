@@ -3,10 +3,11 @@
 
 /* Global variables */
 EventGroupHandle_t xMotorEventGroup;
+EventGroupHandle_t xTimeoutEventGroup;
 
 
 /* Local defines */
-#define TIMER_NAME_LEN      (32UL)
+#define TIMER_NAME_LEN          (32UL)
 
 
 /**
@@ -16,7 +17,7 @@ EventGroupHandle_t xMotorEventGroup;
  * 
  * @return  None
  */
-void vSystemInit(void)
+void vSystemInit(TimerHandle_t *const pxTimeoutTimers)
 {
     /* Analog functionalities */
     ADC0_vInit();
@@ -28,8 +29,7 @@ void vSystemInit(void)
     /* Communications */
     DMA0_vInit();
     UART0_vInit(115200);
-    CRC_vInit();
-    ESP8266_vInit();
+    ESP8266_vInit(pxTimeoutTimers);
 }
 
 
@@ -64,6 +64,9 @@ void vCreateEvents(void)
 {
     xMotorEventGroup = xEventGroupCreate();
     configASSERT(xMotorEventGroup);
+    
+    xTimeoutEventGroup = xEventGroupCreate();
+    configASSERT(xTimeoutEventGroup);
 }
 
 
@@ -74,35 +77,36 @@ void vCreateEvents(void)
  * 
  * @return  None
  */
-void vCreateTasks(void *const pvParameters)
+void vCreateTasks(void *const pvMotorTimers, void *const pvTimeoutTimers)
 {
     TaskHandle_t xHandle;
     BaseType_t xAssert;
     
-    configASSERT((uint32_t) pvParameters);
+    configASSERT((uint32_t) pvMotorTimers);
+    configASSERT((uint32_t) pvTimeoutTimers);
     
-    xAssert = xTaskCreate(vCrcTask, (const char *)"CRC", CRCTASKSIZE / sizeof(portSTACK_TYPE), 0, CRCTASKPRIORITY, &xHandle);
+    xAssert = xTaskCreate(vSqlTask, (const char *)"SQL", CRCTASKSIZE / sizeof(portSTACK_TYPE), 0, CRCTASKPRIORITY, &xHandle);
     configASSERT(xAssert);
     
     xAssert = xTaskCreate(vSensorTask, (const char *)"Sensor", ANALOGTASKSIZE / sizeof(portSTACK_TYPE), 0, ANALOGTASKPRIORITY, &xHandle);
     configASSERT(xAssert);
     
-    xAssert = xTaskCreate(vCommTask, (const char *)"Comm", COMMTASKSIZE / sizeof(portSTACK_TYPE), 0, COMMTASKPRIORITY, &xHandle);
+    xAssert = xTaskCreate(vCommTask, (const char *)"Comm", COMMTASKSIZE / sizeof(portSTACK_TYPE), pvTimeoutTimers, COMMTASKPRIORITY, &xHandle);
     configASSERT(xAssert);
     
-    xAssert = xTaskCreate(vMotorTask, (const char *)"Motor", MOTORTASKSIZE / sizeof(portSTACK_TYPE), pvParameters, MOTORTASKPRIORITY, &xHandle);
+    xAssert = xTaskCreate(vMotorTask, (const char *)"Motor", MOTORTASKSIZE / sizeof(portSTACK_TYPE), pvMotorTimers, MOTORTASKPRIORITY, &xHandle);
     configASSERT(xAssert);
 }
 
 
 /**
- * @brief   Create FreeRTOS software timers. vTimerCallback is called after 100 ms has passed.
+ * @brief   Create FreeRTOS software timers for motors. vTimerCallback is called after 100 ms has passed.
  * 
  * @param   pxTimers    Pointer to FreeRTOS software timers.
  * 
  * @return  None
  */
-void vCreateTimers(TimerHandle_t *const pxTimers)
+void vCreateMotorTimers(TimerHandle_t *const pxTimers)
 {
     int8_t cBytesWritten;
     char ucMotorTimerName[TIMER_NAME_LEN];
@@ -111,7 +115,30 @@ void vCreateTimers(TimerHandle_t *const pxTimers)
     {
         cBytesWritten = csnprintf(ucMotorTimerName, TIMER_NAME_LEN, "Motor Timer %u", i + 1);
         configASSERT(cBytesWritten >= 0);
-        pxTimers[i] = xTimerCreate(ucMotorTimerName, pdMS_TO_TICKS(100), pdTRUE, (void *)i, vTimerCallback);
+        pxTimers[i] = xTimerCreate(ucMotorTimerName, pdMS_TO_TICKS(100), pdTRUE, (void *)i, vMotorTimerCallback);
+        configASSERT(pxTimers[i]);
+    }
+}
+
+
+
+/**
+ * @brief   Create FreeRTOS software timers for timeouts. vTimerCallback is called after 100 ms has passed.
+ * 
+ * @param   pxTimers    Pointer to FreeRTOS software timers.
+ * 
+ * @return  None
+ */
+void vCreateTimeoutTimers(TimerHandle_t *const pxTimers)
+{
+    int8_t cBytesWritten;
+    char ucTimeoutTimerName[TIMER_NAME_LEN];
+    
+    for (uint32_t i = 0; i < TIMEOUT_TIMER_COUNT; i++)
+    {
+        cBytesWritten = csnprintf(ucTimeoutTimerName, TIMER_NAME_LEN, "Motor Timer %u", i + 1);
+        configASSERT(cBytesWritten >= 0);
+        pxTimers[i] = xTimerCreate(ucTimeoutTimerName, pdMS_TO_TICKS(100), pdTRUE, (void *)i, vTimeoutTimerCallback);
         configASSERT(pxTimers[i]);
     }
 }
@@ -132,13 +159,13 @@ void vCreateSemaphores(void)
 
 
 /**
- * @brief   FreeRTOS software timer callback. Sets event bit for motor.
+ * @brief   FreeRTOS software motor timer callback. Sets event bit for motor.
  * 
  * @param   xTimer  Handle to callee software timer.
  * 
  * @return  None
  */
-void vTimerCallback(const TimerHandle_t xTimer)
+void vMotorTimerCallback(const TimerHandle_t xTimer)
 {
     EventBits_t uxBits;
     const uint32_t xTimerId = (uint32_t)pvTimerGetTimerID(xTimer);
@@ -150,6 +177,28 @@ void vTimerCallback(const TimerHandle_t xTimer)
     
     /* Check if false bits were set */
     configASSERT(uxBits <= MASK(MOTOR_COUNT));
+}
+
+
+/**
+ * @brief   FreeRTOS software timeout timer callback. Sets event bit for timeout.
+ * 
+ * @param   xTimer  Handle to callee software timer.
+ * 
+ * @return  None
+ */
+void vTimeoutTimerCallback(const TimerHandle_t xTimer)
+{
+    EventBits_t uxBits;
+    const uint32_t xTimerId = (uint32_t)pvTimerGetTimerID(xTimer);
+    
+    uxBits = xEventGroupSetBits(xTimeoutEventGroup, MASK(xTimerId));
+    
+    /* Check if correct bit was set */
+    configASSERT(uxBits & (MASK(xTimerId)));
+    
+    /* Check if false bits were set */
+    configASSERT(uxBits <= MASK(TIMEOUT_TIMER_COUNT));
 }
 
 

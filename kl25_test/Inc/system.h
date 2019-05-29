@@ -13,7 +13,6 @@
 /* User headers */
 #include "defines.h"
 #include "analog.h"
-#include "crc.h"
 #include "comm.h"
 #include "gpio.h"
 #include "esp8266.h"
@@ -45,15 +44,17 @@ extern QueueHandle_t xCommQueue;
 extern QueueHandle_t xAnalogQueue;
 extern QueueHandle_t xMotorQueue;
 extern EventGroupHandle_t xMotorEventGroup;
+extern EventGroupHandle_t xTimeoutEventGroup;
 extern SemaphoreHandle_t xCommSemaphore;
     
 
 /* Global function prototypes */
-void vSystemInit();
+void vSystemInit(TimerHandle_t *const pxTimeoutTimers);
 void vCreateQueues(void);
 void vCreateEvents(void);
-void vCreateTasks(void *const pvParameters);
-void vCreateTimers(TimerHandle_t *const pxTimers);
+void vCreateTasks(void *const pvMotorTimers, void *const pvTimeoutTimers);
+void vCreateMotorTimers(TimerHandle_t *const pxTimers);
 void vCreateSemaphores(void);
-void vTimerCallback(const TimerHandle_t xTimer);
+void vMotorTimerCallback(const TimerHandle_t xTimer);
+void vTimeoutTimerCallback(const TimerHandle_t xTimer);
 void vAssertCalled(const uint32_t ulLine, char *const pcFile);

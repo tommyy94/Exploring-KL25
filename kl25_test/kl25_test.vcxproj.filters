@@ -137,9 +137,6 @@
     <ClCompile Include="Src\comm.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Src\crc.c">
-      <Filter>Source files\Src</Filter>
-    </ClCompile>
     <ClCompile Include="Src\dma.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
@@ -218,9 +215,6 @@
       <Filter>Source files\Inc</Filter>
     </ClInclude>
     <ClInclude Include="Inc\comm.h">
-      <Filter>Source files\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\crc.h">
       <Filter>Source files\Inc</Filter>
     </ClInclude>
     <ClInclude Include="Inc\defines.h">

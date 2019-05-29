@@ -189,9 +189,8 @@ void UART0_vTransmitPolling(const char *pcData)
  * 
  * @return  None
  */
-void vCommTask(void *const pvParam)
+void vCommTask(void *const pvTimeoutTimers)
 {
-    (void)pvParam;
     BaseType_t xAssert;
     struct AMessage *pxMessage;
     const TickType_t xTicksToWait = 100 / portTICK_PERIOD_MS;
@@ -211,7 +210,7 @@ void vCommTask(void *const pvParam)
             }
         }
         
-        ESP8266_vSendCmd(AT);
+        ESP8266_vSendCmd(AT, pvTimeoutTimers);
         vTaskDelay(MSEC_TO_TICK(50));
     }
 }
@@ -224,7 +223,7 @@ void vCommTask(void *const pvParam)
  * 
  * @return  None
  */
-void vCrcTask(void *const pvParam)
+void vSqlTask(void *const pvParam)
 {
     (void)pvParam;
     int8_t cBytesWritten;
@@ -240,19 +239,15 @@ void vCrcTask(void *const pvParam)
         {
             if (xQueueReceive(xAnalogQueue, &pxSensor, (TickType_t)50))
             {
-                /* Build the frame with checksum */
-                cBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "abcdefgh0123456789"); /* For test purposes */
+                /* Build SQL clause */
+                cBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "INSERT INTO table (column) VALUES (10);"); /* For test purposes */
                 //cBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%ldhum=%lumst=%lu", pxSensor->lTemperature, pxSensor->ulHumidity, pxSensor->ulSoilMoisture);
                 configASSERT(cBytesWritten >= 0);
+            
+                /* Transmit */
+                xAssert = xQueueSend(xCommQueue, (void *)&pxMessage, (TickType_t)10);
+                configASSERT(xAssert);
             }
-            
-            pxMessage->ulCrc32 = CRC_xFast((uint8_t *)pxMessage->ucFrame, strlen(pxMessage->ucFrame));
-            cBytesWritten = csnprintf(pxMessage->ucCrc32Frame, MAX_FRAME_SIZE, "crc32:%x\004", (unsigned int)pxMessage->ulCrc32);
-            configASSERT(cBytesWritten >= 0);
-            strncat(pxMessage->ucFrame, pxMessage->ucCrc32Frame, strlen(pxMessage->ucCrc32Frame));
-            
-            xAssert = xQueueSend(xCommQueue, (void *)&pxMessage, (TickType_t)10);
-            configASSERT(xAssert);
         }
         
         vTaskDelay(MSEC_TO_TICK(100));
