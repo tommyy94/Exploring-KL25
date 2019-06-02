@@ -189,8 +189,9 @@ void UART0_vTransmitPolling(const char *pcData)
  * 
  * @return  None
  */
-void vCommTask(void *const pvTimeoutTimers)
+void vCommTask(void *const pvParam)
 {
+    (void)pvParam;
     BaseType_t xAssert;
     struct AMessage *pxMessage;
     const TickType_t xTicksToWait = 100 / portTICK_PERIOD_MS;
@@ -202,7 +203,7 @@ void vCommTask(void *const pvTimeoutTimers)
             /* Used to guard RF modules state in future */
             if (xSemaphoreTake(xCommSemaphore, (TickType_t)xTicksToWait))
             {
-               // UART0_vTransmitPolling(pxMessage->ucFrame);
+                ESP8266_vSendCmd(pxMessage->ucFrame);
                 
                 /* This call should not fail in any circumstance */
                 xAssert = xSemaphoreGive(xCommSemaphore);
@@ -210,7 +211,6 @@ void vCommTask(void *const pvTimeoutTimers)
             }
         }
         
-        ESP8266_vSendCmd(AT, pvTimeoutTimers);
         vTaskDelay(MSEC_TO_TICK(50));
     }
 }
