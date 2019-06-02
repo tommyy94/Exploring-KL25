@@ -11,18 +11,17 @@ static void ESP8266_vFlushBuffer(char *const buffer);
 
 
 /**
- * Reset ESP8266.
+ * Reset and initialize ESP8266.
  * 
  * @param   None
  * 
  * @return  None
- * @todo Implement some sort of timeout for retransmits. (Remove vAssertCalled()).
  */
-void ESP8266_vInit(TimerHandle_t *const pxTimeoutTimers)
+void ESP8266_vInit(void)
 {
-    ESP8266_vSendCmd(AT_RESET, pxTimeoutTimers);
-    ESP8266_vSendCmd(AT_STA_MODE, pxTimeoutTimers);
-    ESP8266_vSendCmd(AT_CONNECT_AP, pxTimeoutTimers);
+    ESP8266_vSendCmd(AT_RESET);
+    ESP8266_vSendCmd(AT_STA_MODE);
+    ESP8266_vSendCmd(AT_CONNECT_AP);
 }
 
 
@@ -32,27 +31,29 @@ void ESP8266_vInit(TimerHandle_t *const pxTimeoutTimers)
  * @param   pcCmd     AT command as string.
  * 
  * @return  None
- * @todo Implement some sort of timeout for retransmits. (Remove vAssertCalled()).
  */
-void ESP8266_vSendCmd(char *const pcCmd, TimerHandle_t *const pxTimeoutTimers)
+void ESP8266_vSendCmd(char *const pcCmd)
 {
-    BaseType_t xAssert;
+    const TickType_t xTimeoutTicks = 10 / portTICK_PERIOD_MS;
     const char ucAckMsg[] = "OK";
     
-    DMA0_vStart((uint32_t *)UART0_ucRxBuffer, 255);
-    UART0_vTransmitPolling(pcCmd);
-    
-    /* Start software timer */
-    xAssert = xTimerStart(pxTimeoutTimers[0], (TickType_t)0);
-    configASSERT(xAssert);
-    
-    if (strstr((const char *)UART0_ucRxBuffer, ucAckMsg) == NULL)
+    for (uint8_t tries = 5; tries > 0; tries--)
     {
-        vAssertCalled(__LINE__, __FILE__);
+        /* Start transmission */
+        DMA0_vStart((uint32_t *)UART0_ucRxBuffer, BUFFLEN);
+        UART0_vTransmitPolling(pcCmd);
+        
+        /* Wait for response */
+        vTaskDelay(xTimeoutTicks);
+        
+        /* Proceed if OK was received */
+        if (strstr((const char *)UART0_ucRxBuffer, ucAckMsg) != NULL)
+        {
+            break;
+        }
     }
     
     ESP8266_vFlushBuffer((char *const)UART0_ucRxBuffer);
-    
 }
 
 
@@ -67,6 +68,6 @@ static void ESP8266_vFlushBuffer(char *const pcBuffer)
 {
     for (uint32_t i = 0; i < BUFFLEN; i++)
     {
-        pcBuffer[i] = 0;
+        pcBuffer[i] = '\0';
     }
 }

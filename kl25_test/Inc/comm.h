@@ -38,5 +38,5 @@ void UART0_vInit(const uint32_t ulBaudrate);
 uint32_t UART0_ulReadPolling(void);
 void UART0_vTransmitByte(const char ucByte);
 void UART0_vTransmitPolling(const char *pcData);
-void vCommTask(void *const pvTimeoutTimers);
+void vCommTask(void *const pvParam);
 void vSqlTask(void *const pvpParam);
