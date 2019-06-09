@@ -37,6 +37,14 @@ void DMA0_vInit(void)
 }
 
 
+/**
+ * @brief   Set source and destination pointers and enable DMA0.
+ * 
+ * @param   pulDstAddr      Address where received data will saved.
+ * @param   ulByteCount     Number of bytes to receive.
+ * 
+ * @return  None
+ */
 void DMA0_vStart(uint32_t *const pulDstAddr, uint32_t ulByteCount)
 {
     /* Initialize src & dst pointers */
