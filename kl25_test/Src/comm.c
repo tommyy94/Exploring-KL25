@@ -34,15 +34,15 @@ void UART0_vInit(const uint32_t ulBaudrate)
     register uint16_t sbr;
     
     /* Enable clock gating for UART0 & PORTE */
-    SIM->SCGC4 |= SIM_SCGC4_UART0_MASK;
-    SIM->SCGC5 |= SIM_SCGC5_PORTE_MASK;
+    SIM->SCGC4 |= SIM_SCGC4_UART0(1);
+    SIM->SCGC5 |= SIM_SCGC5_PORTE(1);
     
     /* Disable transmitter & receiver */
-    UART0->C2 &= ~UART0_C2_TE_MASK & ~UART0_C2_RE_MASK;
+    UART0->C2 &= ~UART0_C2_TE(1) & ~UART0_C2_RE(1);
     
     /* Set UART0 clock to 48 MHz */
     SIM->SOPT2 |= SIM_SOPT2_UART0SRC(1);
-    SIM->SOPT2 |= SIM_SOPT2_PLLFLLSEL_MASK;
+    SIM->SOPT2 |= SIM_SOPT2_PLLFLLSEL(1);
     
     /* Set pins to UART0 TX & RX */
     PORTE->PCR[UART0_TX_PIN] = PORT_PCR_MUX(ALT4);
@@ -53,7 +53,7 @@ void UART0_vInit(const uint32_t ulBaudrate)
      * Set oversampling ratio
      */
     sbr = (uint16_t)(SystemCoreClock / (ulBaudrate * UART0_OVERSAMPLE_RATE));
-    UART0->BDH &= ~UART0_BDH_SBR_MASK;
+    UART0->BDH &= ~UART0_BDH_SBR(1);
     UART0->BDH |= UART0_BDH_SBR(sbr >> 8);
     UART0->BDL = UART0_BDL_SBR(sbr);
     UART0->C4 |= UART0_C4_OSR(UART0_OVERSAMPLE_RATE - 1);
@@ -105,7 +105,7 @@ void UART0_vInit(const uint32_t ulBaudrate)
  */
 uint32_t UART0_ulReadPolling(void)
 {
-    while (!(UART0->S1 & UART0_S1_RDRF_MASK))
+    while (!(UART0->S1 & UART0_S1_RDRF(1)))
     {
         ; /* Wait for data */
     }
@@ -123,16 +123,16 @@ uint32_t UART0_ulReadPolling(void)
  */
 void UART0_IRQHandler(void)
 {
-    if (UART0->S1 & (UART_S1_OR_MASK | UART_S1_NF_MASK | UART_S1_FE_MASK | UART_S1_PF_MASK))
+    if (UART0->S1 & (UART_S1_OR(1) | UART_S1_NF(1) | UART_S1_FE(1) | UART_S1_PF(1)))
     {
         /* Clear error flags */
-        UART0->S1 |= UART_S1_OR_MASK | UART_S1_NF_MASK | UART_S1_FE_MASK | UART_S1_PF_MASK;
+        UART0->S1 |= UART_S1_OR(1) | UART_S1_NF(1) | UART_S1_FE(1) | UART_S1_PF(1);
         
         /* Clear RDRF */
         (void)UART0->D;
     }
     
-    if (UART0->S1 & UART_S1_RDRF_MASK)
+    if (UART0->S1 & UART_S1_RDRF(1))
     {
         ucRxData[ucRxIndex++] = UART0->D;
         if (ucRxIndex >= UART0_RX_BUFSIZ)
@@ -153,7 +153,7 @@ void UART0_IRQHandler(void)
  */
 void UART0_vTransmitByte(const char ucByte)
 {
-    while (!(UART0->S1 & UART0_S1_TDRE_MASK))
+    while (!(UART0->S1 & UART0_S1_TDRE(1)))
     {
         ; /* Wait until TX buffer empty */
     } 

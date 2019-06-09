@@ -10,6 +10,7 @@
 
 /* Devices vendor headers */
 #include "MKL25Z4.h"
+#include "fsl_bitaccess.h"
 
 /* User headers */
 #include "defines.h"

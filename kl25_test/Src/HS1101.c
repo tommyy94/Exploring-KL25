@@ -15,7 +15,7 @@ static void HS1101_vSendSignal(void);
 
 /**
  * @brief   This function simply sets ports output & writes high to memory so
- * multiplexing pins sets pin high.
+ *          multiplexing pins sets pin high.
  * 
  * @param   None
  * 
@@ -29,20 +29,30 @@ void HS1101_vInit(void)
 
 
 /**
- * @brief   Measure HS1101 capacitance using CMP0
- * and TMP0 Input Capture mode.
+ * @brief   Start measuring HS1101 capacitance using CMP0 and TPM0 Input Capture mode.
+ *          This function disables context switches for few cycles, because timer and
+ *          comparator must be started at the same time.
  * 
  * @param   None
  * 
  * @return  None
- * 
- * @todo    Calibrate humidity sensor
  */
 static void HS1101_vSendSignal(void)
-{
-    PORTE->PCR[HUMID_SENSOR_PIN] |= PORT_PCR_MUX(ALT1);
-    TPM1->SC |= TPM_SC_CMOD(1);
-    PORTE->PCR[HUMID_SENSOR_PIN] = PORT_PCR_MUX(ALT0);
+{    
+    /* Charge capacitor */
+    BME_OR32(&PORTE->PCR[HUMID_SENSOR_PIN], PORT_PCR_MUX(ALT1));
+    
+    /* Start atomic operations */
+    taskENTER_CRITICAL();
+    
+    /* Start timer */
+    BME_OR32(&TPM1->SC, TPM_SC_CMOD(1));
+    
+    /* Set IO to inverted comparator mode */
+    BME_BFI32(&PORTE->PCR[HUMID_SENSOR_PIN], ALT0 << PORT_PCR_MUX_SHIFT, PORT_PCR_MUX_SHIFT, 1);
+    
+    /* Stop atomic operations */
+    taskEXIT_CRITICAL();
 }
 
 
@@ -52,6 +62,8 @@ static void HS1101_vSendSignal(void)
  * @param   None
  * 
  * @return  ulHumid     Air humidity value.
+ * 
+ * @todo    Calibrate humidity sensor
  */
 uint32_t HS1101_ulReadHumidity(void)
 {
@@ -63,6 +75,7 @@ uint32_t HS1101_ulReadHumidity(void)
     /* No conversion should be in progress */
     configASSERT(xAnalogNotification == NULL);
     
+    /* Update status */
     xAnalogNotification = xTaskGetCurrentTaskHandle();
     
     /* Start conversion */

@@ -13,8 +13,8 @@
 void DMA0_vInit(void)
 {
     /* Turn on clock to DMA0 & DMAMUX */
-    SIM->SCGC7 |= SIM_SCGC7_DMA_MASK;
-    SIM->SCGC6 |= SIM_SCGC6_DMAMUX_MASK;
+    SIM->SCGC7 |= SIM_SCGC7_DMA(1);
+    SIM->SCGC6 |= SIM_SCGC6_DMAMUX(1);
 
     /* Disable DMA0 to configure it */
     DMAMUX0->CHCFG[0] = 0;
@@ -47,15 +47,15 @@ void DMA0_vStart(uint32_t *const pulDstAddr, uint32_t ulByteCount)
     DMA0->DMA[0].DSR_BCR = DMA_DSR_BCR_BCR(ulByteCount);
     
     /* Clear done flag */
-    DMA0->DMA[0].DSR_BCR &= ~DMA_DSR_BCR_DONE_MASK;
+    DMA0->DMA[0].DSR_BCR &= ~DMA_DSR_BCR_DONE(1);
     
     /* Set enable flag */
-    DMAMUX0->CHCFG[0] |= DMAMUX_CHCFG_ENBL_MASK;	
+    DMAMUX0->CHCFG[0] |= DMAMUX_CHCFG_ENBL(1);	
 }
 
 
 /**
- * @brief   DMA0 IRQ Handler for receive complete.
+ * @brief   DMA0 IRQ Handler for UART0 receive complete.
  * 
  * @param   None
  * 
@@ -65,6 +65,6 @@ void DMA0_IRQHandler(void)
 {
     NVIC_ClearPendingIRQ(DMA0_IRQn);
     
-    DMA0->DMA[0].DSR_BCR |= DMA_DSR_BCR_DONE_MASK;
-    DMAMUX0->CHCFG[0] &= ~DMAMUX_CHCFG_ENBL_MASK;
+    BME_OR32(&DMA0->DMA[0].DSR_BCR, DMA_DSR_BCR_DONE(1));
+    BME_AND32(&DMAMUX0->CHCFG[0], ~DMAMUX_CHCFG_ENBL(1));
 }
