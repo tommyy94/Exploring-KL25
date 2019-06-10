@@ -176,7 +176,7 @@ void vStartupTask(void *const pvMotorTimers)
 
 
 /**
- * @brief   Idle task hook - sets system to sleep mode.
+ * @brief   Idle task hook.
  * 
  * @param   None
  * 
@@ -184,7 +184,7 @@ void vStartupTask(void *const pvMotorTimers)
  */
 void vApplicationIdleHook(void)
 {
-    __WFI();
+    ; /* Do nothing */
 }
 
 
