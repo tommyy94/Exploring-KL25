@@ -176,6 +176,19 @@ void vStartupTask(void *const pvMotorTimers)
 
 
 /**
+ * @brief   Idle task hook - sets system to sleep mode.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+void vApplicationIdleHook(void)
+{
+    __WFI();
+}
+
+
+/**
  * @brief   System error handler.
  * 
  * @param   file    File name where error occurred
