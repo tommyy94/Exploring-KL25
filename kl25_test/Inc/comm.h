@@ -15,11 +15,11 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+#include "semphr.h"
 
 /* User headers */
 #include "defines.h"
 #include "analog.h"
-#include "crc.h"
 #include "printf-stdarg.h"
 
 /* Global defines */
@@ -39,4 +39,4 @@ uint32_t UART0_ulReadPolling(void);
 void UART0_vTransmitByte(const char ucByte);
 void UART0_vTransmitPolling(const char *pcData);
 void vCommTask(void *const pvParam);
-void vCrcTask(void *const pvpParam);
+void vSqlTask(void *const pvpParam);

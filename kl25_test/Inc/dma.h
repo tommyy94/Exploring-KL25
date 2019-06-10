@@ -10,6 +10,7 @@
 
 /* Devices vendor headers */
 #include "MKL25Z4.h"
+#include "fsl_bitaccess.h"
 
 /* User headers */
 #include "defines.h"
@@ -52,4 +53,5 @@
 
 
 /* Global function prototypes */
-void DMA0_vInit(uint32_t *const pulDstAddr);
+void DMA0_vInit(void);
+void DMA0_vStart(uint32_t *const pulDstAddr, uint32_t ulByteCount);

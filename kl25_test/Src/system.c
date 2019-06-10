@@ -3,10 +3,11 @@
 
 /* Global variables */
 EventGroupHandle_t xMotorEventGroup;
+EventGroupHandle_t xTimeoutEventGroup;
 
 
 /* Local defines */
-#define TIMER_NAME_LEN      (32UL)
+#define TIMER_NAME_LEN          (32UL)
 
 
 /**
@@ -26,11 +27,9 @@ void vSystemInit(void)
     HS1101_vInit();
     
     /* Communications */
-    UART0_vInit(9600);
-    CRC_vInit();
-//    RF_vInit();
-    
-//    GPIO_vInit();
+    DMA0_vInit();
+    UART0_vInit(115200);
+    ESP8266_vInit();
 }
 
 
@@ -65,6 +64,9 @@ void vCreateEvents(void)
 {
     xMotorEventGroup = xEventGroupCreate();
     configASSERT(xMotorEventGroup);
+    
+    xTimeoutEventGroup = xEventGroupCreate();
+    configASSERT(xTimeoutEventGroup);
 }
 
 
@@ -75,14 +77,14 @@ void vCreateEvents(void)
  * 
  * @return  None
  */
-void vCreateTasks(void *const pvParameters)
+void vCreateTasks(void *const pvMotorTimers)
 {
     TaskHandle_t xHandle;
     BaseType_t xAssert;
     
-    configASSERT((uint32_t) pvParameters);
+    configASSERT((uint32_t) pvMotorTimers);
     
-    xAssert = xTaskCreate(vCrcTask, (const char *)"CRC", CRCTASKSIZE / sizeof(portSTACK_TYPE), 0, CRCTASKPRIORITY, &xHandle);
+    xAssert = xTaskCreate(vSqlTask, (const char *)"SQL", SQLTASKSIZE / sizeof(portSTACK_TYPE), 0, SQLTASKPRIORITY, &xHandle);
     configASSERT(xAssert);
     
     xAssert = xTaskCreate(vSensorTask, (const char *)"Sensor", ANALOGTASKSIZE / sizeof(portSTACK_TYPE), 0, ANALOGTASKPRIORITY, &xHandle);
@@ -91,19 +93,19 @@ void vCreateTasks(void *const pvParameters)
     xAssert = xTaskCreate(vCommTask, (const char *)"Comm", COMMTASKSIZE / sizeof(portSTACK_TYPE), 0, COMMTASKPRIORITY, &xHandle);
     configASSERT(xAssert);
     
-    xAssert = xTaskCreate(vMotorTask, (const char *)"Motor", MOTORTASKSIZE / sizeof(portSTACK_TYPE), pvParameters, MOTORTASKPRIORITY, &xHandle);
+    xAssert = xTaskCreate(vMotorTask, (const char *)"Motor", MOTORTASKSIZE / sizeof(portSTACK_TYPE), pvMotorTimers, MOTORTASKPRIORITY, &xHandle);
     configASSERT(xAssert);
 }
 
 
 /**
- * @brief   Create FreeRTOS software timers. vTimerCallback is called after 100 ms has passed.
+ * @brief   Create FreeRTOS software timers for motors. vTimerCallback is called after 100 ms has passed.
  * 
  * @param   pxTimers    Pointer to FreeRTOS software timers.
  * 
  * @return  None
  */
-void vCreateTimers(TimerHandle_t *const pxTimers)
+void vCreateMotorTimers(TimerHandle_t *const pxTimers)
 {
     int8_t cBytesWritten;
     char ucMotorTimerName[TIMER_NAME_LEN];
@@ -112,20 +114,34 @@ void vCreateTimers(TimerHandle_t *const pxTimers)
     {
         cBytesWritten = csnprintf(ucMotorTimerName, TIMER_NAME_LEN, "Motor Timer %u", i + 1);
         configASSERT(cBytesWritten >= 0);
-        pxTimers[i] = xTimerCreate(ucMotorTimerName, pdMS_TO_TICKS(100), pdTRUE, (void *)i, vTimerCallback);
+        pxTimers[i] = xTimerCreate(ucMotorTimerName, pdMS_TO_TICKS(100), pdTRUE, (void *)i, vMotorTimerCallback);
         configASSERT(pxTimers[i]);
     }
 }
 
 
 /**
- * @brief   FreeRTOS software timer callback. Sets event bit for motor.
+ * @brief   Create FreeRTOS semaphores.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+void vCreateSemaphores(void)
+{
+    xCommSemaphore = xSemaphoreCreateMutex();
+    configASSERT(xCommSemaphore != NULL);
+}
+
+
+/**
+ * @brief   FreeRTOS software motor timer callback. Sets event bit for motor.
  * 
  * @param   xTimer  Handle to callee software timer.
  * 
  * @return  None
  */
-void vTimerCallback(const TimerHandle_t xTimer)
+void vMotorTimerCallback(const TimerHandle_t xTimer)
 {
     EventBits_t uxBits;
     const uint32_t xTimerId = (uint32_t)pvTimerGetTimerID(xTimer);
@@ -133,10 +149,29 @@ void vTimerCallback(const TimerHandle_t xTimer)
     uxBits = xEventGroupSetBits(xMotorEventGroup, MASK(xTimerId));
     
     /* Check if correct bit was set */
-    configASSERT(uxBits & (MASK(xTimerId) == MASK(xTimerId)));
+    configASSERT(uxBits & (MASK(xTimerId)));
     
     /* Check if false bits were set */
     configASSERT(uxBits <= MASK(MOTOR_COUNT));
+}
+
+
+void vStartupTask(void *const pvMotorTimers)
+{
+    /* Initialize FreeRTOS components */
+    vCreateQueues();
+    vCreateSemaphores();
+    vCreateEvents();
+    vCreateMotorTimers(pvMotorTimers);
+    
+    /* Initialize hardware */
+    vSystemInit();
+    
+    /* Create tasks */
+    vCreateTasks(pvMotorTimers);
+    
+    /* Startup task no longer needed */
+    vTaskDelete(NULL);
 }
 
 

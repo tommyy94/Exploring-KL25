@@ -148,14 +148,13 @@
     <ClCompile Include="FreeRTOS\src\timers.c" />
     <ClCompile Include="Src\analog.c" />
     <ClCompile Include="Src\comm.c" />
-    <ClCompile Include="Src\crc.c" />
     <ClCompile Include="Src\dma.c" />
+    <ClCompile Include="Src\esp8266.c" />
     <ClCompile Include="Src\gpio.c" />
     <ClCompile Include="Src\HS1101.c" />
     <ClCompile Include="Src\hw_timers.c" />
     <ClCompile Include="Src\main.c" />
     <ClCompile Include="Src\printf-stdarg.c" />
-    <ClCompile Include="Src\rf_module.c" />
     <ClCompile Include="Src\system.c" />
     <ClInclude Include="FreeRTOS\config\KL25Z4\gcc\FreeRTOSConfig.h" />
     <ClInclude Include="FreeRTOS\include\croutine.h" />
@@ -175,15 +174,14 @@
     <ClInclude Include="FreeRTOS\port\gcc\portTicks.h" />
     <ClInclude Include="Inc\analog.h" />
     <ClInclude Include="Inc\comm.h" />
-    <ClInclude Include="Inc\crc.h" />
     <ClInclude Include="Inc\defines.h" />
     <ClInclude Include="Inc\dma.h" />
+    <ClInclude Include="Inc\esp8266.h" />
     <ClInclude Include="Inc\gpio.h" />
     <ClInclude Include="Inc\HS1101.h" />
     <ClInclude Include="Inc\hw_timers.h" />
     <ClInclude Include="Inc\includes.h" />
     <ClInclude Include="Inc\printf-stdarg.h" />
-    <ClInclude Include="Inc\rf_module.h" />
     <ClInclude Include="Inc\system.h" />
     <None Include="kinetis.props" />
     <ClCompile Include="$(BSP_ROOT)\KL25Z4\StartupFiles\startup.c" />
@@ -204,7 +202,6 @@
     <None Include="kl25_test-Debug.vgdbsettings" />
     <None Include="kl25_test-Release.vgdbsettings" />
     <None Include="kinetis.xml" />
-    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <LinkerScript Include="MKL25Z128xxx4_flash.lds" />

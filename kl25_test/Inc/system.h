@@ -13,29 +13,33 @@
 /* User headers */
 #include "defines.h"
 #include "analog.h"
-#include "crc.h"
 #include "comm.h"
 #include "gpio.h"
+#include "esp8266.h"
+#include "dma.h"
 
 
 /* Global defines */
-#define MSEC_TO_TICK(msec)  (((uint32_t)(msec)+500uL/(uint32_t)configTICK_RATE_HZ) \
-                             *(uint32_t)configTICK_RATE_HZ/1000uL)
-#define TICKS_TO_MSEC(tick) ((tick)*1000uL/(uint32_t)configTICK_RATE_HZ)
+#define MSEC_TO_TICK(msec)      (((uint32_t)(msec)+500uL/(uint32_t)configTICK_RATE_HZ) \
+                                *(uint32_t)configTICK_RATE_HZ/1000uL)
+#define TICKS_TO_MSEC(tick)     ((tick)*1000uL/(uint32_t)configTICK_RATE_HZ)
     
-#define ANALOGTASKSIZE 1024
-#define ANALOGTASKPRIORITY 3
+#define ANALOGTASKSIZE          (2048UL)
+#define ANALOGTASKPRIORITY      (6UL)
     
-#define CRCTASKSIZE 1024
-#define CRCTASKPRIORITY 2
+#define SQLTASKSIZE             (1024UL)
+#define SQLTASKPRIORITY         (5UL)
     
-#define COMMTASKSIZE 1024
-#define COMMTASKPRIORITY 1
+#define COMMTASKSIZE            (2048UL)
+#define COMMTASKPRIORITY        (4UL)
     
-#define MOTORTASKSIZE 1024
-#define MOTORTASKPRIORITY 4
+#define MOTORTASKSIZE           (1024UL)
+#define MOTORTASKPRIORITY       (7UL)
+    
+#define STARTUPTASKSIZE         (4096UL)
+#define STARTUPTASKPRIORITY     (10UL)
 
-#define MAX_QUEUE_SIZE      (32UL)
+#define MAX_QUEUE_SIZE          (32UL)
 
     
 /* Global variables */
@@ -43,13 +47,17 @@ extern QueueHandle_t xCommQueue;
 extern QueueHandle_t xAnalogQueue;
 extern QueueHandle_t xMotorQueue;
 extern EventGroupHandle_t xMotorEventGroup;
+extern SemaphoreHandle_t xCommSemaphore;
     
 
 /* Global function prototypes */
-void vSystemInit();
+void vSystemInit(void);
 void vCreateQueues(void);
 void vCreateEvents(void);
-void vCreateTasks(void *const pvParameters);
-void vCreateTimers(TimerHandle_t *const pxTimers);
-void vTimerCallback(const TimerHandle_t xTimer);
+void vCreateTasks(void *const pvMotorTimers);
+void vCreateMotorTimers(TimerHandle_t *const pxTimers);
+void vCreateTimeoutTimers(TimerHandle_t *const pxTimers);
+void vCreateSemaphores(void);
+void vMotorTimerCallback(const TimerHandle_t xTimer);
+void vStartupTask(void *const pvMotorTimers);
 void vAssertCalled(const uint32_t ulLine, char *const pcFile);

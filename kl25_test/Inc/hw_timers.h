@@ -10,6 +10,7 @@
 
 /* Device vendor headers */
 #include "MKL25Z4.h"
+#include "fsl_bitaccess.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
