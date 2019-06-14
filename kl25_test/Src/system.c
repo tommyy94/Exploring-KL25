@@ -176,6 +176,19 @@ void vStartupTask(void *const pvMotorTimers)
 
 
 /**
+ * @brief   Idle task hook.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+void vApplicationIdleHook(void)
+{
+    ; /* Do nothing */
+}
+
+
+/**
  * @brief   System error handler.
  * 
  * @param   file    File name where error occurred

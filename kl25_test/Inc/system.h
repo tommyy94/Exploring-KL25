@@ -60,4 +60,5 @@ void vCreateTimeoutTimers(TimerHandle_t *const pxTimers);
 void vCreateSemaphores(void);
 void vMotorTimerCallback(const TimerHandle_t xTimer);
 void vStartupTask(void *const pvMotorTimers);
+void vApplicationIdleHook(void);
 void vAssertCalled(const uint32_t ulLine, char *const pcFile);
