@@ -6,6 +6,7 @@ Takes care of your precious plants.
 - [Description](#description)
 - [Hardware](#hardware)
 - [Notes](#notes)
+- [TODO](#todo)
 
 ## Description
 * Reads soil moisture, temperature and air humidity
@@ -21,3 +22,7 @@ Takes care of your precious plants.
 
 ## Notes
 * Notes go here
+
+## TODO
+* Web server
+* PCB
