@@ -9,8 +9,6 @@ SemaphoreHandle_t xCommSemaphore;
 
 struct AMessage
 {
-    uint32_t ulCrc32;
-    char ucCrc32Frame[MAX_FRAME_SIZE];
     char ucFrame[MAX_FRAME_SIZE];
 } xMessage;
 
@@ -39,7 +37,7 @@ void vCommTask(void *const pvParam)
             /* Used to guard RF modules state in future */
             if (xSemaphoreTake(xCommSemaphore, (TickType_t)xTicksToWait))
             {
-                /* SEND MESSAGE THROUGH SPI */
+                SPI1_vTransmitPolling(pxMessage->ucFrame);
                 
                 /* This call should not fail in any circumstance */
                 xAssert = xSemaphoreGive(xCommSemaphore);
@@ -53,13 +51,13 @@ void vCommTask(void *const pvParam)
 
 
 /**
- * @brief   FreeRTOS SQL task.
+ * @brief   FreeRTOS frame task. Builds the message to send.
  * 
  * @param   pvParam     Unused.
  * 
  * @return  None
  */
-void vSqlTask(void *const pvParam)
+void vFrameTask(void *const pvParam)
 {
     (void)pvParam;
     int8_t cBytesWritten;
@@ -75,7 +73,7 @@ void vSqlTask(void *const pvParam)
         {
             if (xQueueReceive(xAnalogQueue, &pxSensor, (TickType_t)50))
             {
-                /* Build POST request */
+                /* Build the frame */
                 cBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=23;hum=50;soil=30;");
                 //cBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%ldhum=%lumst=%lu", pxSensor->lTemperature, pxSensor->ulHumidity, pxSensor->ulSoilMoisture);
                 configASSERT(cBytesWritten >= 0);

@@ -30,4 +30,4 @@
 
 /* Global function prototypes */
 void vCommTask(void *const pvParam);
-void vSqlTask(void *const pvpParam);
+void vFrameTask(void *const pvpParam);

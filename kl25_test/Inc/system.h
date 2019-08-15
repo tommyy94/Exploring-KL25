@@ -20,6 +20,7 @@
 #include "dma.h"
 #include "spi.h"
 #include "tpm.h"
+#include "uart.h"
 
 
 /* Global defines */

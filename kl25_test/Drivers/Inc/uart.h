@@ -25,3 +25,9 @@
 /* Global variables */
 extern uint8_t ucRxData[UART0_RX_BUFSIZ];
 extern uint8_t ucRxFlag;
+
+/* Global function prototypes */
+void UART0_vInit(const uint32_t ulBaudrate);
+uint32_t UART0_ulReadPolling(void);
+void UART0_vTransmitByte(const char ucByte);
+void UART0_vTransmitPolling(const char *pcData);

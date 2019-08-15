@@ -24,11 +24,11 @@ void SPI1_vInit(void)
     PORTE->PCR[3] &= ~PORT_PCR_MUX_MASK;
     PORTE->PCR[3] |= PORT_PCR_MUX(ALT5);
     
-    /* Set PTE1 as SPI1_Miso -- ALT5 */
+    /* Set PTE1 as SPI1_MISO -- ALT5 */
     PORTE->PCR[1] &= ~PORT_PCR_MUX_MASK;
     PORTE->PCR[1] |= PORT_PCR_MUX(ALT5);
     
-    /* Set PTE4 as SPI1_pcs0 -- ALT2 */
+    /* Set PTE4 as SPI1_PCS0 -- ALT2 */
     PORTE->PCR[4] &= ~PORT_PCR_MUX_MASK;
     PORTE->PCR[4] |= PORT_PCR_MUX(ALT2);
     
@@ -54,20 +54,40 @@ void SPI1_vInit(void)
 }
 
 
-void SPI1_vTransmitPolling(const  char *data)
+/**
+ * @brief   Transmit character over SPI by polling.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+void SPI1_vTransmitByte(const char ucByte)
+{
+    while (!(SPI1->S  & SPI_S_SPTEF_MASK))
+    {
+        ; /* Wait until TX buffer empty */
+    }
+    
+    /* Send character */
+    SPI1->D = ucByte;
+}
+
+
+/**
+ * @brief   Transmit string over SPI by polling.
+ * 
+ * @param   pcData      String to send
+ *             
+ * @return  None
+ */
+void SPI1_vTransmitPolling(const  char *pcData)
 {
     /* Find size of array */
-    uint16_t dataLen = (uint16_t)strlen(data);
+    uint16_t dataLen = (uint16_t)strlen(pcData);
     
     /* Send the array of characters */
     for (uint16_t i = 0; i < dataLen; i++)
     {
-        while (!(SPI1->S  & SPI_S_SPTEF_MASK))
-        {
-            ; /* Wait until TX buffer empty */
-        }
-    
-        /* Send character */
-        SPI1->D = data[i];
+        SPI1_vTransmitByte(pcData[i]);
     }
 }

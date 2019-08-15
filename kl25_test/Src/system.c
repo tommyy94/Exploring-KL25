@@ -84,7 +84,7 @@ void vCreateTasks(void *const pvMotorTimers)
     
     configASSERT((uint32_t) pvMotorTimers);
     
-    xAssert = xTaskCreate(vSqlTask, (const char *)"SQL", SQLTASKSIZE / sizeof(portSTACK_TYPE), 0, SQLTASKPRIORITY, &xHandle);
+    xAssert = xTaskCreate(vFrameTask, (const char *)"SQL", SQLTASKSIZE / sizeof(portSTACK_TYPE), 0, SQLTASKPRIORITY, &xHandle);
     configASSERT(xAssert);
     
     xAssert = xTaskCreate(vSensorTask, (const char *)"Sensor", ANALOGTASKSIZE / sizeof(portSTACK_TYPE), 0, ANALOGTASKPRIORITY, &xHandle);

@@ -90,7 +90,6 @@ void UART0_vInit(const uint32_t ulBaudrate)
     UART0->C2 |= UART0_C2_TE(1) | UART0_C2_RE(1);
     
     UART0->C2 &= ~UART0_C2_RIE(1);
-    //UART0->C2 |= UART0_C2_TCIE(1);
     
     NVIC_SetPriority(UART0_IRQn, 2);
     NVIC_ClearPendingIRQ(UART0_IRQn);
