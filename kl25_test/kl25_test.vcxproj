@@ -66,7 +66,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
     <ClCompile>
       <CLanguageStandard>GNU99</CLanguageStandard>
-      <AdditionalIncludeDirectories>.;Inc;Src;FreeRTOS;FreeRTOS/config/KL25Z4/gcc;FreeRTOS/include;FreeRTOS/port/gcc;FreeRTOS/src;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;Inc;Src;FreeRTOS;FreeRTOS/config/KL25Z4/gcc;FreeRTOS/include;FreeRTOS/port/gcc;FreeRTOS/src;Drivers/Inc;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DEBUG=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>
       </AdditionalOptions>
@@ -83,9 +83,9 @@
       <LinkTimeOptimization>false</LinkTimeOptimization>
     </ClCompile>
     <Link>
-      <AdditionalLinkerInputs>;%(Link.AdditionalLinkerInputs)</AdditionalLinkerInputs>
-      <LibrarySearchDirectories>;%(Link.LibrarySearchDirectories)</LibrarySearchDirectories>
-      <AdditionalLibraryNames>;%(Link.AdditionalLibraryNames)</AdditionalLibraryNames>
+      <AdditionalLinkerInputs>%(Link.AdditionalLinkerInputs)</AdditionalLinkerInputs>
+      <LibrarySearchDirectories>%(Link.LibrarySearchDirectories)</LibrarySearchDirectories>
+      <AdditionalLibraryNames>%(Link.AdditionalLibraryNames)</AdditionalLibraryNames>
       <LinkerScript>MKL25Z128xxx4_flash.lds</LinkerScript>
       <VerboseMode>false</VerboseMode>
       <AdditionalOptions />
@@ -134,6 +134,12 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
   <ItemGroup>
+    <ClCompile Include="Drivers\Src\adc.c" />
+    <ClCompile Include="Drivers\Src\dma.c" />
+    <ClCompile Include="Drivers\Src\gpio.c" />
+    <ClCompile Include="Drivers\Src\spi.c" />
+    <ClCompile Include="Drivers\Src\tpm.c" />
+    <ClCompile Include="Drivers\Src\uart.c" />
     <ClCompile Include="FreeRTOS\port\gcc\port.c" />
     <ClCompile Include="FreeRTOS\src\croutine.c" />
     <ClCompile Include="FreeRTOS\src\event_groups.c" />
@@ -146,16 +152,19 @@
     <ClCompile Include="FreeRTOS\src\queue.c" />
     <ClCompile Include="FreeRTOS\src\tasks.c" />
     <ClCompile Include="FreeRTOS\src\timers.c" />
-    <ClCompile Include="Src\analog.c" />
+    <ClCompile Include="Src\sensors.c" />
     <ClCompile Include="Src\comm.c" />
-    <ClCompile Include="Src\dma.c" />
-    <ClCompile Include="Src\esp8266.c" />
-    <ClCompile Include="Src\gpio.c" />
     <ClCompile Include="Src\HS1101.c" />
-    <ClCompile Include="Src\hw_timers.c" />
+    <ClCompile Include="Src\motor.c" />
     <ClCompile Include="Src\main.c" />
     <ClCompile Include="Src\printf-stdarg.c" />
     <ClCompile Include="Src\system.c" />
+    <ClInclude Include="Drivers\Inc\adc.h" />
+    <ClInclude Include="Drivers\Inc\dma.h" />
+    <ClInclude Include="Drivers\Inc\gpio.h" />
+    <ClInclude Include="Drivers\Inc\spi.h" />
+    <ClInclude Include="Drivers\Inc\tpm.h" />
+    <ClInclude Include="Drivers\Inc\uart.h" />
     <ClInclude Include="FreeRTOS\config\KL25Z4\gcc\FreeRTOSConfig.h" />
     <ClInclude Include="FreeRTOS\include\croutine.h" />
     <ClInclude Include="FreeRTOS\include\deprecated_definitions.h" />
@@ -172,14 +181,11 @@
     <ClInclude Include="FreeRTOS\include\timers.h" />
     <ClInclude Include="FreeRTOS\port\gcc\portmacro.h" />
     <ClInclude Include="FreeRTOS\port\gcc\portTicks.h" />
-    <ClInclude Include="Inc\analog.h" />
+    <ClInclude Include="Inc\sensors.h" />
     <ClInclude Include="Inc\comm.h" />
     <ClInclude Include="Inc\defines.h" />
-    <ClInclude Include="Inc\dma.h" />
-    <ClInclude Include="Inc\esp8266.h" />
-    <ClInclude Include="Inc\gpio.h" />
     <ClInclude Include="Inc\HS1101.h" />
-    <ClInclude Include="Inc\hw_timers.h" />
+    <ClInclude Include="Inc\motor.h" />
     <ClInclude Include="Inc\includes.h" />
     <ClInclude Include="Inc\printf-stdarg.h" />
     <ClInclude Include="Inc\system.h" />

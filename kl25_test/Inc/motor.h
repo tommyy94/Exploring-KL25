@@ -1,6 +1,6 @@
 /**
- * timers.h
- * This header declares all timer related functions and variables.
+ * motor.h
+ * This header declares all motor related functions and variables.
  */
 
 #pragma once
@@ -29,9 +29,8 @@ struct Motor_States
     uint8_t ucMotorRunTime[MOTOR_COUNT];
 };
 
+
 /* Global function prototypes */
-void TPM0_vInit(const uint16_t usPeriod);
-void TPM0_vStartPWM(const uint8_t ucChannel, TimerHandle_t *const pxMotorTimers);
-void TPM0_vStopPWM(const uint8_t ucChannel, TimerHandle_t *const pxMotorTimers);
-void TPM1_vInit(void);
+void vStartMotor(const uint8_t ucChannel, TimerHandle_t *const pxMotorTimers);
+void vStopMotor(const uint8_t ucChannel, TimerHandle_t *const pxMotorTimers);
 void vMotorTask(void *const pvMotorTimers);

@@ -1,4 +1,9 @@
-#include "gpio.h"
+/**
+ * gpio.c
+ * This compilation unit handles GPIO.
+ */
+
+# include "gpio.h"
 
 
 /* Function descriptions */

@@ -29,7 +29,7 @@ void vSystemInit(void)
     /* Communications */
     DMA0_vInit();
     UART0_vInit(115200);
-    ESP8266_vInit();
+    SPI1_vInit();
 }
 
 
@@ -112,7 +112,7 @@ void vCreateMotorTimers(TimerHandle_t *const pxTimers)
     
     for (uint32_t i = 0; i < MOTOR_COUNT; i++)
     {
-        cBytesWritten = csnprintf(ucMotorTimerName, TIMER_NAME_LEN, "Motor Timer %u", i + 1);
+        cBytesWritten = csnprintf(ucMotorTimerName, TIMER_NAME_LEN, "Motor Timer %lu", i + 1);
         configASSERT(cBytesWritten >= 0);
         pxTimers[i] = xTimerCreate(ucMotorTimerName, pdMS_TO_TICKS(100), pdTRUE, (void *)i, vMotorTimerCallback);
         configASSERT(pxTimers[i]);
@@ -156,6 +156,13 @@ void vMotorTimerCallback(const TimerHandle_t xTimer)
 }
 
 
+/**
+ * @brief   Initializes OS, core and peripherals. Deleted afterwards.
+ * 
+ * @param   pvMotorTimers   Handle to motor timers.
+ * 
+ * @return  None
+ */
 void vStartupTask(void *const pvMotorTimers)
 {
     /* Initialize FreeRTOS components */

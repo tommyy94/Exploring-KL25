@@ -1,26 +1,19 @@
 /**
- * analog.h
- * This file handles all analog functionality.
+ * adc.h
+ * Driver module for MKL25 ADC peripheral.
  */
+
 #pragma once
 
-/* System includes */
-#include <stdint.h>
+/* System headers */
 
 /* Device vendor headers */
 #include "MKL25Z4.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
 
 /* User headers */
 #include "defines.h"
-#include "system.h"
-#include "hw_timers.h"
 
 /* Global defines */
-#define SOIL_MOISTURE_THRESHOLD                 (30UL)
-
 /* ADC0 trigger sources */
 #define SIM_SOPT7_ADC0TRGSEL_EXTRG_IN   	    (0x00)       	/* External trigger pin input (EXTRG_IN) */	
 #define SIM_SOPT7_ADC0TRGSEL_CMP0_OUT   	    (0x01)       	/* CMP0 output */
@@ -38,7 +31,6 @@
 #define ADC_SC3_AVGS_8SAMPLES                   (0x01)          /* 8 samples averaged */
 #define ADC_SC3_AVGS_16SAMPLES                  (0x02)          /* 16 samples averaged */
 #define ADC_SC3_AVGS_32SAMPLES                  (0x03)          /* 32 samples averaged */
-
 
 enum ADC_Channels
 {
@@ -76,19 +68,7 @@ enum ADC_Channels
 };
 
 
-struct Sensor
-{
-    int32_t lTemperature;
-    uint32_t ulHumidity;
-    uint32_t ulSoilMoisture[SOIL_MOISTURE_SENSOR_COUNT];
-    uint32_t ulPotentiometer;
-};
-
-extern QueueHandle_t xAnalogQueue;
-
-
 /* Global function prototypes */
 void ADC0_vInit(void);
 uint16_t ADC0_usReadPolling(const uint8_t ucChannel);
 void CMP0_vInit(void);
-void vSensorTask(void *const pvParam);

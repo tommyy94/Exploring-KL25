@@ -1,5 +1,5 @@
 /**
- * gpioh.
+ * dma.h
  * This compilation unit handles Direct Memory Access.
  */
 
@@ -55,3 +55,4 @@
 /* Global function prototypes */
 void DMA0_vInit(void);
 void DMA0_vStart(uint32_t *const pulDstAddr, uint32_t ulByteCount);
+void DMA0_vStop(void);

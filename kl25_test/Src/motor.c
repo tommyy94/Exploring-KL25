@@ -3,12 +3,10 @@
  * This header declares all motor related functions and variables.
  */
 
-#include "hw_timers.h"
+#include "motor.h"
 
 
 /* Local defines*/
-#define TPM0_CH0_PWM_PIN    (0UL)
-#define TPM1_IC_PIN         (13UL)
 
 /* Global variables */
 QueueHandle_t xMotorQueue;

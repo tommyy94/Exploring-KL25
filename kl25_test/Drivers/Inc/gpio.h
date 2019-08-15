@@ -1,5 +1,5 @@
 /**
- * gpioh.
+ * gpio.h
  * This compilation unit handles GPIO.
  */
 

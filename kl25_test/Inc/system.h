@@ -12,11 +12,14 @@
 
 /* User headers */
 #include "defines.h"
-#include "analog.h"
+#include "motor.h"
 #include "comm.h"
+#include "sensors.h"
 #include "gpio.h"
-#include "esp8266.h"
+#include "adc.h"
 #include "dma.h"
+#include "spi.h"
+#include "tpm.h"
 
 
 /* Global defines */
