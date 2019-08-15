@@ -6,12 +6,13 @@ Takes care of your precious plants.
 - [Description](#description)
 - [Hardware](#hardware)
 - [Notes](#notes)
+- [TODO](#todo)
 
 ## Description
 * Reads soil moisture, temperature and air humidity
 * Waters the plant(s) according to soil moisture
 * Sends data to remote database via Wi-FI
-* Utilizes microprocessors and Wi-Fi module low power modes to save energy
+* Utilizes microprocessors and Wi-Fi modules low power modes to save energy
 
 ## Hardware
 * Evaluation board: FRDM-KL25Z
@@ -21,3 +22,7 @@ Takes care of your precious plants.
 
 ## Notes
 * Notes go here
+
+## TODO
+* Web server
+* PCB
