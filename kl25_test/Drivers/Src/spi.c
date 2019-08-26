@@ -37,6 +37,8 @@ void SPI1_vInit(void)
      * Enable SS
      */
     SPI1->C1 = SPI_C1_MSTR_MASK | SPI_C1_SSOE_MASK;
+    
+    /* Master mode-fault function enable */
     SPI1->C2 = SPI_C2_MODFEN_MASK;
     
     /**
@@ -90,4 +92,29 @@ void SPI1_vTransmitPolling(const  char *pcData)
     {
         SPI1_vTransmitByte(pcData[i]);
     }
+}
+
+
+/**
+ * @brief   Transmit string over SPI by DMA.
+ * 
+ * @param   pcData      String to send
+ *             
+ * @return  None
+ */
+void SPI1_vTransmitDMA(const  char *pcData)
+{
+    /* Disable DMA receiver, enable transmitter */
+    BME_AND8(&SPI1->C2, ~(uint8_t )SPI_C2_RXDMAE(1));
+    BME_OR8(&SPI1->C2, SPI_C2_TXDMAE(1));
+    
+    /**
+     * Datasheet recommends starting transfer by reading status register
+     * and sending first byte by placing value to register
+     */
+    (void)SPI1->S;
+    SPI1->D = pcData[0];
+    
+    /* Send rest of the bytes */
+    DMA0_vStart((uint32_t *)pcData);
 }

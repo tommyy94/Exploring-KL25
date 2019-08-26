@@ -37,7 +37,7 @@ void vCommTask(void *const pvParam)
             /* Used to guard RF modules state in future */
             if (xSemaphoreTake(xCommSemaphore, (TickType_t)xTicksToWait))
             {
-                SPI1_vTransmitPolling(pxMessage->ucFrame);
+                SPI1_vTransmitDMA(pxMessage->ucFrame);
                 
                 /* This call should not fail in any circumstance */
                 xAssert = xSemaphoreGive(xCommSemaphore);

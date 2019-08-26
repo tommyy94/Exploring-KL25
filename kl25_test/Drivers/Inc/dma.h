@@ -7,6 +7,7 @@
 
 /* System headers */
 #include <stdint.h>
+#include "string.h"
 
 /* Devices vendor headers */
 #include "MKL25Z4.h"
@@ -54,5 +55,5 @@
 
 /* Global function prototypes */
 void DMA0_vInit(void);
-void DMA0_vStart(uint32_t *const pulDstAddr, uint32_t ulByteCount);
+void DMA0_vStart(uint32_t *const pulSrcAddr);
 void DMA0_vStop(void);

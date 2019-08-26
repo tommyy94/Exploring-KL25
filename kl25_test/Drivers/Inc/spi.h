@@ -19,8 +19,10 @@
 
 /* User headers */
 #include "defines.h"
+#include "dma.h"
 
 /* Global function prototypes */
 void SPI1_vInit(void);
 void SPI1_vTransmitByte(const char ucByte);
 void SPI1_vTransmitPolling(const char *pcData);
+void SPI1_vTransmitDMA(const  char *pcData);

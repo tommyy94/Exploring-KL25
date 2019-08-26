@@ -28,7 +28,7 @@ void vSystemInit(void)
     
     /* Communications */
     DMA0_vInit();
-    UART0_vInit(115200);
+    //UART0_vInit(115200);
     SPI1_vInit();
 }
 
@@ -219,4 +219,13 @@ void vAssertCalled(const uint32_t ulLine, char *const pcFile)
     }
     
     taskEXIT_CRITICAL();
+}
+
+
+/**
+ * Hard Fault handler.
+ */
+void HardFault_Handler(void)
+{
+    __BKPT();
 }
