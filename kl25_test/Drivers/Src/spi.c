@@ -104,9 +104,12 @@ void SPI1_vTransmitPolling(const  char *pcData)
  */
 void SPI1_vTransmitDMA(const  char *pcData)
 {
-    /* Disable DMA receiver, enable transmitter */
-    BME_AND8(&SPI1->C2, ~(uint8_t )SPI_C2_RXDMAE(1));
-    BME_OR8(&SPI1->C2, SPI_C2_TXDMAE(1));
+    /* Disable DMA receiver & transmitter */
+    BME_AND8(&SPI1->C2, ~(uint8_t)SPI_C2_RXDMAE(1));
+    BME_AND8(&SPI1->C2, ~(uint8_t)SPI_C2_TXDMAE(1));
+    
+    /* Set source and destination addresses */
+    DMA0_vInitTransaction((uint32_t *)pcData, (uint32_t *)&(SPI1->D));
     
     /**
      * Datasheet recommends starting transfer by reading status register
@@ -115,6 +118,9 @@ void SPI1_vTransmitDMA(const  char *pcData)
     (void)SPI1->S;
     SPI1->D = pcData[0];
     
+    /* Enable DMA transmitter */
+    BME_OR8(&SPI1->C2, SPI_C2_TXDMAE(1));
+    
     /* Send rest of the bytes */
-    DMA0_vStart((uint32_t *)pcData);
+    DMA0_vStart();
 }

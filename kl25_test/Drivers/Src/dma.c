@@ -6,10 +6,35 @@
 #include "dma.h"
 
 
+/* Local defines */
+#define BYTE_OFFSET     (0x01UL)
+
+
 /* Function descriptions */
 
+
 /**
- * @brief   Initialize DMA for UART0 RX.
+ * @brief   Initialize DMAMUX0.
+ * 
+ * @param   ucSource        DMA0 trigger source.
+ * 
+ * @return  None
+ */
+void DMAMUX0_vInit(uint8_t const ucSource)
+{
+    /* Enable clock gating */
+    SIM->SCGC6 |= SIM_SCGC6_DMAMUX(1);
+    
+    /* Disable DMA channel to configure it */
+    DMAMUX0->CHCFG[0] = 0;
+    
+    /* Enable DMA0 MUX channel with SPI1 TX as trigger */
+    DMAMUX0->CHCFG[0] = DMAMUX_CHCFG_SOURCE(ucSource) & (~DMAMUX_CHCFG_TRIG_MASK);
+}
+
+
+/**
+ * @brief   Initialize DMA for byte transfers on peripheral request.
  * 
  * @param   None
  * 
@@ -17,12 +42,8 @@
  */
 void DMA0_vInit(void)
 {
-    /* Turn on clock to DMA0 & DMAMUX */
+    /* Enable clock gating */
     SIM->SCGC7 |= SIM_SCGC7_DMA(1);
-    SIM->SCGC6 |= SIM_SCGC6_DMAMUX(1);
-
-    /* Disable DMA channel to configure it */
-    DMAMUX0->CHCFG[0] = 0;
 	
     /**
      * Generate interrupt on completion
@@ -36,9 +57,6 @@ void DMA0_vInit(void)
     /* Clear done flag */
     DMA0->DMA[0].DSR_BCR &= ~DMA_DSR_BCR_DONE(1);
     
-    /* Enable DMA0 MUX channel with SPI1 TX as trigger */
-    DMAMUX0->CHCFG[0] = DMAMUX_CHCFG_SOURCE(DMAMUX_CHCFG_SOURCE_SPI1_TX) & (~DMAMUX_CHCFG_TRIG_MASK);
-    
     /* Set NVIC for DMA ISR */
     NVIC_SetPriority(DMA0_IRQn, 2);
     NVIC_ClearPendingIRQ(DMA0_IRQn); 
@@ -47,29 +65,41 @@ void DMA0_vInit(void)
 
 
 /**
- * @brief   Set source and destination pointers and enable DMA0.
+ * @brief   Initialize DMA addresses and transfer size.
+ * 
+ * @param   pulSrcAddr      Source address
+ * @param   pulDstAddr      Destination address
+ * 
+ * @return  None
+ */
+void DMA0_vInitTransaction(uint32_t *const pulSrcAddr, uint32_t *const pulDstAddr)
+{
+    /* Initialize source & destination pointers */
+    DMA0->DMA[0].SAR = DMA_SAR_SAR((uint32_t)pulSrcAddr + BYTE_OFFSET); /* First byte sent by placing to register */
+    DMA0->DMA[0].DAR = DMA_DAR_DAR((uint32_t)pulDstAddr);
+    
+    /* Number of bytes to transmit */
+    DMA0->DMA[0].DSR_BCR |= DMA_DSR_BCR_BCR(strlen((const char *)pulSrcAddr) - BYTE_OFFSET); /* Subtract first byte sent from count */
+}
+
+
+/**
+ * @brief   Enable DMA0.
  * 
  * @param   pulSrcAddr      TX data adress
  * @param   ulByteCount     Number of bytes to receive.
  * 
  * @return  None
  */
-void DMA0_vStart(uint32_t *const pulSrcAddr)
+void DMA0_vStart(void)
 {
-    /* Initialize src & dst pointers */
-    DMA0->DMA[0].SAR = DMA_SAR_SAR((uint32_t)pulSrcAddr + 0x01); /* First byte sent by placing to register */
-    DMA0->DMA[0].DAR = DMA_DAR_DAR((uint32_t)(&(SPI1->D)));
-    
-    /* Number of bytes to transmit */
-    DMA0->DMA[0].DSR_BCR |= DMA_DSR_BCR_BCR(strlen((const char *)pulSrcAddr) - 1); /* Subtract first byte sent  from count */
-    
     /* Set enable flag */
     BME_OR32(&DMAMUX0->CHCFG[0], DMAMUX_CHCFG_ENBL(1));
 }
 
 
 /**
- * @brief   Stop DMA0 transfers.
+ * @brief   Disable DMA0.
  * 
  * @param   None
  * 
@@ -82,7 +112,7 @@ void DMA0_vStop(void)
 
 
 /**
- * @brief   DMA0 IRQ Handler for SPI1 TX complete.
+ * @brief   DMA0 IRQ Handler for transaction complete.
  * 
  * @param   None
  * 

@@ -21,6 +21,7 @@
 #include "spi.h"
 #include "tpm.h"
 #include "uart.h"
+#include "nrf24l01.h"
 
 
 /* Global defines */

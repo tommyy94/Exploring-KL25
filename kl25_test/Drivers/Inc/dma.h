@@ -54,6 +54,8 @@
 
 
 /* Global function prototypes */
+void DMAMUX0_vInit(uint8_t const ucSource);
 void DMA0_vInit(void);
-void DMA0_vStart(uint32_t *const pulSrcAddr);
+void DMA0_vInitTransaction(uint32_t *const pulSrcAddr, uint32_t *const pulDstAddr);
+void DMA0_vStart(void);
 void DMA0_vStop(void);
