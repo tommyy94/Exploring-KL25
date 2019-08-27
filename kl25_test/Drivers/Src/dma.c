@@ -123,5 +123,6 @@ void DMA0_IRQHandler(void)
     DMA0_vStop();
     BME_OR32(&DMA0->DMA[0].DSR_BCR, DMA_DSR_BCR_DONE(1));
     
-    SPI1_vSetSlave(TRUE);
+    /* Set SS line high */
+    SPI1_vSetSlave(HIGH);
 }

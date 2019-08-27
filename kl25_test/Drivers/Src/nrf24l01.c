@@ -39,18 +39,35 @@ void nRF24L01_vInit(void)
 }
 
 
+/**
+ * @brief   Read nRF24L01 register value.
+ * 
+ * @param   ucRegister      Register to read.
+ * 
+ * @return  value           Register value.
+ */
 uint32_t nRF24L01_ulReadRegister(uint8_t ucRegister)
 {
-    uint32_t byte;
+    uint32_t value;
     
-    FGPIOE->PDOR &= ~MASK(4);
+    /* Begin transfer */
+    SPI1_vSetSlave(LOW);
     
-    for (uint8_t i = 0; i < 32; i++)
-    {
-        SPI1_vTransmitByte(R_REGISTER + ucRegister);
-    }
+    /* Full-duplex needs to be receiving data when it's sending */
+    SPI1_vTransmitByte(R_REGISTER + NOP);           /* Status returned on first write */
+    SPI1_vTransmitByte(R_REGISTER + ucRegister);    /* Read register after second write */
     
-    byte = SPI1_ucReadPolling();
-    FGPIOE->PDOR |= MASK(4);
-    return (byte);
+    /* TODO: Add timeout/Implement DMA transfer/Implement interrupt on RX */
+    value = SPI1_ucReadPolling();
+    
+    /* End transfer */
+    SPI1_vSetSlave(HIGH);
+    
+    return (value);
+}
+
+
+void nRF24L01_vWriteRegister(uint8_t ucValue)
+{
+    
 }

@@ -139,8 +139,8 @@ void SPI1_vTransmitDMA(const  char *pcData)
     /* Set source and destination addresses */
     DMA0_vInitTransaction((uint32_t *)pcData, (uint32_t *)&(SPI1->D));
     
-    /* SPI Slave Select */
-    SPI1_vSetSlave(FALSE);
+    /* Set SS line low */
+    SPI1_vSetSlave(LOW);
     
     /**
      * Datasheet recommends starting transfer by reading status register
@@ -160,7 +160,7 @@ void SPI1_vTransmitDMA(const  char *pcData)
 /**
  * @brief   Set SS line high/low.
  * 
- * @param   ulState     TRUE/FALSE
+ * @param   ulState     HIGH/LOW
  *             
  * @return  None
  */
