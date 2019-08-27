@@ -15,7 +15,6 @@ struct AMessage
 
 /* Function descriptions */
 
-
 /**
  * @brief   FreeRTOS communication task.
  * 
@@ -38,6 +37,7 @@ void vCommTask(void *const pvParam)
             if (xSemaphoreTake(xCommSemaphore, (TickType_t)xTicksToWait))
             {
                 SPI1_vTransmitDMA(pxMessage->ucFrame);
+                //volatile uint32_t tmp = nRF24L01_ulReadRegister(0x04);
                 
                 /* This call should not fail in any circumstance */
                 xAssert = xSemaphoreGive(xCommSemaphore);

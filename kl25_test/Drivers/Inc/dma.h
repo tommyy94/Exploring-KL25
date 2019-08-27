@@ -15,6 +15,7 @@
 
 /* User headers */
 #include "defines.h"
+#include "spi.h"
 
 
 /* Global defines */

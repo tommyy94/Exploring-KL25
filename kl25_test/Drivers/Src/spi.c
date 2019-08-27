@@ -7,6 +7,21 @@
 #include "spi.h"
 
 
+/* Local defines */
+#define MISO    (1UL)
+#define SCK     (2UL)
+#define MOSI    (3UL)
+#define SS      (4UL)
+
+/* Function descriptions */
+
+/**
+ * @brief   Initialize SPI1 peripheral. Manual SS is used to read slave registers.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
 void SPI1_vInit(void)
 {
     /* Enable clock to SPI1 */
@@ -16,30 +31,25 @@ void SPI1_vInit(void)
     /* Disable SPI during configuration */
     SPI1->C1 &= ~SPI_C1_SPE_MASK;
     
-    /* Set PTE2 as SPI1_SCK -- ALT2 */
-    PORTE->PCR[2] &= ~PORT_PCR_MUX_MASK;
-    PORTE->PCR[2] |= PORT_PCR_MUX(ALT2);
+    /* Set PTE2 as SPI1_SCK */
+    PORTE->PCR[SCK] &= ~PORT_PCR_MUX_MASK;
+    PORTE->PCR[SCK] |= PORT_PCR_MUX(ALT2);
     
-    /* Set PTE3 as SPI1_MOSI -- ALT5 */
-    PORTE->PCR[3] &= ~PORT_PCR_MUX_MASK;
-    PORTE->PCR[3] |= PORT_PCR_MUX(ALT5);
+    /* Set PTE3 as SPI1_MOSI */
+    PORTE->PCR[MOSI] &= ~PORT_PCR_MUX_MASK;
+    PORTE->PCR[MOSI] |= PORT_PCR_MUX(ALT5);
     
-    /* Set PTE1 as SPI1_MISO -- ALT5 */
-    PORTE->PCR[1] &= ~PORT_PCR_MUX_MASK;
-    PORTE->PCR[1] |= PORT_PCR_MUX(ALT5);
+    /* Set PTE1 as SPI1_MISO */
+    PORTE->PCR[MISO] &= ~PORT_PCR_MUX_MASK;
+    PORTE->PCR[MISO] |= PORT_PCR_MUX(ALT5);
     
-    /* Set PTE4 as SPI1_PCS0 -- ALT2 */
-    PORTE->PCR[4] &= ~PORT_PCR_MUX_MASK;
-    PORTE->PCR[4] |= PORT_PCR_MUX(ALT2);
+    /* Set PTE4 as GPIO - SS */
+    PORTE->PCR[SS] = PORT_PCR_MUX(ALT1);
+    FGPIOE->PDDR |= MASK(SS);
+    FGPIOE->PDOR |= MASK(SS);
     
-    /**
-     * Select master mode
-     * Enable SS
-     */
-    SPI1->C1 = SPI_C1_MSTR_MASK | SPI_C1_SSOE_MASK;
-    
-    /* Master mode-fault function enable */
-    SPI1->C2 = SPI_C2_MODFEN_MASK;
+    /* Select master mode */
+    SPI1->C1 = SPI_C1_MSTR_MASK;
     
     /**
      * Select active high clock
@@ -53,6 +63,24 @@ void SPI1_vInit(void)
     
     /* Enable SPI1 */
     SPI1->C1 |= SPI_C1_SPE_MASK;
+}
+
+
+/**
+ * @brief   Read byte from SPI1 receive buffer.
+ * 
+ * @param   None
+ * 
+ * @return  SPI1->D     Received byte
+ */
+uint8_t SPI1_ucReadPolling(void)
+{
+    while (!(SPI1->S & SPI_S_SPRF(1)))
+    {
+        ; /* Wait until buffer full */
+    }
+    
+    return SPI1->D;
 }
 
 
@@ -111,6 +139,9 @@ void SPI1_vTransmitDMA(const  char *pcData)
     /* Set source and destination addresses */
     DMA0_vInitTransaction((uint32_t *)pcData, (uint32_t *)&(SPI1->D));
     
+    /* SPI Slave Select */
+    SPI1_vSetSlave(FALSE);
+    
     /**
      * Datasheet recommends starting transfer by reading status register
      * and sending first byte by placing value to register
@@ -123,4 +154,21 @@ void SPI1_vTransmitDMA(const  char *pcData)
     
     /* Send rest of the bytes */
     DMA0_vStart();
+}
+
+
+/**
+ * @brief   Set SS line high/low.
+ * 
+ * @param   ulState     TRUE/FALSE
+ *             
+ * @return  None
+ */
+void SPI1_vSetSlave(const uint32_t ulState)
+{
+    /* Figure out whether to set or clear bit */
+    const uint32_t *reg = (uint32_t *)&FGPIOE->PCOR - ulState;
+    
+    /* Perform bitwise operation */
+    BME_OR32(&(*reg), MASK(SS));
 }

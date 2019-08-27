@@ -23,6 +23,8 @@
 
 /* Global function prototypes */
 void SPI1_vInit(void);
+uint8_t SPI1_ucReadPolling(void);
 void SPI1_vTransmitByte(const char ucByte);
 void SPI1_vTransmitPolling(const char *pcData);
 void SPI1_vTransmitDMA(const  char *pcData);
+void SPI1_vSetSlave(const uint32_t ulState);

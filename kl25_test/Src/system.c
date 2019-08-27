@@ -29,9 +29,8 @@ void vSystemInit(void)
     /* Communications */
     DMAMUX0_vInit(DMAMUX_CHCFG_SOURCE_SPI1_TX);
     DMA0_vInit();
-    //UART0_vInit(115200);
     SPI1_vInit();
-    NRF24L01_vInit();
+    nRF24L01_vInit();
 }
 
 
