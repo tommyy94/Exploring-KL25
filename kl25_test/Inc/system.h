@@ -11,16 +11,10 @@
 #include "event_groups.h"
 
 /* User headers */
-#include "defines.h"
-#include "motor.h"
 #include "comm.h"
-#include "sensors.h"
-#include "gpio.h"
 #include "adc.h"
-#include "dma.h"
-#include "spi.h"
 #include "tpm.h"
-#include "uart.h"
+#include "dma.h"
 #include "nrf24l01.h"
 
 
