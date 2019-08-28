@@ -86,12 +86,11 @@ void DMA0_vInitTransaction(uint32_t *const pulSrcAddr, uint32_t *const pulDstAdd
 /**
  * @brief   Enable DMA0.
  * 
- * @param   pulSrcAddr      TX data adress
- * @param   ulByteCount     Number of bytes to receive.
+ * @param   None
  * 
  * @return  None
  */
-void DMA0_vStart(void)
+__INLINE void DMA0_vStart(void)
 {
     /* Set enable flag */
     BME_OR32(&DMAMUX0->CHCFG[0], DMAMUX_CHCFG_ENBL(1));
@@ -105,24 +104,7 @@ void DMA0_vStart(void)
  * 
  * @return  None
  */
-void DMA0_vStop(void)
+__INLINE void DMA0_vStop(void)
 {
     BME_AND32(&DMAMUX0->CHCFG[0], ~DMAMUX_CHCFG_ENBL(1));
-}
-
-
-/**
- * @brief   DMA0 IRQ Handler for transaction complete.
- * 
- * @param   None
- * 
- * @return  None
- */
-void DMA0_IRQHandler(void)
-{
-    DMA0_vStop();
-    BME_OR32(&DMA0->DMA[0].DSR_BCR, DMA_DSR_BCR_DONE(1));
-    
-    /* Set SS line high */
-    SPI1_vSetSlave(HIGH);
 }
