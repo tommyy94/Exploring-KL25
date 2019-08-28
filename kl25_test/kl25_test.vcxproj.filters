@@ -179,6 +179,9 @@
     <ClCompile Include="Src\sensors.c">
       <Filter>Source files\Src</Filter>
     </ClCompile>
+    <ClCompile Include="Drivers\Src\nrf24l01.c">
+      <Filter>Drivers\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FreeRTOS\include\croutine.h">
@@ -270,6 +273,9 @@
     </ClInclude>
     <ClInclude Include="Inc\sensors.h">
       <Filter>Source files\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Drivers\Inc\nrf24l01.h">
+      <Filter>Drivers\Inc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

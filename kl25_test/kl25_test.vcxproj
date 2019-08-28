@@ -137,6 +137,7 @@
     <ClCompile Include="Drivers\Src\adc.c" />
     <ClCompile Include="Drivers\Src\dma.c" />
     <ClCompile Include="Drivers\Src\gpio.c" />
+    <ClCompile Include="Drivers\Src\nrf24l01.c" />
     <ClCompile Include="Drivers\Src\spi.c" />
     <ClCompile Include="Drivers\Src\tpm.c" />
     <ClCompile Include="Drivers\Src\uart.c" />
@@ -162,6 +163,7 @@
     <ClInclude Include="Drivers\Inc\adc.h" />
     <ClInclude Include="Drivers\Inc\dma.h" />
     <ClInclude Include="Drivers\Inc\gpio.h" />
+    <ClInclude Include="Drivers\Inc\nrf24l01.h" />
     <ClInclude Include="Drivers\Inc\spi.h" />
     <ClInclude Include="Drivers\Inc\tpm.h" />
     <ClInclude Include="Drivers\Inc\uart.h" />
