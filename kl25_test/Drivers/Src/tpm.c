@@ -17,7 +17,6 @@
  * @param   usPeriod    PWM period
  * 
  * @return  None
- * @todo    Figure out correct/adjustable duty cycle and period.
  */
 void TPM0_vInit(const uint16_t usPeriod)
 {
