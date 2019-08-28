@@ -20,6 +20,7 @@
     <ProjectFile>kl25_test.vcxproj</ProjectFile>
     <RemoteBuildEnvironment>
       <Records />
+      <EnvironmentSetupFiles />
     </RemoteBuildEnvironment>
     <ParallelJobCount>1</ParallelJobCount>
     <SuppressDirectoryChangeMessages>true</SuppressDirectoryChangeMessages>
@@ -118,7 +119,7 @@
         <SearchInIncludeSubdirs>true</SearchInIncludeSubdirs>
       </DiscoverySettings>
       <CheckForClangFormatFiles>true</CheckForClangFormatFiles>
-      <FormattingEngine xsi:nil="true" />
+      <FormattingEngine>ClangFormat</FormattingEngine>
     </ExtraSettings>
     <CodeAnalyzerSettings>
       <Enabled>true</Enabled>
@@ -137,12 +138,10 @@
         <string>alpha.core.SizeofPtr</string>
         <string>alpha.core.StackAddressAsyncEscape</string>
         <string>alpha.core.TestAfterDivZero</string>
-        <string>alpha.cplusplus.IteratorRange</string>
         <string>alpha.deadcode.UnreachableCode</string>
         <string>alpha.security.ArrayBoundV2</string>
         <string>alpha.security.MallocOverflow</string>
         <string>alpha.security.ReturnPtrRange</string>
-        <string>alpha.unix.BlockInCriticalSection</string>
         <string>apiModeling.google.GTest</string>
         <string>core.builtin.BuiltinFunctions</string>
         <string>core.builtin.NoReturnFunctions</string>
@@ -164,14 +163,18 @@
         <string>cplusplus.NewDeleteLeaks</string>
         <string>cplusplus.SelfAssignment</string>
         <string>deadcode.DeadStores</string>
+        <string>nullability.NullablePassedToNonnull</string>
+        <string>nullability.NullableReturnedFromNonnull</string>
         <string>nullability.NullPassedToNonnull</string>
         <string>nullability.NullReturnedFromNonnull</string>
         <string>optin.performance.Padding</string>
+        <string>optin.portability.UnixAPI</string>
         <string>security.FloatLoopCounter</string>
         <string>security.insecureAPI.getpw</string>
         <string>security.insecureAPI.gets</string>
         <string>security.insecureAPI.mkstemp</string>
         <string>security.insecureAPI.mktemp</string>
+        <string>security.insecureAPI.rand</string>
         <string>security.insecureAPI.strcpy</string>
         <string>security.insecureAPI.UncheckedReturn</string>
         <string>security.insecureAPI.vfork</string>
@@ -272,6 +275,16 @@
         <ExplicitEndOfFLASH>0</ExplicitEndOfFLASH>
         <ExplicitEndOfRAM>0</ExplicitEndOfRAM>
       </InstrumentedFunctions>
+      <RTOSFeatures>
+        <RTOSFeatureSetting>
+          <FeatureID>com.sysprogs.analysis.thread.timing</FeatureID>
+          <Enabled>true</Enabled>
+        </RTOSFeatureSetting>
+        <RTOSFeatureSetting>
+          <FeatureID>com.sysprogs.analysis.freertos.queues</FeatureID>
+          <Enabled>true</Enabled>
+        </RTOSFeatureSetting>
+      </RTOSFeatures>
     </DynamicAnalysisSettings>
     <EndOfStackSymbol>_estack</EndOfStackSymbol>
     <TimestampProviderTicksPerSecond>0</TimestampProviderTicksPerSecond>
