@@ -11,8 +11,8 @@
 #define IRQ             (2UL)       /* Interrupt Request */
 
 #define NOP             (0xFFUL)    /* No Operation to read STATUS register */
-#define R_REGISTER      (0x0UL)     /* Read command and status registers */
-#define W_REGISTER      (0x0UL)     /* Write command and status registers - power down/standby modes only */
+#define R_REGISTER      (0x00UL)    /* Read command and status registers */
+#define W_REGISTER      (0x20UL)    /* Write command and status registers - power down/standby modes only */
 
 /* Function descriptions */
 
@@ -34,7 +34,7 @@ void nRF24L01_vInit(void)
     /* Set output */
     FGPIOA->PDDR |= MASK(CE);
     
-    /* Enable NRF24L01 */
+    /* Enable nRF24L01 */
     FGPIOA->PDOR |= MASK(CE);
 }
 
@@ -46,28 +46,33 @@ void nRF24L01_vInit(void)
  * 
  * @return  value           Register value.
  */
-uint32_t nRF24L01_ulReadRegister(uint8_t ucRegister)
+uint8_t nRF24L01_ucReadRegister(const uint8_t ucRegister)
 {
-    uint32_t value;
-    
-    /* Begin transfer */
-    SPI1_vSetSlave(LOW);
+    uint8_t ucValue;
     
     /* Full-duplex needs to be receiving data when it's sending */
-    SPI1_vTransmitByte(R_REGISTER + NOP);           /* Status returned on first write */
-    SPI1_vTransmitByte(R_REGISTER + ucRegister);    /* Read register after second write */
+    SPI1_vTransmitByte(NOP);                        /* Status returned on first write */
+    (void)SPI1_ucReadPolling();                     /* TODO: Add timeout/Implement DMA transfer/Implement interrupt on RX */
     
-    /* TODO: Add timeout/Implement DMA transfer/Implement interrupt on RX */
-    value = SPI1_ucReadPolling();
+    SPI1_vTransmitByte(R_REGISTER | ucRegister);    /* Read register after second write */
+    ucValue = SPI1_ucReadPolling();                 /* TODO: Add timeout/Implement DMA transfer/Implement interrupt on RX */
     
-    /* End transfer */
-    SPI1_vSetSlave(HIGH);
-    
-    return (value);
+    return (ucValue);
 }
 
 
-void nRF24L01_vWriteRegister(uint8_t ucValue)
-{
+/**
+ * @brief   Write nRF24L01 register.
+ * 
+ * @param   ucRegister      Register to write.
+ * @param   ucValue         Value to write.
+ * 
+ * @return  None
+ */
+void nRF24L01_vWriteRegister(const uint8_t ucRegister, const uint8_t ucValue)
+{    
+    const uint8_t ucData[] = { ucRegister, ucValue, 0x00 }; /* Add null-terminator for strlen() */
     
+    /* First transfer register, then value */
+    SPI1_vTransmitDMA((const char *)ucData);
 }

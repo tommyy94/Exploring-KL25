@@ -23,4 +23,5 @@
 
 /* Function prototypes */
 void nRF24L01_vInit(void);
-uint32_t nRF24L01_ulReadRegister(uint8_t ucRegister);
+uint8_t nRF24L01_ucReadRegister(const uint8_t ucRegister);
+void nRF24L01_vWriteRegister(const uint8_t ucRegister, const uint8_t ucValue);
