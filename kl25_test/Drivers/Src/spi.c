@@ -55,8 +55,7 @@ void SPI1_vInit(void)
      * Select active high clock
      * First edge sample
      */
-    SPI1->C1 &= ~SPI_C1_CPHA_MASK;
-    SPI1->C1 &= ~SPI_C1_CPOL_MASK;
+    SPI1->C1 &= ~(SPI_C1_CPHA_MASK & SPI_C1_CPOL_MASK);
     
     /* Baudrate = Bus clock / ((SPPR + 1) * 2^^(SPR+1)) */
     SPI1->BR = SPI_BR_SPPR(2) | SPI_BR_SPR(1);
@@ -139,9 +138,6 @@ void SPI1_vTransmitDMA(const  char *pcData)
     /* Set source and destination addresses */
     DMA0_vInitTransaction((uint32_t *)pcData, (uint32_t *)&(SPI1->D));
     
-    /* Set SS line low */
-    SPI1_vSetSlave(LOW);
-    
     /**
      * Datasheet recommends starting transfer by reading status register
      * and sending first byte by placing value to register
@@ -167,8 +163,8 @@ void SPI1_vTransmitDMA(const  char *pcData)
 void SPI1_vSetSlave(const uint32_t ulState)
 {
     /* Figure out whether to set or clear bit */
-    const uint32_t *reg = (uint32_t *)&FGPIOE->PCOR - ulState;
+    const uint32_t *pulReg = (uint32_t *)&FGPIOE->PCOR - ulState; /* Subtract 0 - 1 words from PCOR address => pulReg = FGPIOE->PSOR/PCOR */
     
     /* Perform bitwise operation */
-    BME_OR32(&(*reg), MASK(SS));
+    BME_OR32(&(*pulReg), MASK(SS));
 }
