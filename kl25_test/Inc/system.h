@@ -19,26 +19,23 @@
 
 
 /* Global defines */
-#define MSEC_TO_TICK(msec)      (((uint32_t)(msec)+500uL/(uint32_t)configTICK_RATE_HZ) \
-                                *(uint32_t)configTICK_RATE_HZ/1000uL)
-#define TICKS_TO_MSEC(tick)     ((tick)*1000uL/(uint32_t)configTICK_RATE_HZ)
-    
-#define ANALOGTASKSIZE          (2048UL)
-#define ANALOGTASKPRIORITY      (6UL)
-    
-#define SQLTASKSIZE             (1024UL)
-#define SQLTASKPRIORITY         (5UL)
-    
-#define COMMTASKSIZE            (2048UL)
-#define COMMTASKPRIORITY        (4UL)
-    
-#define MOTORTASKSIZE           (1024UL)
-#define MOTORTASKPRIORITY       (7UL)
-    
-#define STARTUPTASKSIZE         (4096UL)
+#define MSEC_TO_TICK(msec)      (((uint32_t)(msec) + 500uL / (uint32_t)configTICK_RATE_HZ) * (uint32_t)configTICK_RATE_HZ / 1000uL)
+#define TICKS_TO_MSEC(tick)     ((tick)*1000uL / (uint32_t)configTICK_RATE_HZ)
+#define MAX_QUEUE_SIZE          (32UL)
+
+/* Task priorities */
+#define ANALOGTASKPRIORITY      (4UL)
+#define FRAMETASKPRIORITY         (5UL)
+#define COMMTASKPRIORITY        (7UL)
+#define MOTORTASKPRIORITY       (6UL)
 #define STARTUPTASKPRIORITY     (10UL)
 
-#define MAX_QUEUE_SIZE          (32UL)
+/* Task sizes */
+#define ANALOGTASKSIZE          (2048UL)    
+#define FRAMETASKSIZE             (1024UL)    
+#define COMMTASKSIZE            (2048UL)    
+#define MOTORTASKSIZE           (1024UL)    
+#define STARTUPTASKSIZE         (4096UL)
 
     
 /* Global variables */
