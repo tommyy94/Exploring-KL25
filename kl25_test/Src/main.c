@@ -2,7 +2,7 @@
 
 
 /**
- * @brief   FreeRTOS software timer callback.
+ * @brief   The main function.
  * 
  * @param   None
  * 
