@@ -140,7 +140,6 @@
     <ClCompile Include="Drivers\Src\nrf24l01.c" />
     <ClCompile Include="Drivers\Src\spi.c" />
     <ClCompile Include="Drivers\Src\tpm.c" />
-    <ClCompile Include="Drivers\Src\uart.c" />
     <ClCompile Include="FreeRTOS\port\gcc\port.c" />
     <ClCompile Include="FreeRTOS\src\croutine.c" />
     <ClCompile Include="FreeRTOS\src\event_groups.c" />
@@ -166,7 +165,6 @@
     <ClInclude Include="Drivers\Inc\nrf24l01.h" />
     <ClInclude Include="Drivers\Inc\spi.h" />
     <ClInclude Include="Drivers\Inc\tpm.h" />
-    <ClInclude Include="Drivers\Inc\uart.h" />
     <ClInclude Include="FreeRTOS\config\KL25Z4\gcc\FreeRTOSConfig.h" />
     <ClInclude Include="FreeRTOS\include\croutine.h" />
     <ClInclude Include="FreeRTOS\include\deprecated_definitions.h" />
