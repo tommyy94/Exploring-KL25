@@ -5,11 +5,14 @@
 
 #include "tpm.h"
 
-
+/* Local defines */
 #define TPM0_CH0_PWM_PIN    (0UL)
 #define TPM1_IC_PIN         (13UL)
 
-#define TPM2_COMPENSATION   (5UL)
+/* Timings calculated from 24 MHz clock speed */
+#define MICROSECOND         (24UL)                                  /* 1.0 탎 */
+#define TIME_BETWEEN_BYTES  (6UL)                                   /* 0.25 탎 */
+#define TIME_PER_BYTE       (MICROSECOND * 2 + TIME_BETWEEN_BYTES)  /* 2.25 탎 */
 
 /* Function descriptions */
 
@@ -120,9 +123,9 @@ void TPM2_vInit(void)
 
     /**
      * Enable timer overflow interrupts
-     * Divide by 16 prescaler
+     * Divide by 2 prescaler => 24 MHz clock speed
      */
-    TPM2->SC = TPM_SC_PS(4) | TPM_SC_TOIE(1);
+    TPM2->SC = TPM_SC_PS(1) | TPM_SC_TOIE(1);
 
     /* Set NVIC for TPM2 ISR */
     NVIC_SetPriority(TPM2_IRQn, 3);
@@ -134,14 +137,14 @@ void TPM2_vInit(void)
 /**
  * @brief   Wrapper function for loading TPM2 counter.
  * 
- * @detail  TPM2 is configured to 48 MHz/16 prescaler = 3 MHz clock speed.
+ * @detail  TPM2 is configured to 48 MHz/2 prescaler = 24 MHz clock speed.
  * 
  * @note    timePerBit = 250 ns
  *          => timePerByte = 2 탎
  *          timeBetweenBytes = 0.25 탎
  *          => timePerByte = 2.25 탎
  *          
- *          deliveryTime = timePerByte * numberOfBytes - timeBetweenBytes  // Trim last timeBetweenBytes
+ *          deliveryTime = timePerByte * numberOfBytes - timeBetweenBytes
  * 
  *          Note: 2 탎 overhead at beginning
  * 
@@ -151,7 +154,7 @@ void TPM2_vInit(void)
  */
 void TPM2_vLoadCounter(uint8_t ucBytes)
 {
-    TPM2->MOD = (3 * ucBytes * 3) + TPM2_COMPENSATION;
+    TPM2->MOD = TIME_PER_BYTE * ucBytes - TIME_BETWEEN_BYTES; /* Last delay between bytes not needed */
 }
 
 
