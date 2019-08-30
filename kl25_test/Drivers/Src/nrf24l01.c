@@ -53,20 +53,12 @@ void nRF24L01_vInit(void)
 uint8_t nRF24L01_ucReadRegister(const uint8_t ucRegister)
 {
     uint8_t ucValue;
-    
-    /* Begin transfer */
-    SPI1_vSetSlave(LOW);
-    
-    /* Status returned on first write */
-    SPI1_vTransmitByte(R_REGISTER | ucRegister);
-    (void)SPI1_ucReadPolling(); /* Discard status */
-    
-    /* Read register after second write */
-    SPI1_vTransmitByte(R_REGISTER | ucRegister);
+
+    const uint8_t ucData[] = { R_REGISTER | ucRegister, R_REGISTER | ucRegister, 0x00 }; /* Add null-terminator for strlen() */
+
+    SPI1_vTransmitDMA((const char *)ucData);
+    (void)SPI1_ucReadPolling(); /* Discard status byte */
     ucValue = SPI1_ucReadPolling();
-    
-    /* End transfer */
-    SPI1_vSetSlave(HIGH);    
     
     return (ucValue);
 }
