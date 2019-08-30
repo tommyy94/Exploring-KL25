@@ -20,6 +20,7 @@
 /* User headers */
 #include "defines.h"
 #include "sensors.h"
+#include "tpm.h"
 #include "printf-stdarg.h"
 
 /* Global defines */

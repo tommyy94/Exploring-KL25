@@ -13,8 +13,6 @@ struct AMessage
     char ucFrame[MAX_FRAME_SIZE];
 } xMessage;
 
-/* Local function prototypes */
-static void vWaitUntilTransferCplt(void);
     
 /* Function descriptions */
 
@@ -39,19 +37,12 @@ void vCommTask(void *const pvParam)
         {
             /* Used to guard RF modules state in future */
             if (xSemaphoreTake(xCommSemaphore, (TickType_t)xTicksToWait))
-            {                
-                /* Begin transfer */
-                SPI1_vSetSlave(LOW);
-                
-                nRF24L01_vWriteRegister(0x05, 0x67);
-                //SPI1_vTransmitDMA(pxMessage->ucFrame);
-                
-                /* Block task until all bytes sent */
-                vWaitUntilTransferCplt();
-                
-                /* End transfer */
-                SPI1_vSetSlave(HIGH);
-                
+            {
+                //(void)nRF24L01_ucReadRegister(0x05);
+                //nRF24L01_vWriteRegister(0x05, 0x33);
+                //(void)nRF24L01_ucReadRegister(0x05);
+                SPI1_vTransmitDMA(pxMessage->ucFrame);
+
                 /* This call should not fail in any circumstance */
                 xAssert = xSemaphoreGive(xCommSemaphore);
                 configASSERT(xAssert == pdTRUE);
@@ -103,57 +94,32 @@ void vFrameTask(void *const pvParam)
 
 
 /**
- * @brief   DMA0 IRQ Handler for transaction complete.
- * 
- * @note    This handler triggers after last byte is moved to SPI TX register.
- *          The Slave Select line can't be pulled HIGH afterwards, because
- *          the byte is still being transmitted so some delay is needed.
- *          Delay introduced by sending task notification should be
- *          sufficient in this case.
+ * @brief   Sets SPI1 SS line high and stops DMA0.
  * 
  * @param   None
  * 
  * @return  None
  */
-void DMA0_IRQHandler(void)
+void TPM2_IRQHandler(void)
 {
-    /**
-     * Check for:
-     *  Configuration error
-     *  Bus error on source
-     *  Bus error on destination
-     */
-    configASSERT(DMA0->DMA[0].DSR_BCR & ~(DMA_DSR_BCR_CE(1) & DMA_DSR_BCR_BES(1) & DMA_DSR_BCR_BED(1)));
-    
-    DMA0_vStop();
-    
-    /* Clear DONE & error bits */
-    BME_OR32(&DMA0->DMA[0].DSR_BCR, DMA_DSR_BCR_DONE(1));
-    
-    /*-----------------------------------------------------------*/
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    
-    /* Send transfer complete signal */
-    vTaskNotifyGiveFromISR(xCommTaskHandle, &xHigherPriorityTaskWoken);
-    
-    /* Force context switch if xHigherPriorityTaskWoken is set to pdTRUE */
-    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);   
-}
+    if (BME_UBFX32(&TPM2->STATUS, TPM_STATUS_TOF_SHIFT, 1))
+    {
+        SPI1_vSetSlave(HIGH);
 
+        TPM2_vStop();
 
-/**
- * @brief   This function blocks callee task until SPI transfer is completed.
- * 
- * @param   None
- * 
- * @return  None
- */
-static void vWaitUntilTransferCplt(void)
-{
-    BaseType_t xAssert;
-    const TickType_t xTicksToWait = 10 / portTICK_PERIOD_MS;
-    
-    /* Wait until transfer done */
-    xAssert = ulTaskNotifyTake(pdTRUE, xTicksToWait);
-    configASSERT(xAssert == pdPASS);
+        /* Reset counters */
+        TPM2->CNT = 0;
+
+        /* Disable DMA transmitter */
+        BME_AND8(&SPI1->C2, ~(uint8_t)SPI_C2_TXDMAE(1));
+
+        DMA0_vStop();
+
+        /* Clear DONE & error bits */
+        BME_OR32(&DMA0->DMA[0].DSR_BCR, DMA_DSR_BCR_DONE(1));
+    }
+
+    /* Clear Timer Overflow Flag */
+    BME_OR32(&TPM2->STATUS, TPM_STATUS_TOF(1));
 }
