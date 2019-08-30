@@ -8,15 +8,18 @@
 
 
 /* Local defines */
-#define MISO    (1UL)
-#define SCK     (2UL)
-#define MOSI    (3UL)
-#define SS      (4UL)
+#define MISO            (1UL)
+#define SCK             (2UL)
+#define MOSI            (3UL)
+#define SS              (4UL)
+
 
 /* Function descriptions */
 
 /**
- * @brief   Initialize SPI1 peripheral. Manual SS is used to read slave registers.
+ * @brief   Initialize SPI1 peripheral. Manual SS used for full-duplex mode.
+ * 
+ * @details Baud rate = 48 MHz/(3*2²) = 4 MHz = 250 ns/bit
  * 
  * @param   None
  * 
@@ -43,7 +46,7 @@ void SPI1_vInit(void)
     PORTE->PCR[MISO] &= ~PORT_PCR_MUX_MASK;
     PORTE->PCR[MISO] |= PORT_PCR_MUX(ALT5);
     
-    /* Set PTE4 as GPIO - SS */
+    /* Set PTE4 as manual SS */
     PORTE->PCR[SS] = PORT_PCR_MUX(ALT1);
     FGPIOE->PDDR |= MASK(SS);
     FGPIOE->PDOR |= MASK(SS);
@@ -131,12 +134,18 @@ void SPI1_vTransmitPolling(const  char *pcData)
  */
 void SPI1_vTransmitDMA(const  char *pcData)
 {
-    /* Disable DMA receiver & transmitter */
-    BME_AND8(&SPI1->C2, ~(uint8_t)SPI_C2_RXDMAE(1));
-    BME_AND8(&SPI1->C2, ~(uint8_t)SPI_C2_TXDMAE(1));
-    
+    const uint8_t ucLength = strlen(pcData);
+
+    /* Set transfer duration */
+    TPM2_vLoadCounter(ucLength);
+
     /* Set source and destination addresses */
-    DMA0_vInitTransaction((uint32_t *)pcData, (uint32_t *)&(SPI1->D));
+    DMA0_vInitTransaction((uint32_t *)pcData, (uint32_t *)&(SPI1->D), ucLength);
+    
+    /* Begin transfer */
+    SPI1_vSetSlave(LOW);
+
+    TPM2_vStart();
     
     /**
      * Datasheet recommends starting transfer by reading status register
@@ -144,7 +153,7 @@ void SPI1_vTransmitDMA(const  char *pcData)
      */
     (void)SPI1->S;
     SPI1->D = pcData[0];
-    
+
     /* Enable DMA transmitter */
     BME_OR8(&SPI1->C2, SPI_C2_TXDMAE(1));
     

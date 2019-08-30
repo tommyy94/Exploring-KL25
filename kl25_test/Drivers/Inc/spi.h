@@ -20,6 +20,7 @@
 /* User headers */
 #include "defines.h"
 #include "dma.h"
+#include "tpm.h"
 
 /* Global function prototypes */
 void SPI1_vInit(void);
