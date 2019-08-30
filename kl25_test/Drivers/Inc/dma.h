@@ -7,7 +7,6 @@
 
 /* System headers */
 #include <stdint.h>
-#include "string.h"
 
 /* Devices vendor headers */
 #include "MKL25Z4.h"
@@ -57,6 +56,6 @@
 /* Global function prototypes */
 void DMAMUX0_vInit(uint8_t const ucSource);
 void DMA0_vInit(void);
-void DMA0_vInitTransaction(uint32_t *const pulSrcAddr, uint32_t *const pulDstAddr);
+void DMA0_vInitTransaction(uint32_t *const pulSrcAddr, uint32_t *const pulDstAddr, uint32_t ulLength);
 void DMA0_vStart(void);
 void DMA0_vStop(void);

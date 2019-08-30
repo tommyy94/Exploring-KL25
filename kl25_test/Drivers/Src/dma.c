@@ -5,9 +5,8 @@
 
 #include "dma.h"
 
-
 /* Local defines */
-#define BYTE_OFFSET     (0x01UL)
+#define BYTE_OFFSET (0x01UL)
 
 
 /* Function descriptions */
@@ -46,21 +45,15 @@ void DMA0_vInit(void)
     SIM->SCGC7 |= SIM_SCGC7_DMA(1);
 	
     /**
-     * Generate interrupt on completion
      * Increment source address
      * Transfer bytes
      * Enable peripheral request
      * Cycle stealing mode
      */
-    DMA0->DMA[0].DCR = DMA_DCR_EINT(1) | DMA_DCR_ERQ(1) | DMA_DCR_CS(1) | DMA_DCR_SSIZE(1) | DMA_DCR_DSIZE(1) | DMA_DCR_SINC(1);
+    DMA0->DMA[0].DCR = DMA_DCR_ERQ(1) | DMA_DCR_CS(1) | DMA_DCR_SSIZE(1) | DMA_DCR_DSIZE(1) | DMA_DCR_SINC(1);
     
     /* Clear done flag */
     DMA0->DMA[0].DSR_BCR &= ~DMA_DSR_BCR_DONE(1);
-    
-    /* Set NVIC for DMA ISR */
-    NVIC_SetPriority(DMA0_IRQn, 2);
-    NVIC_ClearPendingIRQ(DMA0_IRQn); 
-    NVIC_EnableIRQ(DMA0_IRQn);
 }
 
 
@@ -72,14 +65,14 @@ void DMA0_vInit(void)
  * 
  * @return  None
  */
-void DMA0_vInitTransaction(uint32_t *const pulSrcAddr, uint32_t *const pulDstAddr)
+void DMA0_vInitTransaction(uint32_t *const pulSrcAddr, uint32_t *const pulDstAddr, uint32_t ulLength)
 {
     /* Initialize source & destination pointers */
     DMA0->DMA[0].SAR = DMA_SAR_SAR((uint32_t)pulSrcAddr + BYTE_OFFSET); /* First byte sent by placing to register */
     DMA0->DMA[0].DAR = DMA_DAR_DAR((uint32_t)pulDstAddr);
     
     /* Number of bytes to transmit */
-    DMA0->DMA[0].DSR_BCR |= DMA_DSR_BCR_BCR(strlen((const char *)pulSrcAddr) - BYTE_OFFSET); /* Subtract first byte sent from count */
+    DMA0->DMA[0].DSR_BCR |= DMA_DSR_BCR_BCR(ulLength - BYTE_OFFSET); /* Subtract first byte sent from count */
 }
 
 
@@ -90,7 +83,7 @@ void DMA0_vInitTransaction(uint32_t *const pulSrcAddr, uint32_t *const pulDstAdd
  * 
  * @return  None
  */
-__INLINE void DMA0_vStart(void)
+void DMA0_vStart(void)
 {
     /* Set enable flag */
     BME_OR32(&DMAMUX0->CHCFG[0], DMAMUX_CHCFG_ENBL(1));
@@ -104,7 +97,7 @@ __INLINE void DMA0_vStart(void)
  * 
  * @return  None
  */
-__INLINE void DMA0_vStop(void)
+void DMA0_vStop(void)
 {
     BME_AND32(&DMAMUX0->CHCFG[0], ~DMAMUX_CHCFG_ENBL(1));
 }
