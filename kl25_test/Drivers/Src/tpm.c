@@ -9,6 +9,8 @@
 #define TPM0_CH0_PWM_PIN    (0UL)
 #define TPM1_IC_PIN         (13UL)
 
+#define TPM2_COMPENSATION   (5UL)
+
 /* Function descriptions */
 
 /**
@@ -87,9 +89,9 @@ void TPM1_vInit(void)
      */
     TPM1->CONTROLS[0].CnSC = TPM_CnSC_ELSB(1);
     TPM1->CONTROLS[1].CnSC = TPM_CnSC_ELSA(1) | TPM_CnSC_CHIE(1);
-    
+
     /**
-     * Enable interrupts
+     * Enable timer overflow interrupts
      * Divide by 128 prescaler
      */
     TPM1->SC = TPM_SC_PS(7) | TPM_SC_TOIE(1);
@@ -98,4 +100,82 @@ void TPM1_vInit(void)
     NVIC_SetPriority(TPM1_IRQn, 3);
     NVIC_ClearPendingIRQ(TPM1_IRQn);
     NVIC_EnableIRQ(TPM1_IRQn);
+}
+
+
+/**
+ * @brief   Initialize TPM2.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+void TPM2_vInit(void)
+{
+    /* Turn on clock gating for TPM2 and PORTA */
+    SIM->SCGC6 |= SIM_SCGC6_TPM2(1);
+
+    /* Set clock source for TPM2 */
+    SIM->SOPT2 |= SIM_SOPT2_TPMSRC(1) | SIM_SOPT2_PLLFLLSEL_MASK;
+
+    /**
+     * Enable timer overflow interrupts
+     * Divide by 16 prescaler
+     */
+    TPM2->SC = TPM_SC_PS(4) | TPM_SC_TOIE(1);
+
+    /* Set NVIC for TPM2 ISR */
+    NVIC_SetPriority(TPM2_IRQn, 3);
+    NVIC_ClearPendingIRQ(TPM2_IRQn);
+    NVIC_EnableIRQ(TPM2_IRQn);
+}
+
+
+/**
+ * @brief   Wrapper function for loading TPM2 counter.
+ * 
+ * @detail  TPM2 is configured to 48 MHz/16 prescaler = 3 MHz clock speed.
+ * 
+ * @note    timePerBit = 250 ns
+ *          => timePerByte = 2 탎
+ *          timeBetweenBytes = 0.25 탎
+ *          => timePerByte = 2.25 탎
+ *          
+ *          deliveryTime = timePerByte * numberOfBytes - timeBetweenBytes  // Trim last timeBetweenBytes
+ * 
+ *          Note: 2 탎 overhead at beginning
+ * 
+ * @param   ucBytes     Number of bytes to send.
+ * 
+ * @return  None
+ */
+void TPM2_vLoadCounter(uint8_t ucBytes)
+{
+    TPM2->MOD = (3 * ucBytes * 3) + TPM2_COMPENSATION;
+}
+
+
+/**
+ * @brief   Wrapper function for starting TPM2 counter.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+void TPM2_vStart(void)
+{
+    BME_OR32(&TPM2->SC, TPM_SC_CMOD(1));
+}
+
+
+/**
+ * @brief   Wrapper function for stopping TPM2 counter.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+void TPM2_vStop(void)
+{
+    BME_AND32(&TPM2->SC, ~TPM_SC_CMOD(1));
 }
