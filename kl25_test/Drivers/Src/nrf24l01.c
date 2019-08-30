@@ -14,6 +14,7 @@
 #define R_REGISTER      (0x00UL)    /* Read command and status registers */
 #define W_REGISTER      (0x20UL)    /* Write command and status registers - power down/standby modes only */
 
+
 /* Function descriptions */
 
 /**
@@ -42,6 +43,9 @@ void nRF24L01_vInit(void)
 /**
  * @brief   Read nRF24L01 register value.
  * 
+ * @note    Because of full-duplex mode SPI receive buffer is polled while DMA
+ *          is transferring through SPI transmit buffer.
+ * 
  * @param   ucRegister      Register to read.
  * 
  * @return  value           Register value.
@@ -50,12 +54,19 @@ uint8_t nRF24L01_ucReadRegister(const uint8_t ucRegister)
 {
     uint8_t ucValue;
     
-    /* Full-duplex needs to be receiving data when it's sending */
-    SPI1_vTransmitByte(NOP);                        /* Status returned on first write */
-    (void)SPI1_ucReadPolling();                     /* TODO: Add timeout/Implement DMA transfer/Implement interrupt on RX */
+    /* Begin transfer */
+    SPI1_vSetSlave(LOW);
     
-    SPI1_vTransmitByte(R_REGISTER | ucRegister);    /* Read register after second write */
-    ucValue = SPI1_ucReadPolling();                 /* TODO: Add timeout/Implement DMA transfer/Implement interrupt on RX */
+    /* Status returned on first write */
+    SPI1_vTransmitByte(R_REGISTER | ucRegister);
+    (void)SPI1_ucReadPolling(); /* Discard status */
+    
+    /* Read register after second write */
+    SPI1_vTransmitByte(R_REGISTER | ucRegister);
+    ucValue = SPI1_ucReadPolling();
+    
+    /* End transfer */
+    SPI1_vSetSlave(HIGH);    
     
     return (ucValue);
 }
@@ -65,14 +76,16 @@ uint8_t nRF24L01_ucReadRegister(const uint8_t ucRegister)
  * @brief   Write nRF24L01 register.
  * 
  * @param   ucRegister      Register to write.
+ * 
  * @param   ucValue         Value to write.
  * 
  * @return  None
  */
 void nRF24L01_vWriteRegister(const uint8_t ucRegister, const uint8_t ucValue)
 {    
-    const uint8_t ucData[] = { ucRegister, ucValue, 0x00 }; /* Add null-terminator for strlen() */
-    
+    const uint8_t ucData[] = { W_REGISTER | ucRegister, ucValue, 0x00 }; /* Add null-terminator for strlen() */
+
     /* First transfer register, then value */
     SPI1_vTransmitDMA((const char *)ucData);
+    
 }
