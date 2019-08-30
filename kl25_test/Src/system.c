@@ -23,6 +23,7 @@ void vSystemInit(void)
     ADC0_vInit();
     TPM0_vInit(4800);
     TPM1_vInit();
+    TPM2_vInit();
     CMP0_vInit();
     HS1101_vInit();
     
@@ -85,7 +86,7 @@ void vCreateTasks(void *const pvMotorTimers)
     
     configASSERT((uint32_t) pvMotorTimers);
     
-    xAssert = xTaskCreate(vFrameTask, (const char *)"SQL", SQLTASKSIZE / sizeof(portSTACK_TYPE), 0, SQLTASKPRIORITY, &xHandle);
+    xAssert = xTaskCreate(vFrameTask, (const char *)"SQL", FRAMETASKSIZE / sizeof(portSTACK_TYPE), 0, FRAMETASKPRIORITY, &xHandle);
     configASSERT(xAssert);
     
     xAssert = xTaskCreate(vSensorTask, (const char *)"Sensor", ANALOGTASKSIZE / sizeof(portSTACK_TYPE), 0, ANALOGTASKPRIORITY, &xHandle);
