@@ -7,12 +7,52 @@
 
 
 /* Local defines */
-#define CE              (1UL)       /* Chip Enable */
-#define IRQ             (2UL)       /* Interrupt Request */
+#define CE                          (1UL)       /* Chip Enable */
+#define IRQ                         (2UL)       /* Interrupt Request */
 
-#define NOP             (0xFFUL)    /* No Operation to read STATUS register */
-#define R_REGISTER      (0x00UL)    /* Read command and status registers */
-#define W_REGISTER      (0x20UL)    /* Write command and status registers - power down/standby modes only */
+/* Commands */
+#define NOP                         (0xFFUL)    /* No Operation to read STATUS register */
+#define R_REGISTER                  (0x00UL)    /* Read command and status registers */
+#define W_REGISTER                  (0x20UL)    /* Write command and status registers - power down/standby modes only */
+
+/* Registers */
+#define CONFIG                      (0x00UL)    /* Configuration Register */
+#define EN_AA                       (0x01UL)    /* Enable Auto Acknowledgement */
+#define SETUP_RETR                  (0x04UL)    /* Setup of Automatic Retransmission */
+#define RF_CH                       (0x05UL)    /* RF Channel */
+#define RF_SETUP                    (0x06UL)    /* RF Setup Register */
+#define RX_PW_P0                    (0x11UL)    /* RX Payload Width Pipe 0 */
+#define RX_PW_P1                    (0x12UL)    /* RX Payload Width Pipe 1 */
+#define RX_PW_P2                    (0x13UL)    /* RX Payload Width Pipe 2 */
+#define RX_PW_P3                    (0x14UL)    /* RX Payload Width Pipe 3 */
+#define RX_PW_P4                    (0x15UL)    /* RX Payload Width Pipe 4 */
+#define RX_PW_P5                    (0x16UL)    /* RX Payload Width Pipe 5 */
+
+/* Register bits */
+#define EN_AA_ENAA_P5(x)            (((uint8_t)(((uint8_t)(x)) << 5)) & 0xFFUL)
+#define EN_AA_ENAA_P4(x)            (((uint8_t)(((uint8_t)(x)) << 4)) & 0xFFUL)
+#define EN_AA_ENAA_P3(x)            (((uint8_t)(((uint8_t)(x)) << 3)) & 0xFFUL)
+#define EN_AA_ENAA_P2(x)            (((uint8_t)(((uint8_t)(x)) << 2)) & 0xFFUL)
+#define EN_AA_ENAA_P1(x)            (((uint8_t)(((uint8_t)(x)) << 1)) & 0xFFUL)
+#define EN_AA_ENAA_P0(x)            (((uint8_t)(((uint8_t)(x)) << 0)) & 0xFFUL)
+
+#define SETUP_RETR_ARD(x)           (((uint8_t)(((uint8_t)(x)) << 4)) & 0xFFUL)
+#define SETUP_RETR_ARC(x)           (((uint8_t)(((uint8_t)(x)) << 0)) & 0xFFUL)
+
+#define CONFIG_MASK_RX_DR(x)        (((uint8_t)(((uint8_t)(x)) << 6)) & 0xFFUL)
+#define CONFIG_MASK_TS_DS(x)        (((uint8_t)(((uint8_t)(x)) << 5)) & 0xFFUL)
+#define CONFIG_MASK_MAX_RT(x)       (((uint8_t)(((uint8_t)(x)) << 4)) & 0xFFUL)
+#define CONFIG_MASK_EN_CRC(x)       (((uint8_t)(((uint8_t)(x)) << 3)) & 0xFFUL)
+#define CONFIG_MASK_CRC0(x)         (((uint8_t)(((uint8_t)(x)) << 2)) & 0xFFUL)
+#define CONFIG_MASK_PWR_UP(x)       (((uint8_t)(((uint8_t)(x)) << 1)) & 0xFFUL)
+#define CONFIG_MASK_PRIM_RX(x)      (((uint8_t)(((uint8_t)(x)) << 0)) & 0xFFUL)
+
+#define RF_SETUP_CONT_WAVE(x)       (((uint8_t)(((uint8_t)(x)) << 7)) & 0xFFUL)
+#define RF_SETUP_RF_DR_LOW(x)       (((uint8_t)(((uint8_t)(x)) << 5)) & 0xFFUL)
+#define RF_SETUP_PLL_LOCK(x)        (((uint8_t)(((uint8_t)(x)) << 4)) & 0xFFUL)
+#define RF_SETUP_RF_DR_HIGH(x)      (((uint8_t)(((uint8_t)(x)) << 3)) & 0xFFUL)
+#define RF_SETUP_RF_PWR(x)          (((uint8_t)(((uint8_t)(x)) << 1)) & 0xFFUL)
+
 
 
 /* Function descriptions */
@@ -28,15 +68,24 @@ void nRF24L01_vInit(void)
 {
     /* Enable PORTA clock gating */
     SIM->SCGC5 |= SIM_SCGC5_PORTA(1);
-    
-    /* Select GPIO  */
     PORTA->PCR[CE] = PORT_PCR_MUX(ALT1);
-    
-    /* Set output */
     FGPIOA->PDDR |= MASK(CE);
     
     /* Enable nRF24L01 */
     FGPIOA->PDOR |= MASK(CE);
+
+    nRF24L01_vWriteRegister(RX_PW_P0, 22);
+    (void)nRF24L01_ucReadRegister(RX_PW_P0);
+    nRF24L01_vWriteRegister(RF_CH, 50);
+    (void)nRF24L01_ucReadRegister(RF_CH);
+
+    nRF24L01_vWriteRegister(EN_AA, EN_AA_ENAA_P0(1));
+    (void)nRF24L01_ucReadRegister(EN_AA);
+    nRF24L01_vWriteRegister(SETUP_RETR, SETUP_RETR_ARD(2)); /* 750 µs delay */
+    (void)nRF24L01_ucReadRegister(SETUP_RETR);
+
+    nRF24L01_vWriteRegister(CONFIG, CONFIG_MASK_EN_CRC(1) | CONFIG_MASK_PWR_UP(1));
+    (void)nRF24L01_ucReadRegister(CONFIG);
 }
 
 
