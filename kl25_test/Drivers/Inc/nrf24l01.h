@@ -25,3 +25,5 @@
 void nRF24L01_vInit(void);
 uint8_t nRF24L01_ucReadRegister(const uint8_t ucRegister);
 void nRF24L01_vWriteRegister(const uint8_t ucRegister, const uint8_t ucValue);
+void nRF24L01_vWrite8BitAddressRegister(const uint8_t ucRegister, const uint8_t ucValue);
+void nRF24L01_vWrite40BitAddressRegister(const uint8_t ucRegister, const uint8_t *pucValue);

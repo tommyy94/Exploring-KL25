@@ -10,6 +10,8 @@
 #define CE                          (1UL)       /* Chip Enable */
 #define IRQ                         (2UL)       /* Interrupt Request */
 
+#define RXTX_ADDR_LEN               (5UL)
+
 /* Commands */
 #define NOP                         (0xFFUL)    /* No Operation to read STATUS register */
 #define R_REGISTER                  (0x00UL)    /* Read command and status registers */
@@ -18,9 +20,17 @@
 /* Registers */
 #define CONFIG                      (0x00UL)    /* Configuration Register */
 #define EN_AA                       (0x01UL)    /* Enable Auto Acknowledgement */
+#define EN_RXADDR                   (0x02UL)    /* Enabled RX Addresses */
 #define SETUP_RETR                  (0x04UL)    /* Setup of Automatic Retransmission */
 #define RF_CH                       (0x05UL)    /* RF Channel */
 #define RF_SETUP                    (0x06UL)    /* RF Setup Register */
+#define RX_ADDR_P0                  (0x0AUL)    /* Receive address data pipe 0 */
+#define RX_ADDR_P1                  (0x0BUL)    /* Receive address data pipe 1 */
+#define RX_ADDR_P2                  (0x0CUL)    /* Receive address data pipe 2 */
+#define RX_ADDR_P3                  (0x0DUL)    /* Receive address data pipe 3 */
+#define RX_ADDR_P4                  (0x0EUL)    /* Receive address data pipe 4 */
+#define RX_ADDR_P5                  (0x0FUL)    /* Receive address data pipe 5 */
+#define TX_ADDR                     (0x10UL)    /* Transmit address */
 #define RX_PW_P0                    (0x11UL)    /* RX Payload Width Pipe 0 */
 #define RX_PW_P1                    (0x12UL)    /* RX Payload Width Pipe 1 */
 #define RX_PW_P2                    (0x13UL)    /* RX Payload Width Pipe 2 */
@@ -35,6 +45,13 @@
 #define EN_AA_ENAA_P2(x)            (((uint8_t)(((uint8_t)(x)) << 2)) & 0xFFUL)
 #define EN_AA_ENAA_P1(x)            (((uint8_t)(((uint8_t)(x)) << 1)) & 0xFFUL)
 #define EN_AA_ENAA_P0(x)            (((uint8_t)(((uint8_t)(x)) << 0)) & 0xFFUL)
+
+#define EN_RXADDR_ERX_P5(x)         (((uint8_t)(((uint8_t)(x)) << 5)) & 0xFFUL)
+#define EN_RXADDR_ERX_P4(x)         (((uint8_t)(((uint8_t)(x)) << 4)) & 0xFFUL)
+#define EN_RXADDR_ERX_P3(x)         (((uint8_t)(((uint8_t)(x)) << 3)) & 0xFFUL)
+#define EN_RXADDR_ERX_P2(x)         (((uint8_t)(((uint8_t)(x)) << 2)) & 0xFFUL)
+#define EN_RXADDR_ERX_P1(x)         (((uint8_t)(((uint8_t)(x)) << 1)) & 0xFFUL)
+#define EN_RXADDR_ERX_P0(x)         (((uint8_t)(((uint8_t)(x)) << 0)) & 0xFFUL)
 
 #define SETUP_RETR_ARD(x)           (((uint8_t)(((uint8_t)(x)) << 4)) & 0xFFUL)
 #define SETUP_RETR_ARC(x)           (((uint8_t)(((uint8_t)(x)) << 0)) & 0xFFUL)
@@ -75,17 +92,23 @@ void nRF24L01_vInit(void)
     FGPIOA->PDOR |= MASK(CE);
 
     nRF24L01_vWriteRegister(RX_PW_P0, 22);
-    (void)nRF24L01_ucReadRegister(RX_PW_P0);
     nRF24L01_vWriteRegister(RF_CH, 50);
-    (void)nRF24L01_ucReadRegister(RF_CH);
 
     nRF24L01_vWriteRegister(EN_AA, EN_AA_ENAA_P0(1));
-    (void)nRF24L01_ucReadRegister(EN_AA);
     nRF24L01_vWriteRegister(SETUP_RETR, SETUP_RETR_ARD(2)); /* 750 µs delay */
-    (void)nRF24L01_ucReadRegister(SETUP_RETR);
 
     nRF24L01_vWriteRegister(CONFIG, CONFIG_MASK_EN_CRC(1) | CONFIG_MASK_PWR_UP(1));
-    (void)nRF24L01_ucReadRegister(CONFIG);
+
+    const uint8_t ulTxAddr[5] = {0x11, 0x22, 0x33, 0x44, 0x55};
+    nRF24L01_vWrite40BitAddressRegister(RX_ADDR_P0, ulTxAddr);
+    nRF24L01_vWrite40BitAddressRegister(TX_ADDR, ulTxAddr);
+
+    nRF24L01_vWriteRegister(EN_RXADDR, EN_RXADDR_ERX_P0(1)); /* Enable data pipe 0 */
+
+    while (1)
+    {
+        ;
+    }
 }
 
 
@@ -128,5 +151,53 @@ void nRF24L01_vWriteRegister(const uint8_t ucRegister, const uint8_t ucValue)
 
     /* First transfer register, then value */
     SPI1_vTransmitDMA((const char *)ucData);
-    
+}
+
+
+/**
+ * @brief   Write 8-bit value to nRF24L01 address register.
+ * 
+ * @param   ucRegister      Register to write.
+ * 
+ * @param   ucValue         Value to write.
+ * 
+ * @return  None
+ */
+void nRF24L01_vWrite8BitAddressRegister(const uint8_t ucRegister, const uint8_t ucValue)
+{
+    nRF24L01_vWriteRegister(ucRegister, ucValue);
+}
+
+
+/**
+ * @brief   Write 40-bit value to  nRF24L01 address register.
+ * 
+ * @note    Blocks task until address written.
+ * 
+ * @param   ucRegister      Register to write.
+ * 
+ * @param   ucValue         Value to write.
+ * 
+ * @return  None
+ */
+void nRF24L01_vWrite40BitAddressRegister(const uint8_t ucRegister, const uint8_t *pucValue)
+{
+    uint8_t ucData[RXTX_ADDR_LEN + 2]; /* Pad by 1 on each side */
+
+    /* Build message */
+    ucData[0] = W_REGISTER | ucRegister;
+    for (uint8_t i = 0; i < RXTX_ADDR_LEN; i++)
+    {
+        ucData[i + 1] = pucValue[i];
+    }
+    ucData[RXTX_ADDR_LEN + 1] = 0x00; /* Add null-terminator for strlen() */
+
+    /* First transfer register, then values */
+    SPI1_vTransmitDMA((const char *)ucData);
+
+    /* Block task until message sent */
+    for (uint8_t i = 0; i < RXTX_ADDR_LEN + 2; i++)
+    {
+        (void)SPI1_ucReadPolling();
+    }
 }
