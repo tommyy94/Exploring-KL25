@@ -23,6 +23,7 @@
 
 /* Function prototypes */
 void nRF24L01_vInit(void);
+void nRF24L01_vResetStatusFlags(uint8_t ucStatusMask);
 uint8_t nRF24L01_ucReadRegister(const uint8_t ucRegister);
 void nRF24L01_vWriteRegister(const uint8_t ucRegister, const uint8_t ucValue);
 void nRF24L01_vWrite8BitAddressRegister(const uint8_t ucRegister, const uint8_t ucValue);
