@@ -39,36 +39,36 @@
 #define RX_PW_P5                    (0x16UL)    /* RX Payload Width Pipe 5 */
 
 /* Register bits */
-#define EN_AA_ENAA_P5(x)            (((uint8_t)(((uint8_t)(x)) << 5)) & 0xFFUL)
-#define EN_AA_ENAA_P4(x)            (((uint8_t)(((uint8_t)(x)) << 4)) & 0xFFUL)
-#define EN_AA_ENAA_P3(x)            (((uint8_t)(((uint8_t)(x)) << 3)) & 0xFFUL)
-#define EN_AA_ENAA_P2(x)            (((uint8_t)(((uint8_t)(x)) << 2)) & 0xFFUL)
-#define EN_AA_ENAA_P1(x)            (((uint8_t)(((uint8_t)(x)) << 1)) & 0xFFUL)
-#define EN_AA_ENAA_P0(x)            (((uint8_t)(((uint8_t)(x)) << 0)) & 0xFFUL)
+#define CONFIG_MASK_RX_DR(x)        (((uint8_t)(((uint8_t)(x)) << 6)) & 0x40UL)
+#define CONFIG_MASK_TS_DS(x)        (((uint8_t)(((uint8_t)(x)) << 5)) & 0x20UL)
+#define CONFIG_MASK_MAX_RT(x)       (((uint8_t)(((uint8_t)(x)) << 4)) & 0x10UL)
+#define CONFIG_MASK_EN_CRC(x)       (((uint8_t)(((uint8_t)(x)) << 3)) & 0x08UL)
+#define CONFIG_MASK_CRC0(x)         (((uint8_t)(((uint8_t)(x)) << 2)) & 0x04UL)
+#define CONFIG_MASK_PWR_UP(x)       (((uint8_t)(((uint8_t)(x)) << 1)) & 0x02UL)
+#define CONFIG_MASK_PRIM_RX(x)      (((uint8_t)(((uint8_t)(x)) << 0)) & 0x01UL)
 
-#define EN_RXADDR_ERX_P5(x)         (((uint8_t)(((uint8_t)(x)) << 5)) & 0xFFUL)
-#define EN_RXADDR_ERX_P4(x)         (((uint8_t)(((uint8_t)(x)) << 4)) & 0xFFUL)
-#define EN_RXADDR_ERX_P3(x)         (((uint8_t)(((uint8_t)(x)) << 3)) & 0xFFUL)
-#define EN_RXADDR_ERX_P2(x)         (((uint8_t)(((uint8_t)(x)) << 2)) & 0xFFUL)
-#define EN_RXADDR_ERX_P1(x)         (((uint8_t)(((uint8_t)(x)) << 1)) & 0xFFUL)
-#define EN_RXADDR_ERX_P0(x)         (((uint8_t)(((uint8_t)(x)) << 0)) & 0xFFUL)
+#define EN_AA_ENAA_P5(x)            (((uint8_t)(((uint8_t)(x)) << 5)) & 0x20UL)
+#define EN_AA_ENAA_P4(x)            (((uint8_t)(((uint8_t)(x)) << 4)) & 0x10UL)
+#define EN_AA_ENAA_P3(x)            (((uint8_t)(((uint8_t)(x)) << 3)) & 0x08UL)
+#define EN_AA_ENAA_P2(x)            (((uint8_t)(((uint8_t)(x)) << 2)) & 0x04UL)
+#define EN_AA_ENAA_P1(x)            (((uint8_t)(((uint8_t)(x)) << 1)) & 0x02UL)
+#define EN_AA_ENAA_P0(x)            (((uint8_t)(((uint8_t)(x)) << 0)) & 0x01UL)
 
-#define SETUP_RETR_ARD(x)           (((uint8_t)(((uint8_t)(x)) << 4)) & 0xFFUL)
-#define SETUP_RETR_ARC(x)           (((uint8_t)(((uint8_t)(x)) << 0)) & 0xFFUL)
+#define EN_RXADDR_ERX_P5(x)         (((uint8_t)(((uint8_t)(x)) << 5)) & 0x20UL)
+#define EN_RXADDR_ERX_P4(x)         (((uint8_t)(((uint8_t)(x)) << 4)) & 0x10UL)
+#define EN_RXADDR_ERX_P3(x)         (((uint8_t)(((uint8_t)(x)) << 3)) & 0x08UL)
+#define EN_RXADDR_ERX_P2(x)         (((uint8_t)(((uint8_t)(x)) << 2)) & 0x04UL)
+#define EN_RXADDR_ERX_P1(x)         (((uint8_t)(((uint8_t)(x)) << 1)) & 0x02UL)
+#define EN_RXADDR_ERX_P0(x)         (((uint8_t)(((uint8_t)(x)) << 0)) & 0x01UL)
 
-#define CONFIG_MASK_RX_DR(x)        (((uint8_t)(((uint8_t)(x)) << 6)) & 0xFFUL)
-#define CONFIG_MASK_TS_DS(x)        (((uint8_t)(((uint8_t)(x)) << 5)) & 0xFFUL)
-#define CONFIG_MASK_MAX_RT(x)       (((uint8_t)(((uint8_t)(x)) << 4)) & 0xFFUL)
-#define CONFIG_MASK_EN_CRC(x)       (((uint8_t)(((uint8_t)(x)) << 3)) & 0xFFUL)
-#define CONFIG_MASK_CRC0(x)         (((uint8_t)(((uint8_t)(x)) << 2)) & 0xFFUL)
-#define CONFIG_MASK_PWR_UP(x)       (((uint8_t)(((uint8_t)(x)) << 1)) & 0xFFUL)
-#define CONFIG_MASK_PRIM_RX(x)      (((uint8_t)(((uint8_t)(x)) << 0)) & 0xFFUL)
+#define SETUP_RETR_ARD(x)           (((uint8_t)(((uint8_t)(x)) << 4)) & 0xF0UL)
+#define SETUP_RETR_ARC(x)           (((uint8_t)(((uint8_t)(x)) << 0)) & 0x0FUL)
 
-#define RF_SETUP_CONT_WAVE(x)       (((uint8_t)(((uint8_t)(x)) << 7)) & 0xFFUL)
-#define RF_SETUP_RF_DR_LOW(x)       (((uint8_t)(((uint8_t)(x)) << 5)) & 0xFFUL)
-#define RF_SETUP_PLL_LOCK(x)        (((uint8_t)(((uint8_t)(x)) << 4)) & 0xFFUL)
-#define RF_SETUP_RF_DR_HIGH(x)      (((uint8_t)(((uint8_t)(x)) << 3)) & 0xFFUL)
-#define RF_SETUP_RF_PWR(x)          (((uint8_t)(((uint8_t)(x)) << 1)) & 0xFFUL)
+#define RF_SETUP_CONT_WAVE(x)       (((uint8_t)(((uint8_t)(x)) << 7)) & 0x80UL)
+#define RF_SETUP_RF_DR_LOW(x)       (((uint8_t)(((uint8_t)(x)) << 5)) & 0x30UL)
+#define RF_SETUP_PLL_LOCK(x)        (((uint8_t)(((uint8_t)(x)) << 4)) & 0x10UL)
+#define RF_SETUP_RF_DR_HIGH(x)      (((uint8_t)(((uint8_t)(x)) << 3)) & 0x08UL)
+#define RF_SETUP_RF_PWR(x)          (((uint8_t)(((uint8_t)(x)) << 1)) & 0x06UL)
 
 
 
@@ -95,7 +95,12 @@ void nRF24L01_vInit(void)
     nRF24L01_vWriteRegister(RF_CH, 50);
 
     nRF24L01_vWriteRegister(EN_AA, EN_AA_ENAA_P0(1));
-    nRF24L01_vWriteRegister(SETUP_RETR, SETUP_RETR_ARD(2)); /* 750 µs delay */
+    
+    /**
+     * 500 µs delay between retries
+     * 10 retries
+     */
+    nRF24L01_vWriteRegister(SETUP_RETR, SETUP_RETR_ARD(1) | SETUP_RETR_ARC(3));
 
     nRF24L01_vWriteRegister(CONFIG, CONFIG_MASK_EN_CRC(1) | CONFIG_MASK_PWR_UP(1));
 
