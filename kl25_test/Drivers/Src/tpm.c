@@ -9,11 +9,6 @@
 #define TPM0_CH0_PWM_PIN    (0UL)
 #define TPM1_IC_PIN         (13UL)
 
-/* Timings calculated from 24 MHz clock speed */
-#define MICROSECOND         (24UL)                                  /* 1.0 µs */
-#define TIME_BETWEEN_BYTES  (6UL)                                   /* 0.25 µs */
-#define TIME_PER_BYTE       (MICROSECOND * 2 + TIME_BETWEEN_BYTES)  /* 2.25 µs */
-
 /* Function descriptions */
 
 /**

@@ -77,7 +77,7 @@ void SPI1_vInit(void)
  */
 uint8_t SPI1_ucReadPolling(void)
 {
-    while (!(SPI1->S & SPI_S_SPRF(1)))
+    while (!BME_AND8(&SPI1->S, SPI_S_SPRF(1)))
     {
         ; /* Wait until buffer full */
     }
@@ -95,7 +95,7 @@ uint8_t SPI1_ucReadPolling(void)
  */
 void SPI1_vTransmitByte(const char ucByte)
 {
-    while (!(SPI1->S  & SPI_S_SPTEF_MASK))
+    while (!BME_AND8(&SPI1->S, SPI_S_SPTEF(1)))
     {
         ; /* Wait until TX buffer empty */
     }
