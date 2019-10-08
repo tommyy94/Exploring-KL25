@@ -10,6 +10,17 @@ EventGroupHandle_t xTimeoutEventGroup;
 #define TIMER_NAME_LEN          (32UL)
 
 
+/* Local function prototypes */
+static void vSystemInit(void);
+static void vEnableClockGating(void);
+static void vCreateQueues(void);
+static void vCreateEvents(void);
+static void vCreateTasks(void *const pvMotorTimers);
+static void vCreateMotorTimers(TimerHandle_t *const pxTimers);
+static void vCreateSemaphores(void);
+static void vMotorTimerCallback(const TimerHandle_t xTimer);
+
+
 /**
  * @brief   Initialize system hardware.
  * 
@@ -17,8 +28,11 @@ EventGroupHandle_t xTimeoutEventGroup;
  * 
  * @return  None
  */
-void vSystemInit(void)
+static void vSystemInit(void)
 {
+    /* Power up all necessary peripherals */
+    vEnableClockGating();
+
     /* Analog functionalities */
     ADC0_vInit();
     TPM0_vInit(4800);
@@ -36,13 +50,29 @@ void vSystemInit(void)
 
 
 /**
+ * @brief   Enable clock gating to modules. Accessing peripheral while disabled generates hard fault.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+static void vEnableClockGating(void)
+{
+    SIM->SCGC4 |= SIM_SCGC4_SPI1(1);
+    SIM->SCGC5 |= SIM_SCGC5_PORTA(1) | SIM_SCGC5_PORTB(1) | SIM_SCGC5_PORTD(1) | SIM_SCGC5_PORTE(1);
+    SIM->SCGC6 |= SIM_SCGC6_TPM0(1) | SIM_SCGC6_TPM1(1) | SIM_SCGC6_TPM2(1) | SIM_SCGC6_ADC0(1) | SIM_SCGC6_DMAMUX(1);
+    SIM->SCGC7 |= SIM_SCGC7_DMA(1);
+}
+
+
+/**
  * @brief   Create FreeRTOS queues.
  * 
  * @param   None
  * 
  * @return  None
  */
-void vCreateQueues(void)
+static void vCreateQueues(void)
 {
     xAnalogQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(struct Sensor));
     configASSERT(xAnalogQueue);
@@ -62,7 +92,7 @@ void vCreateQueues(void)
  * 
  * @return  None
  */
-void vCreateEvents(void)
+static void vCreateEvents(void)
 {
     xMotorEventGroup = xEventGroupCreate();
     configASSERT(xMotorEventGroup);
@@ -79,7 +109,7 @@ void vCreateEvents(void)
  * 
  * @return  None
  */
-void vCreateTasks(void *const pvMotorTimers)
+static void vCreateTasks(void *const pvMotorTimers)
 {
     TaskHandle_t xHandle;
     BaseType_t xAssert;
@@ -107,15 +137,15 @@ void vCreateTasks(void *const pvMotorTimers)
  * 
  * @return  None
  */
-void vCreateMotorTimers(TimerHandle_t *const pxTimers)
+static void vCreateMotorTimers(TimerHandle_t *const pxTimers)
 {
-    int8_t cBytesWritten;
+    int32_t lBytesWritten;
     char ucMotorTimerName[TIMER_NAME_LEN];
     
     for (uint32_t i = 0; i < MOTOR_COUNT; i++)
     {
-        cBytesWritten = csnprintf(ucMotorTimerName, TIMER_NAME_LEN, "Motor Timer %lu", i + 1);
-        configASSERT(cBytesWritten >= 0);
+        lBytesWritten = csnprintf(ucMotorTimerName, TIMER_NAME_LEN, "Motor Timer %lu", i + 1);
+        configASSERT(lBytesWritten >= 0);
         pxTimers[i] = xTimerCreate(ucMotorTimerName, pdMS_TO_TICKS(100), pdTRUE, (void *)i, vMotorTimerCallback);
         configASSERT(pxTimers[i]);
     }
@@ -129,7 +159,7 @@ void vCreateMotorTimers(TimerHandle_t *const pxTimers)
  * 
  * @return  None
  */
-void vCreateSemaphores(void)
+static void vCreateSemaphores(void)
 {
     xCommSemaphore = xSemaphoreCreateMutex();
     configASSERT(xCommSemaphore != NULL);
@@ -143,7 +173,7 @@ void vCreateSemaphores(void)
  * 
  * @return  None
  */
-void vMotorTimerCallback(const TimerHandle_t xTimer)
+static void vMotorTimerCallback(const TimerHandle_t xTimer)
 {
     EventBits_t uxBits;
     const uint32_t xTimerId = (uint32_t)pvTimerGetTimerID(xTimer);

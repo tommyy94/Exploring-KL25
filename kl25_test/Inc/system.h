@@ -25,14 +25,14 @@
 
 /* Task priorities */
 #define ANALOGTASKPRIORITY      (4UL)
-#define FRAMETASKPRIORITY         (5UL)
+#define FRAMETASKPRIORITY       (5UL)
 #define COMMTASKPRIORITY        (7UL)
 #define MOTORTASKPRIORITY       (6UL)
 #define STARTUPTASKPRIORITY     (10UL)
 
 /* Task sizes */
 #define ANALOGTASKSIZE          (2048UL)    
-#define FRAMETASKSIZE             (1024UL)    
+#define FRAMETASKSIZE           (1024UL)    
 #define COMMTASKSIZE            (2048UL)    
 #define MOTORTASKSIZE           (1024UL)    
 #define STARTUPTASKSIZE         (4096UL)
@@ -47,14 +47,6 @@ extern SemaphoreHandle_t xCommSemaphore;
     
 
 /* Global function prototypes */
-void vSystemInit(void);
-void vCreateQueues(void);
-void vCreateEvents(void);
-void vCreateTasks(void *const pvMotorTimers);
-void vCreateMotorTimers(TimerHandle_t *const pxTimers);
-void vCreateTimeoutTimers(TimerHandle_t *const pxTimers);
-void vCreateSemaphores(void);
-void vMotorTimerCallback(const TimerHandle_t xTimer);
 void vStartupTask(void *const pvMotorTimers);
 void vApplicationIdleHook(void);
 void vAssertCalled(const uint32_t ulLine, char *const pcFile);

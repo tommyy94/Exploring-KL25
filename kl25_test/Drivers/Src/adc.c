@@ -21,11 +21,7 @@
  * @return  None
  */
 void ADC0_vInit(void)
-{
-    /* Enable clock to ADC0 & PORTB */
-    SIM->SCGC6 |= SIM_SCGC6_ADC0(1);
-    SIM->SCGC5 |= SIM_SCGC5_PORTB(1);
-    
+{    
     /* Select analog for pin */
     PORTB->PCR[TEMP_SENSOR_PIN] |= PORT_PCR_MUX(ALT0);
     PORTB->PCR[MOIST_SENSOR_PIN] |= PORT_PCR_MUX(ALT0);

@@ -20,10 +20,7 @@
  * @return  None
  */
 void DMAMUX0_vInit(uint8_t const ucSource)
-{
-    /* Enable clock gating */
-    SIM->SCGC6 |= SIM_SCGC6_DMAMUX(1);
-    
+{    
     /* Disable DMA channel to configure it */
     DMAMUX0->CHCFG[0] = 0;
     
@@ -40,10 +37,7 @@ void DMAMUX0_vInit(uint8_t const ucSource)
  * @return  None
  */
 void DMA0_vInit(void)
-{
-    /* Enable clock gating */
-    SIM->SCGC7 |= SIM_SCGC7_DMA(1);
-	
+{	
     /**
      * Increment source address
      * Transfer bytes
