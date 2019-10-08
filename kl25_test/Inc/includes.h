@@ -11,7 +11,6 @@
 #include "motor.h"
 #include "comm.h"
 #include "sensors.h"
-#include "gpio.h"
 #include "adc.h"
 #include "dma.h"
 #include "tpm.h"

@@ -161,9 +161,6 @@
     <ClCompile Include="Drivers\Src\dma.c">
       <Filter>Drivers\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Drivers\Src\gpio.c">
-      <Filter>Drivers\Src</Filter>
-    </ClCompile>
     <ClCompile Include="Drivers\Src\tpm.c">
       <Filter>Drivers\Src</Filter>
     </ClCompile>
@@ -251,9 +248,6 @@
       <Filter>Drivers\Inc</Filter>
     </ClInclude>
     <ClInclude Include="Drivers\Inc\dma.h">
-      <Filter>Drivers\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="Drivers\Inc\gpio.h">
       <Filter>Drivers\Inc</Filter>
     </ClInclude>
     <ClInclude Include="Drivers\Inc\tpm.h">
