@@ -19,6 +19,7 @@
 
 /* User headers */
 #include "defines.h"
+#include "system.h"
 #include "dma.h"
 #include "tpm.h"
 

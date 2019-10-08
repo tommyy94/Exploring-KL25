@@ -11,8 +11,8 @@
 #define IRQ                         (2UL)       /* Interrupt Request */
 
 #define RXTX_ADDR_LEN               (5UL)
-#define MAX_MSG_LEN                 (32UL)
-#define ADDR_40BIT                  (5UL)
+#define MAX_PAYLOAD_LEN             (32UL)
+#define ADDR_40BIT_LEN              (6UL)
 
 /* Commands */
 #define R_REGISTER                  (0x00UL)    /* Read command and status registers */
@@ -20,7 +20,7 @@
 #define R_RX_PAYLOAD                (0x61UL)    /* Read RX-payload */
 #define W_TX_PAYLOAD                (0xA0UL)    /* Write TX-payload */
 #define FLUSH_TX                    (0xE1UL)    /* Flush TX FIFO */
-#define FLUSH_RX                    (0xE1UL)    /* Flush RX FIFO */
+#define FLUSH_RX                    (0xE2UL)    /* Flush RX FIFO */
 #define REUSE_TX_PL                 (0xE3UL)    /* Reuse last transmitted payload */
 #define R_RX_PL_WID                 (0x63UL)    /* Read RX payload width */
 #define W_ACK_PAYLOAD               (0xA8UL)    /* Write Payload to be transmitted together ACK packet */
@@ -93,14 +93,16 @@
 
 
 /* Local function prototypes */
+__STATIC_INLINE void nRF24L01_vConfigureIRQ(void);
 __STATIC_INLINE void nRF24L01_vConfigureChipEnable(void);
-__STATIC_INLINE void nRF24L01_vSetChipEnable(uint32_t ulState);
+__STATIC_INLINE void nRF24L01_vSetChipEnable(const uint32_t ulState);
+static void nRF24L01_vStartTransmission(void);
 
 
 /* Function descriptions */
 
 /**
- * @brief   Initialize NRF24L01 and masters peripherals.
+ * @brief   Initialize nRF24L01 and masters peripherals.
  * 
  * @param   None
  * 
@@ -108,19 +110,17 @@ __STATIC_INLINE void nRF24L01_vSetChipEnable(uint32_t ulState);
  */
 void nRF24L01_vInit(void)
 {
+    nRF24L01_vConfigureIRQ();
     nRF24L01_vConfigureChipEnable();
     nRF24L01_vSetChipEnable(LOW);
-
-    /* Transfer 32 bytes */
-    nRF24L01_vWriteRegister(RX_PW_P0, RX_PW_PX(32));
 
     /* RF Channel 2450 MHz */
     nRF24L01_vWriteRegister(RF_CH, RF_CH_MHZ(50));
 
     /* Set RX & TX address matching */
-    const uint8_t ulTxAddr[ADDR_40BIT] = { 0x11, 0x22, 0x33, 0x44, 0x55 }; /* LSB written first */
-    nRF24L01_vWrite40BitAddressRegister(RX_ADDR_P0, ulTxAddr);
-    nRF24L01_vWrite40BitAddressRegister(TX_ADDR, ulTxAddr);
+    const uint8_t ucTxAddr[ADDR_40BIT_LEN] = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x00 }; /* LSB written first, null-terminator at end */
+    nRF24L01_vWriteAddressRegister(RX_ADDR_P0, ucTxAddr);
+    nRF24L01_vWriteAddressRegister(TX_ADDR, ucTxAddr);
     
     /* Enable data pipe 0 */
     nRF24L01_vWriteRegister(EN_RXADDR, EN_RXADDR_ERX_P0(1));
@@ -141,37 +141,45 @@ void nRF24L01_vInit(void)
      * TX mode
      */
     nRF24L01_vWriteRegister(CONFIG, CONFIG_EN_CRC(1) | CONFIG_CRCO(1) | CONFIG_PWR_UP(1));
+}
 
+
+/**
+ * @brief   Configure IRQ pin.
+ * 
+ * @param   None
+ *             
+ * @return  None
+ */
+__STATIC_INLINE void nRF24L01_vConfigureIRQ(void)
+{
     /**
-     * Reset data received flag
-     * Reset transmission succeeded flag
-     * Reset transmission failed flag
+     * Select GPIO
+     * Interrupt on falling edge
+     * Enable internal pullup resistor
      */
-    const uint8_t ucStatusMask = STATUS_RX_DR(1) | STATUS_TX_DS(1) | STATUS_MAX_RT(1);
-    nRF24L01_vResetStatusFlags(ucStatusMask);
-
-    nRF24L01_vSendPayload((uint8_t *)"test");
-    volatile const uint8_t ucStatus = nRF24L01_ucReadRegister(STATUS);
-
-    while (1)
-    {
-        ;
-    }
+    PORTA->PCR[IRQ] = PORT_PCR_MUX(ALT1) | PORT_PCR_IRQC(10) | PORT_PCR_PE(1) | PORT_PCR_PS(1);
+    
+    /* Configure NVIC */
+    NVIC_SetPriority(PORTA_IRQn, 2);
+    NVIC_ClearPendingIRQ(PORTA_IRQn);
+    NVIC_EnableIRQ(PORTA_IRQn);
 }
 
 
 /**
  * @brief   Configure CE pin as output.
  * 
- * @param   ulState     TRUE/FALSE
+ * @param   None
  *             
  * @return  None
  */
 __STATIC_INLINE void nRF24L01_vConfigureChipEnable(void)
 {
-    /* Enable PORTA clock gating */
-    SIM->SCGC5 |= SIM_SCGC5_PORTA(1);
+    /* Select GPIO */
     PORTA->PCR[CE] = PORT_PCR_MUX(ALT1);
+    
+    /* Set output */
     FGPIOA->PDDR |= MASK(CE);    
 }
 
@@ -183,13 +191,48 @@ __STATIC_INLINE void nRF24L01_vConfigureChipEnable(void)
  *             
  * @return  None
  */
-__STATIC_INLINE void nRF24L01_vSetChipEnable(uint32_t ulState)
+__STATIC_INLINE void nRF24L01_vSetChipEnable(const uint32_t ulState)
 {
+    configASSERT(ulState == LOW || (ulState == HIGH));
+
     /* Figure out whether to set or clear bit */
     const uint32_t *pulReg = (uint32_t *)&FGPIOA->PCOR - ulState; /* Subtract 0 - 1 words from PCOR address => pulReg = FGPIOA->PSOR/PCOR */
 
     /* Perform bitwise operation */
     BME_OR32(&(*pulReg), MASK(CE));
+}
+
+
+/**
+ * @brief   Pulse CE line low for 10 탎 to start transmission.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+static void nRF24L01_vStartTransmission(void)
+{
+    /* Disable TPM2 interrupts just to be sure */
+    BME_AND8(&TPM2->SC, ~(uint8_t)TPM_SC_TOIE(1));
+
+    /* Send 10 탎 pulse */
+    nRF24L01_vSetChipEnable(HIGH);
+    TPM2_vStart();
+
+    //vTaskDelay(10);
+    while (TPM2->CNT < TEN_MICROSECONDS)
+    {
+        ; /* Wait until 10 탎 passed */
+    }
+
+    nRF24L01_vSetChipEnable(LOW);
+    TPM2_vStop();
+
+    /* Turn TPM2 interrupts on again */
+    BME_OR8(&TPM2->SC, TPM_SC_TOIE(1));
+
+    /* Reset TPM2 counter */
+    TPM2->CNT = 0;
 }
 
 
@@ -200,7 +243,7 @@ __STATIC_INLINE void nRF24L01_vSetChipEnable(uint32_t ulState)
  *             
  * @return  None
  */
-void nRF24L01_vResetStatusFlags(uint8_t ucStatusMask)
+void nRF24L01_vResetStatusFlags(const uint8_t ucStatusMask)
 {
     nRF24L01_vWriteRegister(STATUS, ucStatusMask);
 }
@@ -209,51 +252,48 @@ void nRF24L01_vResetStatusFlags(uint8_t ucStatusMask)
 /**
  * @brief   Transmit payload.
  * 
+ * @note    Message max length 32 bytes.
+ * 
  * @param   pucPayload      Payload to send.
  *             
  * @return  None
  */
-void nRF24L01_vSendPayload(uint8_t *pucPayload)
+void nRF24L01_vSendPayload(const char *pucPayload)
 {
-    uint8_t ucData[MAX_MSG_LEN + 2]; /* Pad by 1 on each side */
-    
+    const uint32_t ulPayloadLength = strlen((const char *)pucPayload) + 1; /* Add W_TX_PAYLOAD as first element later */
+    configASSERT((ulPayloadLength - 1) <= MAX_PAYLOAD_LEN); /* W_TX_PAYLOAD not included in the payload */
+    uint8_t ucData[ulPayloadLength + 1]; /* Allocate space for null-terminator */
+
+    /* Transfer 1...32 bytes */
+    nRF24L01_vWriteRegister(RX_PW_P0, RX_PW_PX(ulPayloadLength));
+
     /* Flush TX buffer */
     nRF24L01_vSendCommand(FLUSH_TX);
 
+    /**
+     * Reset data received flag
+     * Reset transmission succeeded flag
+     * Reset transmission failed flag
+     */
+    nRF24L01_vResetStatusFlags(STATUS_RX_DR(1) | STATUS_TX_DS(1) | STATUS_MAX_RT(1));
+
     /* Build message */
     ucData[0] = W_TX_PAYLOAD;
-    for (uint8_t i = 0; i < MAX_MSG_LEN; i++)
+    for (uint32_t i = 0; i < ulPayloadLength - 1; i++) /* First index already filled */
     {
         ucData[i + 1] = pucPayload[i];
     }
-    ucData[MAX_MSG_LEN] = 0x00; /* Add null-terminator for strlen() */
+    ucData[ulPayloadLength] = 0x00; /* Add null-terminator for strlen() */
 
-    /* First transfer register, then values */
+    /* Transfer bytes to nRF24L01 */
     SPI1_vTransmitDMA((const char *)ucData);
-
-    /* Block task until message sent */
-    for (uint8_t i = 0; i < MAX_MSG_LEN + 2; i++)
-    {
-        (void)SPI1_ucReadPolling();
-    }
-
-    /* Send 10 탎 pulse to start transmission */
-    nRF24L01_vSetChipEnable(HIGH);
-    TPM2_vStart();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
-    while (TPM2->CNT < TEN_MICROSECONDS)
-    {
-        ; /* Wait until 10 탎 passed */
-    }
-    TPM2_vStop();
-    nRF24L01_vSetChipEnable(LOW);
     
-    /* Reset TPM2 counter */
-    TPM2->CNT = 0;
+    nRF24L01_vStartTransmission();
 }
 
 
 /**
- * @brief   Read nRF24L01 register value.
+ * @brief   Read nRF24L01 register value. 
  * 
  * @note    Because of full-duplex mode SPI receive buffer is polled while DMA
  *          is transferring through SPI transmit buffer.
@@ -261,6 +301,8 @@ void nRF24L01_vSendPayload(uint8_t *pucPayload)
  * @param   ucRegister      Register to read.
  * 
  * @return  value           Register value.
+ * 
+ * @deprecated              Don't use.
  */
 uint8_t nRF24L01_ucReadRegister(const uint8_t ucRegister)
 {
@@ -303,28 +345,14 @@ void nRF24L01_vWriteRegister(const uint8_t ucRegister, const uint8_t ucValue)
  */
 void nRF24L01_vSendCommand(const uint8_t ucCommand)
 {
-    SPI1_vTransmitByte(ucCommand);
-    (void)SPI1_ucReadPolling(); /* Clear SPI1 receive buffer */
+    const uint8_t ucCommandString[] = { ucCommand, 0x00 }; /* Add null-terminator for strlen() */
+
+    SPI1_vTransmitDMA((const char *)ucCommandString);
 }
 
 
 /**
- * @brief   Write 8-bit value to nRF24L01 address register.
- * 
- * @param   ucRegister      Register to write.
- * 
- * @param   ucValue         Value to write.
- * 
- * @return  None
- */
-void nRF24L01_vWrite8BitAddressRegister(const uint8_t ucRegister, const uint8_t ucValue)
-{
-    nRF24L01_vWriteRegister(ucRegister, ucValue);
-}
-
-
-/**
- * @brief   Write 40-bit value to  nRF24L01 address register.
+ * @brief   Write to nRF24L01 address register.
  * 
  * @note    Blocks task until address written.
  * 
@@ -334,24 +362,37 @@ void nRF24L01_vWrite8BitAddressRegister(const uint8_t ucRegister, const uint8_t 
  * 
  * @return  None
  */
-void nRF24L01_vWrite40BitAddressRegister(const uint8_t ucRegister, const uint8_t *pucValue)
+void nRF24L01_vWriteAddressRegister(const uint8_t ucRegister, const uint8_t *pucValue)
 {
-    uint8_t ucData[RXTX_ADDR_LEN + 2]; /* Pad by 1 on each side */
+    const uint32_t ulLength = strlen((const char *)pucValue) + 1; /* Add W_REGISTER as first element later */
+    configASSERT((ulLength - 1) <= ADDR_40BIT_LEN);  /* W_REGISTER not included in the payload */
+
+    uint8_t ucData[ulLength];
 
     /* Build message */
     ucData[0] = W_REGISTER | ucRegister;
-    for (uint8_t i = 0; i < RXTX_ADDR_LEN; i++)
+    for (uint32_t i = 0; i < ulLength - 1; i++) /* First index already filled */
     {
         ucData[i + 1] = pucValue[i];
     }
-    ucData[RXTX_ADDR_LEN + 1] = 0x00; /* Add null-terminator for strlen() */
 
     /* First transfer register, then values */
     SPI1_vTransmitDMA((const char *)ucData);
+}
 
-    /* Block task until message sent */
-    for (uint8_t i = 0; i < RXTX_ADDR_LEN + 2; i++)
+
+/**
+ * @brief   PORTA IRQ handler. Triggered when nRF24L01 transmits payload.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+void PORTA_IRQHandler(void)
+{
+    if (PORTA_ISFR & MASK(IRQ))
     {
-        (void)SPI1_ucReadPolling();
+        /* Clear status flag */
+        PORTA->ISFR = MASK(IRQ);
     }
 }

@@ -35,12 +35,12 @@ void vCommTask(void *const pvParam)
     {
         if (xQueueReceive(xCommQueue, &(pxMessage), (TickType_t) 10))
         {
-            /* Used to guard RF modules state in future */
+            /* Guard nRF24L01 */
             if (xSemaphoreTake(xCommSemaphore, (TickType_t)xTicksToWait))
             {
-                (void)nRF24L01_ucReadRegister(0x05);
-                nRF24L01_vWriteRegister(0x05, 0x54);
-                (void)nRF24L01_ucReadRegister(0x05);
+                taskENTER_CRITICAL();
+                nRF24L01_vSendPayload(pxMessage->ucFrame);
+                taskEXIT_CRITICAL();
 
                 /* This call should not fail in any circumstance */
                 xAssert = xSemaphoreGive(xCommSemaphore);
@@ -63,7 +63,7 @@ void vCommTask(void *const pvParam)
 void vFrameTask(void *const pvParam)
 {
     (void)pvParam;
-    int8_t cBytesWritten;
+    int32_t lBytesWritten;
     BaseType_t xAssert;
     
     struct Sensor *pxSensor;
@@ -77,9 +77,9 @@ void vFrameTask(void *const pvParam)
             if (xQueueReceive(xAnalogQueue, &pxSensor, (TickType_t)50))
             {
                 /* Build the frame */
-                cBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=23;hum=50;soil=30;");
+                lBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=23;hum=50;soil=30;");
                 //cBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%ldhum=%lumst=%lu", pxSensor->lTemperature, pxSensor->ulHumidity, pxSensor->ulSoilMoisture);
-                configASSERT(cBytesWritten >= 0);
+                configASSERT(lBytesWritten >= 0);
             
                 /* Transmit */
                 xAssert = xQueueSend(xCommQueue, (void *)&pxMessage, (TickType_t)10);

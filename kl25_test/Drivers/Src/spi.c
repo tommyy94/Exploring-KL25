@@ -26,11 +26,7 @@
  * @return  None
  */
 void SPI1_vInit(void)
-{
-    /* Enable clock to SPI1 */
-    SIM->SCGC4 |= SIM_SCGC4_SPI1_MASK;
-    SIM->SCGC5 |= SIM_SCGC5_PORTE_MASK;
-    
+{    
     /* Disable SPI during configuration */
     SPI1->C1 &= ~SPI_C1_SPE_MASK;
     
@@ -77,7 +73,7 @@ void SPI1_vInit(void)
  */
 uint8_t SPI1_ucReadPolling(void)
 {
-    while (!BME_AND8(&SPI1->S, SPI_S_SPRF(1)))
+    while (!BME_UBFX8(&SPI1->S, SPI_S_SPRF_SHIFT, 1))
     {
         ; /* Wait until buffer full */
     }
@@ -95,7 +91,7 @@ uint8_t SPI1_ucReadPolling(void)
  */
 void SPI1_vTransmitByte(const char ucByte)
 {
-    while (!BME_AND8(&SPI1->S, SPI_S_SPTEF(1)))
+    while (!BME_UBFX8(&SPI1->S, SPI_S_SPTEF_SHIFT, 1))
     {
         ; /* Wait until TX buffer empty */
     }
@@ -128,13 +124,15 @@ void SPI1_vTransmitPolling(const  char *pcData)
 /**
  * @brief   Transmit string over SPI by DMA.
  * 
+ * @note    This is a blocking function.
+ * 
  * @param   pcData      String to send
  *             
  * @return  None
  */
 void SPI1_vTransmitDMA(const  char *pcData)
 {
-    const uint8_t ucLength = strlen(pcData);
+    const uint32_t ucLength = strlen(pcData);
 
     /* Set transfer duration */
     TPM2_vLoadCounter(ucLength);
@@ -159,6 +157,13 @@ void SPI1_vTransmitDMA(const  char *pcData)
     
     /* Send rest of the bytes */
     DMA0_vStart();
+
+    /* Block until message sent */
+    for (uint32_t i = 0; i < ucLength; i++)
+    {
+        (void)SPI1_ucReadPolling();
+        //(void)SPI1->D;
+    }
 }
 
 
@@ -171,6 +176,8 @@ void SPI1_vTransmitDMA(const  char *pcData)
  */
 void SPI1_vSetSlave(const uint32_t ulState)
 {
+    configASSERT(ulState == LOW || (ulState == HIGH));
+    
     /* Figure out whether to set or clear bit */
     const uint32_t *pulReg = (uint32_t *)&FGPIOE->PCOR - ulState; /* Subtract 0 - 1 words from PCOR address => pulReg = FGPIOE->PSOR/PCOR */
     
