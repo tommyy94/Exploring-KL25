@@ -132,13 +132,13 @@ void SPI1_vTransmitPolling(const  char *pcData)
  */
 void SPI1_vTransmitDMA(const  char *pcData)
 {
-    const uint32_t ucLength = strlen(pcData);
+    const uint32_t ulLength = strlen(pcData);
 
     /* Set transfer duration */
-    TPM2_vLoadCounter(ucLength);
+    TPM2_vLoadCounter(ulLength);
 
     /* Set source and destination addresses */
-    DMA0_vInitTransaction((uint32_t *)pcData, (uint32_t *)&(SPI1->D), ucLength);
+    DMA0_vInitTransaction((uint32_t *)pcData, (uint32_t *)&(SPI1->D), ulLength);
     
     /* Begin transfer */
     SPI1_vSetSlave(LOW);
@@ -159,10 +159,9 @@ void SPI1_vTransmitDMA(const  char *pcData)
     DMA0_vStart();
 
     /* Block until message sent */
-    for (uint32_t i = 0; i < ucLength; i++)
+    for (uint32_t i = 0; i < ulLength; i++)
     {
         (void)SPI1_ucReadPolling();
-        //(void)SPI1->D;
     }
 }
 

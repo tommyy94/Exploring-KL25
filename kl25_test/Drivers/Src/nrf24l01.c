@@ -96,8 +96,7 @@
 __STATIC_INLINE void nRF24L01_vConfigureIRQ(void);
 __STATIC_INLINE void nRF24L01_vConfigureChipEnable(void);
 __STATIC_INLINE void nRF24L01_vSetChipEnable(const uint32_t ulState);
-static void nRF24L01_vStartTransmission(void);
-
+__STATIC_INLINE void nRF24L01_vStartTransmission(void);
 
 /* Function descriptions */
 
@@ -210,23 +209,21 @@ __STATIC_INLINE void nRF24L01_vSetChipEnable(const uint32_t ulState)
  * 
  * @return  None
  */
-static void nRF24L01_vStartTransmission(void)
+__STATIC_INLINE void nRF24L01_vStartTransmission(void)
 {
     /* Disable TPM2 interrupts just to be sure */
     BME_AND8(&TPM2->SC, ~(uint8_t)TPM_SC_TOIE(1));
 
-    /* Send 10 µs pulse */
+    /* Send minimum 10 µs pulse */
+    TPM2->CNT = 0;
     nRF24L01_vSetChipEnable(HIGH);
     TPM2_vStart();
-
-    //vTaskDelay(10);
     while (TPM2->CNT < TEN_MICROSECONDS)
     {
         ; /* Wait until 10 µs passed */
     }
-
-    nRF24L01_vSetChipEnable(LOW);
     TPM2_vStop();
+    nRF24L01_vSetChipEnable(LOW);
 
     /* Turn TPM2 interrupts on again */
     BME_OR8(&TPM2->SC, TPM_SC_TOIE(1));
@@ -239,13 +236,18 @@ static void nRF24L01_vStartTransmission(void)
 /**
  * @brief   Reset the given mask of status bits.
  * 
- * @param   ucStatusMask    Status bits to reset.
+ * @param   None
  *             
  * @return  None
  */
-void nRF24L01_vResetStatusFlags(const uint8_t ucStatusMask)
+void nRF24L01_vResetStatusFlags(void)
 {
-    nRF24L01_vWriteRegister(STATUS, ucStatusMask);
+    /**
+     * Reset data received flag
+     * Reset transmission succeeded flag
+     * Reset transmission failed flag
+     */
+    nRF24L01_vWriteRegister(STATUS, STATUS_RX_DR(1) | STATUS_TX_DS(1) | STATUS_MAX_RT(1));
 }
 
 
@@ -267,15 +269,9 @@ void nRF24L01_vSendPayload(const char *pucPayload)
     /* Transfer 1...32 bytes */
     nRF24L01_vWriteRegister(RX_PW_P0, RX_PW_PX(ulPayloadLength));
 
-    /* Flush TX buffer */
     nRF24L01_vSendCommand(FLUSH_TX);
-
-    /**
-     * Reset data received flag
-     * Reset transmission succeeded flag
-     * Reset transmission failed flag
-     */
-    nRF24L01_vResetStatusFlags(STATUS_RX_DR(1) | STATUS_TX_DS(1) | STATUS_MAX_RT(1));
+    
+    nRF24L01_vResetStatusFlags();
 
     /* Build message */
     ucData[0] = W_TX_PAYLOAD;

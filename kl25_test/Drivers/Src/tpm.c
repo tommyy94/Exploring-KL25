@@ -111,6 +111,12 @@ void TPM2_vInit(void)
      */
     TPM2->SC = TPM_SC_PS(1) | TPM_SC_TOIE(1);
 
+    /* Clear Timer Overflow Flag */
+    TPM2->STATUS |= 0xFFFFFFFF;
+    
+    /* Reset counters */
+    TPM2->CNT = 0;
+
     /* Set NVIC for TPM2 ISR */
     NVIC_SetPriority(TPM2_IRQn, 3);
     NVIC_ClearPendingIRQ(TPM2_IRQn);

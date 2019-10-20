@@ -78,7 +78,7 @@
       <EnableLeakSanitizer>false</EnableLeakSanitizer>
       <EnableUndefSanitizer>false</EnableUndefSanitizer>
       <Optimization>Og</Optimization>
-      <InlineFunctions>true</InlineFunctions>
+      <InlineFunctions>false</InlineFunctions>
       <VerboseMode>false</VerboseMode>
       <LinkTimeOptimization>false</LinkTimeOptimization>
     </ClCompile>

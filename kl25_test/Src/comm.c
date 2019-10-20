@@ -6,7 +6,6 @@
 /* Global variables */
 QueueHandle_t xCommQueue;
 SemaphoreHandle_t xCommSemaphore;
-static TaskHandle_t xCommTaskHandle;
 
 struct AMessage
 {
@@ -29,7 +28,6 @@ void vCommTask(void *const pvParam)
     BaseType_t xAssert;
     struct AMessage *pxMessage;
     const TickType_t xTicksToWait = 100 / portTICK_PERIOD_MS;
-    xCommTaskHandle = xTaskGetCurrentTaskHandle();
     
     for (;;)
     {
@@ -38,9 +36,7 @@ void vCommTask(void *const pvParam)
             /* Guard nRF24L01 */
             if (xSemaphoreTake(xCommSemaphore, (TickType_t)xTicksToWait))
             {
-                taskENTER_CRITICAL();
                 nRF24L01_vSendPayload(pxMessage->ucFrame);
-                taskEXIT_CRITICAL();
 
                 /* This call should not fail in any circumstance */
                 xAssert = xSemaphoreGive(xCommSemaphore);
@@ -103,9 +99,9 @@ void TPM2_IRQHandler(void)
 {
     if (BME_UBFX32(&TPM2->STATUS, TPM_STATUS_TOF_SHIFT, 1))
     {
-        SPI1_vSetSlave(HIGH);
-
         TPM2_vStop();
+        
+        SPI1_vSetSlave(HIGH);
 
         /* Reset counters */
         TPM2->CNT = 0;
