@@ -36,7 +36,7 @@ void vCommTask(void *const pvParam)
             /* Guard nRF24L01 */
             if (xSemaphoreTake(xCommSemaphore, (TickType_t)xTicksToWait))
             {
-                nRF24L01_vSendPayload(pxMessage->ucFrame);
+                nRF24L01_vSendPayload(pxMessage->ucFrame, strlen(pxMessage->ucFrame));
 
                 /* This call should not fail in any circumstance */
                 xAssert = xSemaphoreGive(xCommSemaphore);
@@ -106,13 +106,15 @@ void TPM2_IRQHandler(void)
         /* Reset counters */
         TPM2->CNT = 0;
 
-        /* Disable DMA transmitter */
+        /* Disable DMA TX & RX */
         BME_AND8(&SPI1->C2, ~(uint8_t)SPI_C2_TXDMAE(1));
+        BME_AND8(&SPI1->C2, ~(uint8_t)SPI_C2_RXDMAE(1));
 
-        DMA0_vStop();
+        DMA0_vStop(DMA_CHANNEL0);
 
         /* Clear DONE & error bits */
-        BME_OR32(&DMA0->DMA[0].DSR_BCR, DMA_DSR_BCR_DONE(1));
+        BME_OR32(&DMA0->DMA[DMA_CHANNEL0].DSR_BCR, DMA_DSR_BCR_DONE(1));
+        BME_OR32(&DMA0->DMA[DMA_CHANNEL1].DSR_BCR, DMA_DSR_BCR_DONE(1));
     }
 
     /* Clear Timer Overflow Flag */

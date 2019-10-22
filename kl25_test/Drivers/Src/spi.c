@@ -105,16 +105,15 @@ void SPI1_vTransmitByte(const char ucByte)
  * @brief   Transmit string over SPI by polling.
  * 
  * @param   pcData      String to send
+ *
+ * @param   ulLength    Transaction length
  *             
  * @return  None
  */
-void SPI1_vTransmitPolling(const  char *pcData)
-{
-    /* Find size of array */
-    uint16_t dataLen = (uint16_t)strlen(pcData);
-    
+void SPI1_vTransmitPolling(char const *pcData, const uint32_t ulLength)
+{    
     /* Send the array of characters */
-    for (uint16_t i = 0; i < dataLen; i++)
+    for (uint16_t i = 0; i < ulLength; i++)
     {
         SPI1_vTransmitByte(pcData[i]);
     }
@@ -126,19 +125,22 @@ void SPI1_vTransmitPolling(const  char *pcData)
  * 
  * @note    This is a blocking function.
  * 
- * @param   pcData      String to send
+ * @param   pcTxData    String to send
+ * 
+ * @param   pcRxData    String to receive
+ *
+ * @param   ulLength    Transaction length
  *             
  * @return  None
  */
-void SPI1_vTransmitDMA(const  char *pcData)
+void SPI1_vTransmitDMA(char const *pcTxData, char *const pcRxData, const uint32_t ulLength)
 {
-    const uint32_t ulLength = strlen(pcData);
-
     /* Set transfer duration */
     TPM2_vLoadCounter(ulLength);
 
     /* Set source and destination addresses */
-    DMA0_vInitTransaction((uint32_t *)pcData, (uint32_t *)&(SPI1->D), ulLength);
+    DMA0_vInitTransaction(DMA_CHANNEL0, (uint32_t *)(pcTxData + BYTE_OFFSET), (uint32_t *)&(SPI1->D), ulLength - BYTE_OFFSET);
+    DMA0_vInitTransaction(DMA_CHANNEL1, (uint32_t *)&(SPI1->D), (uint32_t *)(pcRxData), ulLength);
     
     /* Begin transfer */
     SPI1_vSetSlave(LOW);
@@ -150,19 +152,14 @@ void SPI1_vTransmitDMA(const  char *pcData)
      * and sending first byte by placing value to register
      */
     (void)SPI1->S;
-    SPI1->D = pcData[0];
+    SPI1->D = pcTxData[0];
 
-    /* Enable DMA transmitter */
+    /* Enable DMA TX & RX */
     BME_OR8(&SPI1->C2, SPI_C2_TXDMAE(1));
+    BME_OR8(&SPI1->C2, SPI_C2_RXDMAE(1));
     
     /* Send rest of the bytes */
-    DMA0_vStart();
-
-    /* Block until message sent */
-    for (uint32_t i = 0; i < ulLength; i++)
-    {
-        (void)SPI1_ucReadPolling();
-    }
+    DMA0_vStart(DMA_CHANNEL0);
 }
 
 

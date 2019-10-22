@@ -118,8 +118,8 @@ void nRF24L01_vInit(void)
 
     /* Set RX & TX address matching */
     const uint8_t ucTxAddr[ADDR_40BIT_LEN] = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x00 }; /* LSB written first, null-terminator at end */
-    nRF24L01_vWriteAddressRegister(RX_ADDR_P0, ucTxAddr);
-    nRF24L01_vWriteAddressRegister(TX_ADDR, ucTxAddr);
+    nRF24L01_vWriteAddressRegister(RX_ADDR_P0, ucTxAddr, ADDR_40BIT_LEN);
+    nRF24L01_vWriteAddressRegister(TX_ADDR, ucTxAddr, ADDR_40BIT_LEN);
     
     /* Enable data pipe 0 */
     nRF24L01_vWriteRegister(EN_RXADDR, EN_RXADDR_ERX_P0(1));
@@ -257,60 +257,35 @@ void nRF24L01_vResetStatusFlags(void)
  * @note    Message max length 32 bytes.
  * 
  * @param   pucPayload      Payload to send.
+ *
+ * @param   ulLength        Transaction length
  *             
  * @return  None
  */
-void nRF24L01_vSendPayload(const char *pucPayload)
+void nRF24L01_vSendPayload(const char *pucPayload, const uint32_t ulLength)
 {
-    const uint32_t ulPayloadLength = strlen((const char *)pucPayload) + 1; /* Add W_TX_PAYLOAD as first element later */
-    configASSERT((ulPayloadLength - 1) <= MAX_PAYLOAD_LEN); /* W_TX_PAYLOAD not included in the payload */
-    uint8_t ucData[ulPayloadLength + 1]; /* Allocate space for null-terminator */
+    configASSERT((ulLength) < MAX_PAYLOAD_LEN);
+    char ucRxData[ulLength];
+    char ucTxData[ulLength + 1]; /* Allocate byte for W_TX_PAYLOD */
 
     /* Transfer 1...32 bytes */
-    nRF24L01_vWriteRegister(RX_PW_P0, RX_PW_PX(ulPayloadLength));
+    nRF24L01_vWriteRegister(RX_PW_P0, RX_PW_PX(ulLength));
 
     nRF24L01_vSendCommand(FLUSH_TX);
     
     nRF24L01_vResetStatusFlags();
 
     /* Build message */
-    ucData[0] = W_TX_PAYLOAD;
-    for (uint32_t i = 0; i < ulPayloadLength - 1; i++) /* First index already filled */
+    ucTxData[0] = W_TX_PAYLOAD;
+    for (uint32_t i = 0; i < ulLength; i++) /* First index already filled */
     {
-        ucData[i + 1] = pucPayload[i];
+        ucTxData[i + 1] = pucPayload[i];
     }
-    ucData[ulPayloadLength] = 0x00; /* Add null-terminator for strlen() */
 
     /* Transfer bytes to nRF24L01 */
-    SPI1_vTransmitDMA((const char *)ucData);
+    SPI1_vTransmitDMA(ucTxData, ucRxData, ulLength);
     
     nRF24L01_vStartTransmission();
-}
-
-
-/**
- * @brief   Read nRF24L01 register value. 
- * 
- * @note    Because of full-duplex mode SPI receive buffer is polled while DMA
- *          is transferring through SPI transmit buffer.
- * 
- * @param   ucRegister      Register to read.
- * 
- * @return  value           Register value.
- * 
- * @deprecated              Don't use.
- */
-uint8_t nRF24L01_ucReadRegister(const uint8_t ucRegister)
-{
-    uint8_t ucValue;
-
-    const uint8_t ucData[] = { R_REGISTER | ucRegister, R_REGISTER | ucRegister, 0x00 }; /* Add null-terminator for strlen() */
-
-    SPI1_vTransmitDMA((const char *)ucData);
-    (void)SPI1_ucReadPolling(); /* Discard status byte */
-    ucValue = SPI1_ucReadPolling();
-    
-    return (ucValue);
 }
 
 
@@ -324,11 +299,13 @@ uint8_t nRF24L01_ucReadRegister(const uint8_t ucRegister)
  * @return  None
  */
 void nRF24L01_vWriteRegister(const uint8_t ucRegister, const uint8_t ucValue)
-{    
+{
+    char ucBuffer[32] = { '\0' };
+
     const uint8_t ucData[] = { W_REGISTER | ucRegister, ucValue, 0x00 }; /* Add null-terminator for strlen() */
 
     /* First transfer register, then value */
-    SPI1_vTransmitDMA((const char *)ucData);
+    SPI1_vTransmitDMA((const char *)ucData, ucBuffer, 2);
 }
 
 
@@ -341,9 +318,10 @@ void nRF24L01_vWriteRegister(const uint8_t ucRegister, const uint8_t ucValue)
  */
 void nRF24L01_vSendCommand(const uint8_t ucCommand)
 {
-    const uint8_t ucCommandString[] = { ucCommand, 0x00 }; /* Add null-terminator for strlen() */
+    char ucBuffer[32] = {'\0'};
+    const uint8_t *pucCommand = &ucCommand;
 
-    SPI1_vTransmitDMA((const char *)ucCommandString);
+    SPI1_vTransmitDMA((const char *)pucCommand, ucBuffer, 1);
 }
 
 
@@ -356,24 +334,32 @@ void nRF24L01_vSendCommand(const uint8_t ucCommand)
  * 
  * @param   ucValue         Value to write.
  * 
+ * @param   ulLength        Transaction length
+ * 
  * @return  None
  */
-void nRF24L01_vWriteAddressRegister(const uint8_t ucRegister, const uint8_t *pucValue)
+void nRF24L01_vWriteAddressRegister(const uint8_t ucRegister, const uint8_t *pucValue, const uint32_t ulLength)
 {
-    const uint32_t ulLength = strlen((const char *)pucValue) + 1; /* Add W_REGISTER as first element later */
-    configASSERT((ulLength - 1) <= ADDR_40BIT_LEN);  /* W_REGISTER not included in the payload */
+    configASSERT((ulLength) <= ADDR_40BIT_LEN);
+    char ucRxData[ulLength];
+    char ucTxData[ulLength + 1]; /* Allocate byte for W_REGISTER */
 
-    uint8_t ucData[ulLength];
+    /* Transfer 1...32 bytes */
+    nRF24L01_vWriteRegister(RX_PW_P0, RX_PW_PX(ulLength));
+
+    nRF24L01_vSendCommand(FLUSH_TX);
+
+    nRF24L01_vResetStatusFlags();
 
     /* Build message */
-    ucData[0] = W_REGISTER | ucRegister;
-    for (uint32_t i = 0; i < ulLength - 1; i++) /* First index already filled */
+    ucTxData[0] = W_REGISTER | ucRegister;
+    for (uint32_t i = 0; i < ulLength; i++) /* First index already filled */
     {
-        ucData[i + 1] = pucValue[i];
+        ucTxData[i + 1] = pucValue[i];
     }
 
-    /* First transfer register, then values */
-    SPI1_vTransmitDMA((const char *)ucData);
+    /* Transfer bytes to nRF24L01 */
+    SPI1_vTransmitDMA(ucTxData, ucRxData, ulLength);
 }
 
 
