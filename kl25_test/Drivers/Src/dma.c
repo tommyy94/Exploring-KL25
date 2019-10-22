@@ -21,6 +21,7 @@
  * @brief   Initialize DMAMUX0.
  * 
  * @param   ulChannel       DMA channel.
+ *
  * @param   ucSource        DMA0 trigger source.
  * 
  * @return  None
@@ -42,6 +43,7 @@
  * @brief   Link DMA0 channels.
  * 
  * @param   ucSrcCh     Source channel
+ *
  * @param   ucDstCh     Destination channel
  * 
  * @return  None
@@ -102,7 +104,7 @@ void DMA0_vInit(void)
  * 
  * @return  None
  */
-void DMA0_vInitTransaction(uint32_t ulChannel, uint32_t *const pulSrcAddr, uint32_t *const pulDstAddr, const uint32_t ulLength)
+void DMA0_vInitTransaction(const uint32_t ulChannel, uint32_t *const pulSrcAddr, uint32_t *const pulDstAddr, const uint32_t ulLength)
 {
     configASSERT(ulChannel < DMAMUX_CHCFG_COUNT);
     configASSERT(VALIDATE_ADDR_REG((uint32_t)pulSrcAddr));
