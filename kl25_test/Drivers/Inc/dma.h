@@ -61,6 +61,6 @@
 void DMAMUX0_vInit(uint32_t const ulChannel, uint32_t const ulSource);
 void DMA0_vLinkChannel(uint32_t const ulSrcCh, uint32_t const ulDstCh);
 void DMA0_vInit(void);
-void DMA0_vInitTransaction(const uint32_t ulChannel, uint32_t *const pulSrcAddr, uint32_t *const pulDstAddr, const uint32_t ulLength)
+void DMA0_vInitTransaction(const uint32_t ulChannel, uint32_t *const pulSrcAddr, uint32_t *const pulDstAddr, const uint32_t ulLength);
 void DMA0_vStart(const uint32_t ulChannel);
 void DMA0_vStop(const uint32_t ulChannel);

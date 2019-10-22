@@ -26,7 +26,7 @@
  * 
  * @return  None
  */
-    void DMAMUX0_vInit(uint32_t const ulChannel, uint32_t const ulSource)
+void DMAMUX0_vInit(uint32_t const ulChannel, uint32_t const ulSource)
 {
     configASSERT(ulChannel < DMAMUX_CHCFG_COUNT);
     configASSERT(ulSource <= DMAMUX0_CHCFG_SOURCE_TSI);
