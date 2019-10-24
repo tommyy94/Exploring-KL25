@@ -18,7 +18,7 @@
  * 
  * @return  None
  */
-void TPM0_vInit(const uint16_t usPeriod)
+void TPM0_vInit(void)
 {    
     /* Set clock source for TPM0 */
     SIM->SOPT2 |= SIM_SOPT2_TPMSRC(1) | SIM_SOPT2_PLLFLLSEL_MASK;
@@ -30,7 +30,7 @@ void TPM0_vInit(const uint16_t usPeriod)
     }
     
     /* Load counter */
-    TPM0->MOD |= usPeriod - 1;
+    TPM0->MOD |= 4800 - 1;
     
     /* Continue in debug mode */
     TPM0->CONF = TPM_CONF_DBGMODE(1);

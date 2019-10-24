@@ -21,7 +21,7 @@
 #define TIME_PER_BYTE                       (MICROSECOND * 2 + TIME_BETWEEN_BYTES)      /* 2.25 µs */
 
 /* Global function prototypes */
-void TPM0_vInit(const uint16_t usPeriod);
+void TPM0_vInit(void);
 void TPM1_vInit(void);
 void TPM2_vInit(void);
 void TPM2_vLoadCounter(uint32_t ulBytes);
