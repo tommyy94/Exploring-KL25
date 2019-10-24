@@ -158,13 +158,7 @@
     <ClCompile Include="Drivers\Src\spi.c">
       <Filter>Drivers\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Drivers\Src\uart.c">
-      <Filter>Drivers\Src</Filter>
-    </ClCompile>
     <ClCompile Include="Drivers\Src\dma.c">
-      <Filter>Drivers\Src</Filter>
-    </ClCompile>
-    <ClCompile Include="Drivers\Src\gpio.c">
       <Filter>Drivers\Src</Filter>
     </ClCompile>
     <ClCompile Include="Drivers\Src\tpm.c">
@@ -178,6 +172,9 @@
     </ClCompile>
     <ClCompile Include="Src\sensors.c">
       <Filter>Source files\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Drivers\Src\nrf24l01.c">
+      <Filter>Drivers\Src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -253,12 +250,6 @@
     <ClInclude Include="Drivers\Inc\dma.h">
       <Filter>Drivers\Inc</Filter>
     </ClInclude>
-    <ClInclude Include="Drivers\Inc\gpio.h">
-      <Filter>Drivers\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="Drivers\Inc\uart.h">
-      <Filter>Drivers\Inc</Filter>
-    </ClInclude>
     <ClInclude Include="Drivers\Inc\tpm.h">
       <Filter>Drivers\Inc</Filter>
     </ClInclude>
@@ -270,6 +261,9 @@
     </ClInclude>
     <ClInclude Include="Inc\sensors.h">
       <Filter>Source files\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Drivers\Inc\nrf24l01.h">
+      <Filter>Drivers\Inc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

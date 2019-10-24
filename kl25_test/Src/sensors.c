@@ -71,6 +71,61 @@ void vSensorTask(void *const pvParam)
             configASSERT(xAssert);
         }
         
-        vTaskDelay(MSEC_TO_TICK(500));
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
+}
+
+
+/**
+ * @brief   TPM1 IRQ Handler used to capture CMP0 output.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ * @todo    Convert capacitor value (HS1101_ulValue) to humidity.
+ */
+void TPM1_IRQHandler(void)
+{
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    static uint32_t ulOverflows = 0;
+    uint32_t HS1101_ulValue = 0;
+    BaseType_t xAssert;
+
+    if (BME_UBFX32(&TPM1->STATUS, TPM_STATUS_TOF_SHIFT, TPM_STATUS_TOF_WIDTH))
+    {
+        ulOverflows++;
+    }
+
+    if (BME_UBFX32(&TPM1->STATUS, TPM_STATUS_CH1F_SHIFT, TPM_STATUS_CH1F_WIDTH))
+    {
+        /* Overflows should not happen */
+        configASSERT(ulOverflows == 0);
+
+        /* Stop TPM1 */
+        BME_AND32(&TPM1->SC, ~TPM_SC_CMOD(1));
+
+        /* Read humidity */
+        HS1101_ulValue = TPM1->CONTROLS[1].CnV;
+
+        /* Conversion should have been in progress */
+        configASSERT(xAnalogNotification != NULL);
+
+        /* Notify task */
+        xAssert = xTaskNotifyFromISR(xAnalogNotification, HS1101_ulValue, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+        configASSERT(xAssert == pdPASS);
+
+        /* No conversion in progress, so no tasks to notify */
+        xAnalogNotification = NULL;
+
+        /* Reset counters */
+        TPM1->CNT = 0;
+        ulOverflows = 0;
+    }
+
+    /* Reset all flags */
+    BME_OR32(&TPM1->STATUS, TPM_STATUS_TOF(1) | TPM_STATUS_CH1F(1));
+    BME_OR32(&TPM1->CONTROLS[1].CnSC, TPM_CnSC_CHF(1));
+
+    /* Force context switch if xHigherPriorityTaskWoken is set to pdTRUE */
+    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }

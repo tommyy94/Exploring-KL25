@@ -16,42 +16,42 @@ TaskHandle_t xAnalogNotification;
 /**
  * @brief   Starts PWM on target channel.
  * 
- * @param   ucChannel       PWM channel
+ * @param   ulChannel       PWM channel
  * @param   pxMotorTimers   Pointer to FreeRTOS software timers.
  * 
  * @return  None
  */
-void vStartMotor(const uint8_t ucChannel, TimerHandle_t *const pxMotorTimers)
+void vStartMotor(const uint32_t ulChannel, TimerHandle_t *const pxMotorTimers)
 {
     BaseType_t xAssert;
     
     /* Start software timer */
-    xAssert = xTimerStart(pxMotorTimers[ucChannel], (TickType_t)0);
+    xAssert = xTimerStart(pxMotorTimers[ulChannel], (TickType_t)0);
     configASSERT(xAssert);
     
     /* Enable PWM output on channel */
-    PORTD->PCR[ucChannel] |= PORT_PCR_MUX(ALT4);
+    PORTD->PCR[ulChannel] |= PORT_PCR_MUX(ALT4);
 }
 
 
 /**
  * @brief   Stops PWM on target channel.
  * 
- * @param   ucChannel       PWM channel
+ * @param   ulChannel       PWM channel
  * @param   pxMotorTimers   Pointer to FreeRTOS software timers.
  * 
  * @return  None
  */
-void vStopMotor(const uint8_t ucChannel, TimerHandle_t *const pxMotorTimers)
+void vStopMotor(const uint32_t ulChannel, TimerHandle_t *const pxMotorTimers)
 {
     BaseType_t xAssert;
     
     /* Stop software timer */
-    xAssert = xTimerStop(pxMotorTimers[ucChannel], (TickType_t)0);
+    xAssert = xTimerStop(pxMotorTimers[ulChannel], (TickType_t)0);
     configASSERT(xAssert);
         
     /* Disable PWM output on channel */
-    PORTD->PCR[ucChannel] &= ~PORT_PCR_MUX(ALT4);
+    PORTD->PCR[ulChannel] &= ~PORT_PCR_MUX(ALT4);
 }
 
 
@@ -73,7 +73,7 @@ void vMotorTask(void *const pvMotorTimers)
     {
         if (xQueueReceive(xMotorQueue, &pxMotors, (TickType_t)10))
         {
-            for (uint8_t i = 0; i < MOTOR_COUNT; i++)
+            for (uint32_t i = 0; i < MOTOR_COUNT; i++)
             {
                 if (pxMotors->ucMotorState[i] == TRUE)
                 {
@@ -83,7 +83,7 @@ void vMotorTask(void *const pvMotorTimers)
         }
         
         uxBits = xEventGroupWaitBits(xMotorEventGroup, 0xF, pdTRUE, pdFALSE, xTicksToWait);
-        for (uint8_t i = 0; i < MOTOR_COUNT; i++)
+        for (uint32_t i = 0; i < MOTOR_COUNT; i++)
         {
             if (uxBits & (MASK(i) == MASK(i)))
             {
@@ -92,61 +92,7 @@ void vMotorTask(void *const pvMotorTimers)
             }
         }
         
-        vTaskDelay(MSEC_TO_TICK(100));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
-
-/**
- * @brief   TPM1 IRQ Handler used to capture CMP0 output.
- * 
- * @param   None
- * 
- * @return  None
- * @todo    Convert capacitor value (HS1101_ulValue) to humidity.
- */
-void TPM1_IRQHandler(void)
-{ 
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    static uint32_t ulOverflows = 0;
-    uint32_t HS1101_ulValue = 0;
-    BaseType_t xAssert;
-    
-    if (BME_UBFX32(&TPM1->STATUS, TPM_STATUS_TOF_SHIFT, 1))
-    {
-        ulOverflows++;
-    }
-    
-    if (BME_UBFX32(&TPM1->STATUS, TPM_STATUS_CH1F_SHIFT, 1))
-    {
-        /* Overflows should not happen */
-        configASSERT(ulOverflows == 0);
-        
-        /* Stop TPM1 */
-        BME_AND32(&TPM1->SC, ~TPM_SC_CMOD(1));
-        
-        /* Read humidity */
-        HS1101_ulValue = TPM1->CONTROLS[1].CnV;
-        
-        /* Conversion should have been in progress */
-        configASSERT(xAnalogNotification != NULL);
-        
-        /* Notify task */
-        xAssert = xTaskNotifyFromISR(xAnalogNotification, HS1101_ulValue, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
-        configASSERT(xAssert == pdPASS);
-        
-        /* No conversion in progress, so no tasks to notify */
-        xAnalogNotification = NULL;
-        
-        /* Reset counters */
-        TPM1->CNT = 0;
-        ulOverflows = 0;
-    }
-    
-    /* Reset all flags */
-    BME_OR32(&TPM1->STATUS, TPM_STATUS_TOF(1) | TPM_STATUS_CH1F(1));
-    BME_OR32(&TPM1->CONTROLS[1].CnSC, TPM_CnSC_CHF(1));
-    
-    /* Force context switch if xHigherPriorityTaskWoken is set to pdTRUE */
-    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-}

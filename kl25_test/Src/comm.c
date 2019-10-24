@@ -6,15 +6,15 @@
 /* Global variables */
 QueueHandle_t xCommQueue;
 SemaphoreHandle_t xCommSemaphore;
+TaskHandle_t xCommTask = NULL;
 
 struct AMessage
 {
     char ucFrame[MAX_FRAME_SIZE];
 } xMessage;
 
-
+    
 /* Function descriptions */
-
 
 /**
  * @brief   FreeRTOS communication task.
@@ -34,18 +34,18 @@ void vCommTask(void *const pvParam)
     {
         if (xQueueReceive(xCommQueue, &(pxMessage), (TickType_t) 10))
         {
-            /* Used to guard RF modules state in future */
+            /* Guard nRF24L01 */
             if (xSemaphoreTake(xCommSemaphore, (TickType_t)xTicksToWait))
             {
-                SPI1_vTransmitDMA(pxMessage->ucFrame);
-                
+                nRF24L01_vSendPayload(pxMessage->ucFrame, strlen(pxMessage->ucFrame));
+
                 /* This call should not fail in any circumstance */
                 xAssert = xSemaphoreGive(xCommSemaphore);
                 configASSERT(xAssert == pdTRUE);
             }
         }
         
-        vTaskDelay(MSEC_TO_TICK(50));
+        vTaskDelay(pdMS_TO_TICKS(50));
     }
 }
 
@@ -60,7 +60,7 @@ void vCommTask(void *const pvParam)
 void vFrameTask(void *const pvParam)
 {
     (void)pvParam;
-    int8_t cBytesWritten;
+    int32_t lBytesWritten;
     BaseType_t xAssert;
     
     struct Sensor *pxSensor;
@@ -74,9 +74,9 @@ void vFrameTask(void *const pvParam)
             if (xQueueReceive(xAnalogQueue, &pxSensor, (TickType_t)50))
             {
                 /* Build the frame */
-                cBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=23;hum=50;soil=30;");
+                lBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=23;hum=50;soil=30;");
                 //cBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%ldhum=%lumst=%lu", pxSensor->lTemperature, pxSensor->ulHumidity, pxSensor->ulSoilMoisture);
-                configASSERT(cBytesWritten >= 0);
+                configASSERT(lBytesWritten >= 0);
             
                 /* Transmit */
                 xAssert = xQueueSend(xCommQueue, (void *)&pxMessage, (TickType_t)10);
@@ -84,6 +84,41 @@ void vFrameTask(void *const pvParam)
             }
         }
         
-        vTaskDelay(MSEC_TO_TICK(100));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
+}
+
+
+/**
+ * @brief   Sets SPI1 SS line high and stops DMA0.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+void TPM2_IRQHandler(void)
+{
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    
+    if (BME_UBFX32(&TPM2->STATUS, TPM_STATUS_TOF_SHIFT, TPM_STATUS_TOF_WIDTH))
+    {
+        /* Cleanup */
+        SPI1_vSetSlave(HIGH);
+        TPM2_vStop();
+
+        /* Should not be NULL as transmission was in progress */
+        configASSERT(xCommTask != NULL);
+
+        /* Notify task */
+        vTaskNotifyGiveFromISR(xCommTask, &xHigherPriorityTaskWoken);
+        
+        /* Transmission no longer in progress */
+        xCommTask = NULL;
+    }
+
+    /* Clear Timer Overflow Flag */
+    BME_OR32(&TPM2->STATUS, TPM_STATUS_TOF(1));
+
+    /* Force context switch if xHigherPriorityTaskWoken is set pdTRUE */
+    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }

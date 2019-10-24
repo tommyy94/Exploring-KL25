@@ -31,6 +31,6 @@ struct Motor_States
 
 
 /* Global function prototypes */
-void vStartMotor(const uint8_t ucChannel, TimerHandle_t *const pxMotorTimers);
-void vStopMotor(const uint8_t ucChannel, TimerHandle_t *const pxMotorTimers);
+void vStartMotor(const uint32_t ulChannel, TimerHandle_t *const pxMotorTimers);
+void vStopMotor(const uint32_t ulChannel, TimerHandle_t *const pxMotorTimers);
 void vMotorTask(void *const pvMotorTimers);

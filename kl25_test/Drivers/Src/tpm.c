@@ -5,7 +5,7 @@
 
 #include "tpm.h"
 
-
+/* Local defines */
 #define TPM0_CH0_PWM_PIN    (0UL)
 #define TPM1_IC_PIN         (13UL)
 
@@ -17,14 +17,9 @@
  * @param   usPeriod    PWM period
  * 
  * @return  None
- * @todo    Figure out correct/adjustable duty cycle and period.
  */
-void TPM0_vInit(const uint16_t usPeriod)
-{
-    /* Turn on clock gating for TPM0 and PORTD */
-    SIM->SCGC6 |= SIM_SCGC6_TPM0(1);
-    SIM->SCGC5 |= SIM_SCGC5_PORTD(1);
-    
+void TPM0_vInit(void)
+{    
     /* Set clock source for TPM0 */
     SIM->SOPT2 |= SIM_SOPT2_TPMSRC(1) | SIM_SOPT2_PLLFLLSEL_MASK;
 
@@ -35,7 +30,7 @@ void TPM0_vInit(const uint16_t usPeriod)
     }
     
     /* Load counter */
-    TPM0->MOD |= usPeriod - 1;
+    TPM0->MOD |= 4800 - 1;
     
     /* Continue in debug mode */
     TPM0->CONF = TPM_CONF_DBGMODE(1);
@@ -68,11 +63,7 @@ void TPM0_vInit(const uint16_t usPeriod)
  * @return  None
  */
 void TPM1_vInit(void)
-{
-    /* Turn on clock gating for TPM1 and PORTA */
-    SIM->SCGC6 |= SIM_SCGC6_TPM1(1);
-    SIM->SCGC5 |= SIM_SCGC5_PORTA(1);
-    
+{    
     /* Set clock source for TPM1 */
     SIM->SOPT2 |= SIM_SOPT2_TPMSRC(1) | SIM_SOPT2_PLLFLLSEL_MASK;
 
@@ -88,9 +79,9 @@ void TPM1_vInit(void)
      */
     TPM1->CONTROLS[0].CnSC = TPM_CnSC_ELSB(1);
     TPM1->CONTROLS[1].CnSC = TPM_CnSC_ELSA(1) | TPM_CnSC_CHIE(1);
-    
+
     /**
-     * Enable interrupts
+     * Enable timer overflow interrupts
      * Divide by 128 prescaler
      */
     TPM1->SC = TPM_SC_PS(7) | TPM_SC_TOIE(1);
@@ -99,4 +90,85 @@ void TPM1_vInit(void)
     NVIC_SetPriority(TPM1_IRQn, 3);
     NVIC_ClearPendingIRQ(TPM1_IRQn);
     NVIC_EnableIRQ(TPM1_IRQn);
+}
+
+
+/**
+ * @brief   Initialize TPM2.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+void TPM2_vInit(void)
+{
+    /* Set clock source for TPM2 */
+    SIM->SOPT2 |= SIM_SOPT2_TPMSRC(1) | SIM_SOPT2_PLLFLLSEL_MASK;
+
+    /**
+     * Enable timer overflow interrupts
+     * Divide by 2 prescaler => 24 MHz clock speed
+     */
+    TPM2->SC = TPM_SC_PS(1) | TPM_SC_TOIE(1);
+
+    /* Clear Timer Overflow Flag */
+    TPM2->STATUS |= 0xFFFFFFFF;
+    
+    /* Reset counters */
+    TPM2->CNT = 0;
+
+    /* Set NVIC for TPM2 ISR */
+    NVIC_SetPriority(TPM2_IRQn, 3);
+    NVIC_ClearPendingIRQ(TPM2_IRQn);
+    NVIC_EnableIRQ(TPM2_IRQn);
+}
+
+
+/**
+ * @brief   Wrapper function for loading TPM2 counter.
+ * 
+ * @detail  TPM2 is configured to 48 MHz/2 prescaler = 24 MHz clock speed.
+ * 
+ * @note    timePerBit = 250 ns
+ *          => timePerByte = 2 탎
+ *          timeBetweenBytes = 0.25 탎
+ *          => timePerByte = 2.25 탎
+ *          
+ *          deliveryTime = timePerByte * numberOfBytes - timeBetweenBytes
+ * 
+ *          Note: 2 탎 overhead at beginning
+ * 
+ * @param   ulBytes     Number of bytes to send.
+ * 
+ * @return  None
+ */
+void TPM2_vLoadCounter(uint32_t ulBytes)
+{
+    TPM2->MOD = TIME_PER_BYTE * ulBytes - TIME_BETWEEN_BYTES; /* Last delay between bytes not needed */
+}
+
+
+/**
+ * @brief   Wrapper function for starting TPM2 counter.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+void TPM2_vStart(void)
+{
+    BME_OR32(&TPM2->SC, TPM_SC_CMOD(1));
+}
+
+
+/**
+ * @brief   Wrapper function for stopping TPM2 counter.
+ * 
+ * @param   None
+ * 
+ * @return  None
+ */
+void TPM2_vStop(void)
+{
+    BME_AND32(&TPM2->SC, ~TPM_SC_CMOD(1));
 }

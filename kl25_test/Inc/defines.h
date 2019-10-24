@@ -13,6 +13,10 @@
 #define FALSE                           (0UL)
 #define TRUE                            (!FALSE)
 
+/* Signal edges */
+#define LOW     (0UL)
+#define HIGH    (1UL)
+
 /* Sensor pins */
 #define TEMP_SENSOR_PIN                 (0UL)   /* TMP36GT */
 #define MOIST_SENSOR_PIN                (1UL)   /* SEN0193 */

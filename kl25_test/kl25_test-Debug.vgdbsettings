@@ -20,6 +20,7 @@
     <ProjectFile>kl25_test.vcxproj</ProjectFile>
     <RemoteBuildEnvironment>
       <Records />
+      <EnvironmentSetupFiles />
     </RemoteBuildEnvironment>
     <ParallelJobCount>1</ParallelJobCount>
     <SuppressDirectoryChangeMessages>true</SuppressDirectoryChangeMessages>
@@ -36,68 +37,15 @@
     <PostDebugActions />
     <DebugStopActions />
     <BreakMode>Default</BreakMode>
+    <CustomBreakCommand>
+      <SkipWhenRunningCommandList>false</SkipWhenRunningCommandList>
+      <RemoteHost>
+        <HostName>BuildMachine</HostName>
+        <Transport>BuiltinShortcut</Transport>
+      </RemoteHost>
+      <BackgroundMode xsi:nil="true" />
+    </CustomBreakCommand>
   </CustomDebug>
-  <DeviceTerminalSettings>
-    <Connection xsi:type="com.sysprogs.terminal.connection.serial">
-      <ComPortName>COM7</ComPortName>
-      <AdvancedSettings>
-        <BaudRate>115200</BaudRate>
-        <DataBits>8</DataBits>
-        <Parity>None</Parity>
-        <StopBits>One</StopBits>
-        <FlowControl>None</FlowControl>
-      </AdvancedSettings>
-    </Connection>
-    <LastConnectionTime>0</LastConnectionTime>
-    <EchoTypedCharacters>true</EchoTypedCharacters>
-    <ClearContentsWhenReconnecting>true</ClearContentsWhenReconnecting>
-    <ReconnectAutomatically>false</ReconnectAutomatically>
-    <DisplayMode>ASCII</DisplayMode>
-    <Colors>
-      <Background>
-        <Alpha>255</Alpha>
-        <Red>0</Red>
-        <Green>0</Green>
-        <Blue>0</Blue>
-      </Background>
-      <Disconnected>
-        <Alpha>255</Alpha>
-        <Red>169</Red>
-        <Green>169</Green>
-        <Blue>169</Blue>
-      </Disconnected>
-      <Text>
-        <Alpha>255</Alpha>
-        <Red>211</Red>
-        <Green>211</Green>
-        <Blue>211</Blue>
-      </Text>
-      <Echo>
-        <Alpha>255</Alpha>
-        <Red>144</Red>
-        <Green>238</Green>
-        <Blue>144</Blue>
-      </Echo>
-      <Inactive>
-        <Alpha>255</Alpha>
-        <Red>169</Red>
-        <Green>169</Green>
-        <Blue>169</Blue>
-      </Inactive>
-    </Colors>
-    <HexSettings>
-      <MaximumBytesPerLine>16</MaximumBytesPerLine>
-      <ShowTextView>true</ShowTextView>
-      <BreaksAroundEcho>true</BreaksAroundEcho>
-      <AutoSend>true</AutoSend>
-      <SendAsHex>true</SendAsHex>
-      <TimeoutForAutoBreak>0</TimeoutForAutoBreak>
-    </HexSettings>
-    <LineEnding>LF</LineEnding>
-    <TreatLFAsCRLF>false</TreatLFAsCRLF>
-    <KeepOpenAfterExit>false</KeepOpenAfterExit>
-    <ShowAfterProgramming>true</ShowAfterProgramming>
-  </DeviceTerminalSettings>
   <CustomShortcuts>
     <Shortcuts />
     <ShowMessageAfterExecuting>true</ShowMessageAfterExecuting>
@@ -105,7 +53,7 @@
   <UserDefinedVariables />
   <ImportedPropertySheets />
   <CodeSense>
-    <Enabled>Unknown</Enabled>
+    <Enabled>True</Enabled>
     <CFLAGS>-Wno-main-return-type</CFLAGS>
     <CXXFLAGS>-Wno-main-return-type</CXXFLAGS>
     <ExtraSettings>
@@ -118,7 +66,7 @@
         <SearchInIncludeSubdirs>true</SearchInIncludeSubdirs>
       </DiscoverySettings>
       <CheckForClangFormatFiles>true</CheckForClangFormatFiles>
-      <FormattingEngine xsi:nil="true" />
+      <FormattingEngine>ClangFormat</FormattingEngine>
     </ExtraSettings>
     <CodeAnalyzerSettings>
       <Enabled>true</Enabled>
@@ -137,12 +85,10 @@
         <string>alpha.core.SizeofPtr</string>
         <string>alpha.core.StackAddressAsyncEscape</string>
         <string>alpha.core.TestAfterDivZero</string>
-        <string>alpha.cplusplus.IteratorRange</string>
         <string>alpha.deadcode.UnreachableCode</string>
         <string>alpha.security.ArrayBoundV2</string>
         <string>alpha.security.MallocOverflow</string>
         <string>alpha.security.ReturnPtrRange</string>
-        <string>alpha.unix.BlockInCriticalSection</string>
         <string>apiModeling.google.GTest</string>
         <string>core.builtin.BuiltinFunctions</string>
         <string>core.builtin.NoReturnFunctions</string>
@@ -164,14 +110,18 @@
         <string>cplusplus.NewDeleteLeaks</string>
         <string>cplusplus.SelfAssignment</string>
         <string>deadcode.DeadStores</string>
+        <string>nullability.NullablePassedToNonnull</string>
+        <string>nullability.NullableReturnedFromNonnull</string>
         <string>nullability.NullPassedToNonnull</string>
         <string>nullability.NullReturnedFromNonnull</string>
         <string>optin.performance.Padding</string>
+        <string>optin.portability.UnixAPI</string>
         <string>security.FloatLoopCounter</string>
         <string>security.insecureAPI.getpw</string>
         <string>security.insecureAPI.gets</string>
         <string>security.insecureAPI.mkstemp</string>
         <string>security.insecureAPI.mktemp</string>
+        <string>security.insecureAPI.rand</string>
         <string>security.insecureAPI.strcpy</string>
         <string>security.insecureAPI.UncheckedReturn</string>
         <string>security.insecureAPI.vfork</string>
@@ -272,6 +222,16 @@
         <ExplicitEndOfFLASH>0</ExplicitEndOfFLASH>
         <ExplicitEndOfRAM>0</ExplicitEndOfRAM>
       </InstrumentedFunctions>
+      <RTOSFeatures>
+        <RTOSFeatureSetting>
+          <FeatureID>com.sysprogs.analysis.thread.timing</FeatureID>
+          <Enabled>true</Enabled>
+        </RTOSFeatureSetting>
+        <RTOSFeatureSetting>
+          <FeatureID>com.sysprogs.analysis.freertos.queues</FeatureID>
+          <Enabled>true</Enabled>
+        </RTOSFeatureSetting>
+      </RTOSFeatures>
     </DynamicAnalysisSettings>
     <EndOfStackSymbol>_estack</EndOfStackSymbol>
     <TimestampProviderTicksPerSecond>0</TimestampProviderTicksPerSecond>

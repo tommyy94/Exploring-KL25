@@ -20,12 +20,14 @@
 /* User headers */
 #include "defines.h"
 #include "sensors.h"
+#include "tpm.h"
 #include "printf-stdarg.h"
 
 /* Global defines */
 #define MAX_FRAME_SIZE          (64UL)
 
 /* Global variables */
+extern TaskHandle_t xCommTask;
 
 
 /* Global function prototypes */

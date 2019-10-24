@@ -77,8 +77,8 @@
       <EnableThreadSanitizer>false</EnableThreadSanitizer>
       <EnableLeakSanitizer>false</EnableLeakSanitizer>
       <EnableUndefSanitizer>false</EnableUndefSanitizer>
-      <Optimization>O0</Optimization>
-      <InlineFunctions>true</InlineFunctions>
+      <Optimization>Og</Optimization>
+      <InlineFunctions>false</InlineFunctions>
       <VerboseMode>false</VerboseMode>
       <LinkTimeOptimization>false</LinkTimeOptimization>
     </ClCompile>
@@ -136,10 +136,9 @@
   <ItemGroup>
     <ClCompile Include="Drivers\Src\adc.c" />
     <ClCompile Include="Drivers\Src\dma.c" />
-    <ClCompile Include="Drivers\Src\gpio.c" />
+    <ClCompile Include="Drivers\Src\nrf24l01.c" />
     <ClCompile Include="Drivers\Src\spi.c" />
     <ClCompile Include="Drivers\Src\tpm.c" />
-    <ClCompile Include="Drivers\Src\uart.c" />
     <ClCompile Include="FreeRTOS\port\gcc\port.c" />
     <ClCompile Include="FreeRTOS\src\croutine.c" />
     <ClCompile Include="FreeRTOS\src\event_groups.c" />
@@ -161,10 +160,9 @@
     <ClCompile Include="Src\system.c" />
     <ClInclude Include="Drivers\Inc\adc.h" />
     <ClInclude Include="Drivers\Inc\dma.h" />
-    <ClInclude Include="Drivers\Inc\gpio.h" />
+    <ClInclude Include="Drivers\Inc\nrf24l01.h" />
     <ClInclude Include="Drivers\Inc\spi.h" />
     <ClInclude Include="Drivers\Inc\tpm.h" />
-    <ClInclude Include="Drivers\Inc\uart.h" />
     <ClInclude Include="FreeRTOS\config\KL25Z4\gcc\FreeRTOSConfig.h" />
     <ClInclude Include="FreeRTOS\include\croutine.h" />
     <ClInclude Include="FreeRTOS\include\deprecated_definitions.h" />

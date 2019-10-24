@@ -7,7 +7,6 @@
 
 /* System headers */
 #include <stdint.h>
-#include "string.h"
 
 /* Devices vendor headers */
 #include "MKL25Z4.h"
@@ -15,6 +14,7 @@
 
 /* User headers */
 #include "defines.h"
+#include "spi.h"
 
 
 /* Global defines */
@@ -52,8 +52,15 @@
 #define DMAMUX0_CHCFG_SOURCE_TPM2_OVERFLOW  56          /* 0x38 TPM2 overflow */
 #define DMAMUX0_CHCFG_SOURCE_TSI            57      	/* 0x39 TSI	*/
 
+#define DMA_CHANNEL0                        0
+#define DMA_CHANNEL1                        1
+#define DMA_CHANNEL2                        2
+#define DMA_CHANNEL3                        3
 
 /* Global function prototypes */
+void DMAMUX0_vInit(uint32_t const ulChannel, uint32_t const ulSource);
+void DMA0_vLinkChannel(uint32_t const ulSrcCh, uint32_t const ulDstCh);
 void DMA0_vInit(void);
-void DMA0_vStart(uint32_t *const pulSrcAddr);
-void DMA0_vStop(void);
+void DMA0_vInitTransaction(const uint32_t ulChannel, uint32_t *const pulSrcAddr, uint32_t *const pulDstAddr, const uint32_t ulLength);
+void DMA0_vStart(const uint32_t ulChannel);
+void DMA0_vStop(const uint32_t ulChannel);
