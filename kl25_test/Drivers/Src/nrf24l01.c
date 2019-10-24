@@ -262,11 +262,13 @@ void nRF24L01_vResetStatusFlags(void)
  *             
  * @return  None
  */
-void nRF24L01_vSendPayload(const char *pucPayload, const uint32_t ulLength)
+void nRF24L01_vSendPayload(const char *pucPayload, uint32_t ulLength)
 {
+    ulLength++; /* Allocate byte for W_TX_PAYLOD */
+    
     configASSERT((ulLength) < MAX_PAYLOAD_LEN);
     char ucRxData[ulLength];
-    char ucTxData[ulLength + 1]; /* Allocate byte for W_TX_PAYLOD */
+    char ucTxData[ulLength];
 
     /* Transfer 1...32 bytes */
     nRF24L01_vWriteRegister(RX_PW_P0, RX_PW_PX(ulLength));
@@ -277,7 +279,7 @@ void nRF24L01_vSendPayload(const char *pucPayload, const uint32_t ulLength)
 
     /* Build message */
     ucTxData[0] = W_TX_PAYLOAD;
-    for (uint32_t i = 0; i < ulLength; i++) /* First index already filled */
+    for (uint32_t i = 0; i < ulLength - 1; i++)
     {
         ucTxData[i + 1] = pucPayload[i];
     }
@@ -300,17 +302,17 @@ void nRF24L01_vSendPayload(const char *pucPayload, const uint32_t ulLength)
  */
 void nRF24L01_vWriteRegister(const uint8_t ucRegister, const uint8_t ucValue)
 {
-    char ucBuffer[32] = { '\0' };
+    char ucBuffer[MAX_PAYLOAD_LEN] = { '\0' };
 
-    const uint8_t ucData[] = { W_REGISTER | ucRegister, ucValue, 0x00 }; /* Add null-terminator for strlen() */
+    char ucData[] = { W_REGISTER | ucRegister, ucValue};
 
     /* First transfer register, then value */
-    SPI1_vTransmitDMA((const char *)ucData, ucBuffer, 2);
+    SPI1_vTransmitPolling(ucData, ucBuffer, 2);
 }
 
 
 /**
- * @brief   Write command nRF24L01.
+ * @brief   Write command to nRF24L01.
  * 
  * @param   ucCommand
  * 
@@ -318,10 +320,7 @@ void nRF24L01_vWriteRegister(const uint8_t ucRegister, const uint8_t ucValue)
  */
 void nRF24L01_vSendCommand(const uint8_t ucCommand)
 {
-    char ucBuffer[32] = {'\0'};
-    const uint8_t *pucCommand = &ucCommand;
-
-    SPI1_vTransmitDMA((const char *)pucCommand, ucBuffer, 1);
+    SPI1_vTransmitByte(ucCommand);
 }
 
 
@@ -338,22 +337,17 @@ void nRF24L01_vSendCommand(const uint8_t ucCommand)
  * 
  * @return  None
  */
-void nRF24L01_vWriteAddressRegister(const uint8_t ucRegister, const uint8_t *pucValue, const uint32_t ulLength)
+void nRF24L01_vWriteAddressRegister(const uint8_t ucRegister, const uint8_t *pucValue, uint32_t ulLength)
 {
     configASSERT((ulLength) <= ADDR_40BIT_LEN);
+
+    ulLength++; /* Allocate byte for W_REGISTER */
     char ucRxData[ulLength];
-    char ucTxData[ulLength + 1]; /* Allocate byte for W_REGISTER */
-
-    /* Transfer 1...32 bytes */
-    nRF24L01_vWriteRegister(RX_PW_P0, RX_PW_PX(ulLength));
-
-    nRF24L01_vSendCommand(FLUSH_TX);
-
-    nRF24L01_vResetStatusFlags();
+    char ucTxData[ulLength];
 
     /* Build message */
     ucTxData[0] = W_REGISTER | ucRegister;
-    for (uint32_t i = 0; i < ulLength; i++) /* First index already filled */
+    for (uint32_t i = 0; i < ulLength - 1; i++)
     {
         ucTxData[i + 1] = pucValue[i];
     }

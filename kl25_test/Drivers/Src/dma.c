@@ -9,10 +9,10 @@
 #define BCR_MAX_LEN                 (0x00F0FFFFUL)
 
 /* Validate DMA address register as specified in the datasheet */
-#define VALIDATE_ADDR_REG(x)        ((((x) >= 0x00000000) && ((x) < 0x00100000)) |   \
-                                     (((x) >= 0x1FF00000) && ((x) < 0x20000000)) |   \
-                                     (((x) >= 0x20000000) && ((x) < 0x20100000)) |   \
-                                     (((x) >= 0x40000000) && ((x) < 0x40100000)))    
+#define VALIDATE_ADDR_REG(x)        (((x) < 0x00100000)                         |   \
+                                    (((x) >= 0x1FF00000) && ((x) < 0x20000000)) |   \
+                                    (((x) >= 0x20000000) && ((x) < 0x20100000)) |   \
+                                    (((x) >= 0x40000000) && ((x) < 0x40100000)))    
 
 
 /* Function descriptions */

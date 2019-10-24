@@ -71,7 +71,7 @@ void vSensorTask(void *const pvParam)
             configASSERT(xAssert);
         }
         
-        vTaskDelay(MSEC_TO_TICK(500));
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 
@@ -91,12 +91,12 @@ void TPM1_IRQHandler(void)
     uint32_t HS1101_ulValue = 0;
     BaseType_t xAssert;
 
-    if (BME_UBFX32(&TPM1->STATUS, TPM_STATUS_TOF_SHIFT, 1))
+    if (BME_UBFX32(&TPM1->STATUS, TPM_STATUS_TOF_SHIFT, TPM_STATUS_TOF_WIDTH))
     {
         ulOverflows++;
     }
 
-    if (BME_UBFX32(&TPM1->STATUS, TPM_STATUS_CH1F_SHIFT, 1))
+    if (BME_UBFX32(&TPM1->STATUS, TPM_STATUS_CH1F_SHIFT, TPM_STATUS_CH1F_WIDTH))
     {
         /* Overflows should not happen */
         configASSERT(ulOverflows == 0);

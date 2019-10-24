@@ -8,10 +8,13 @@
 
 
 /* Local defines */
-#define MISO            (1UL)
-#define SCK             (2UL)
-#define MOSI            (3UL)
-#define SS              (4UL)
+#define MISO                    (1UL)
+#define SCK                     (2UL)
+#define MOSI                    (3UL)
+#define SS                      (4UL)
+
+#define COMM_TASK_NOTIFICATION (1UL)
+#define BYTE_OFFSET             (0x01UL)
 
 
 /* Function descriptions */
@@ -73,7 +76,7 @@ void SPI1_vInit(void)
  */
 uint8_t SPI1_ucReadPolling(void)
 {
-    while (!BME_UBFX8(&SPI1->S, SPI_S_SPRF_SHIFT, 1))
+    while (!BME_UBFX8(&SPI1->S, SPI_S_SPRF_SHIFT, SPI_S_SPRF_WIDTH))
     {
         ; /* Wait until buffer full */
     }
@@ -85,45 +88,77 @@ uint8_t SPI1_ucReadPolling(void)
 /**
  * @brief   Transmit character over SPI by polling.
  * 
- * @param   None
+ * @param   ucByte      Byte to send.
  * 
  * @return  None
  */
 void SPI1_vTransmitByte(const char ucByte)
 {
-    while (!BME_UBFX8(&SPI1->S, SPI_S_SPTEF_SHIFT, 1))
+    while (!BME_UBFX8(&SPI1->S, SPI_S_SPTEF_SHIFT, SPI_S_SPTEF_WIDTH))
     {
-        ; /* Wait until TX buffer empty */
+        ; /* Wait until buffer empty */
     }
     
-    /* Send character */
+    /* Transfer byte */
+    SPI1_vSetSlave(LOW);
+    
     SPI1->D = ucByte;
+    (void)SPI1_ucReadPolling();
+    
+    SPI1_vSetSlave(HIGH);
 }
 
 
 /**
- * @brief   Transmit string over SPI by polling.
+ * @brief   Transmit message over SPI by polling.
  * 
- * @param   pcData      String to send
- *
- * @param   ulLength    Transaction length
- *             
+ * @param   pucTxData   Pointer to data to send.
+ * 
+ * @param   pucRxData   Pointer to data to receive.
+ * 
+ * @param   ulLength    Data length
+ * 
  * @return  None
  */
-void SPI1_vTransmitPolling(char const *pcData, const uint32_t ulLength)
-{    
-    /* Send the array of characters */
-    for (uint16_t i = 0; i < ulLength; i++)
+void SPI1_vTransmitPolling(char *const pucData, char *const pucRxData, const uint32_t ulLength)
+{
+    /* Disable TPM2 interrupts just to be sure */
+    BME_AND8(&TPM2->SC, ~(uint8_t)TPM_SC_TOIE(1));
+
+    TPM2->CNT = 0;
+    TPM2_vStart();
+    
+    /* Transfer byte */
+    SPI1_vSetSlave(LOW);
+
+    for (uint32_t i = 0; i < ulLength; i++)
     {
-        SPI1_vTransmitByte(pcData[i]);
+        while (!BME_UBFX8(&SPI1->S, SPI_S_SPTEF_SHIFT, SPI_S_SPTEF_WIDTH))
+        {
+            ; /* Wait until TX buffer empty */
+        }
+        
+        SPI1->D = pucData[i];
+        pucRxData[i] = SPI1_ucReadPolling();
     }
+
+    while (TPM2->CNT < (TIME_PER_BYTE * ulLength))
+    {
+        ; /* Wait until transaction done */
+    }
+
+    /* Stop TPM2 first to give small overhead for SS */
+    TPM2_vStop();
+    
+    SPI1_vSetSlave(HIGH);
+
+    /* Turn TPM2 interrupts on again */
+    BME_OR8(&TPM2->SC, TPM_SC_TOIE(1));
 }
 
 
 /**
  * @brief   Transmit string over SPI by DMA.
- * 
- * @note    This is a blocking function.
  * 
  * @param   pcTxData    String to send
  * 
@@ -133,18 +168,29 @@ void SPI1_vTransmitPolling(char const *pcData, const uint32_t ulLength)
  *             
  * @return  None
  */
-void SPI1_vTransmitDMA(char const *pcTxData, char *const pcRxData, const uint32_t ulLength)
+void SPI1_vTransmitDMA(char const *pucTxData, char *const pucRxData, const uint32_t ulLength)
 {
+    uint32_t ulTxDone;
+    const TickType_t xMaxBlockTime = pdMS_TO_TICKS(200);
+
+    /* Should be NULL as no transmission is in progress */
+    configASSERT(xCommTask == NULL);
+
+    /* Store the handle of the calling task */
+    xCommTask = xTaskGetCurrentTaskHandle();
+
     /* Set transfer duration */
     TPM2_vLoadCounter(ulLength);
 
     /* Set source and destination addresses */
-    DMA0_vInitTransaction(DMA_CHANNEL0, (uint32_t *)(pcTxData + BYTE_OFFSET), (uint32_t *)&(SPI1->D), ulLength - BYTE_OFFSET);
-    DMA0_vInitTransaction(DMA_CHANNEL1, (uint32_t *)&(SPI1->D), (uint32_t *)(pcRxData), ulLength);
+    DMA0_vInitTransaction(DMA_CHANNEL0, (uint32_t *)(pucTxData + BYTE_OFFSET), (uint32_t *)&(SPI1->D), ulLength - BYTE_OFFSET);
+    DMA0_vInitTransaction(DMA_CHANNEL1, (uint32_t *)&(SPI1->D), (uint32_t *)(pucRxData), ulLength);
     
     /* Begin transfer */
     SPI1_vSetSlave(LOW);
 
+    /* Reset counter and start timer */
+    TPM2->CNT = 0;
     TPM2_vStart();
     
     /**
@@ -152,14 +198,27 @@ void SPI1_vTransmitDMA(char const *pcTxData, char *const pcRxData, const uint32_
      * and sending first byte by placing value to register
      */
     (void)SPI1->S;
-    SPI1->D = pcTxData[0];
+    SPI1->D = pucTxData[0];
 
-    /* Enable DMA TX & RX */
+    /* Enable DMA TX & RX */ 
     BME_OR8(&SPI1->C2, SPI_C2_TXDMAE(1));
     BME_OR8(&SPI1->C2, SPI_C2_RXDMAE(1));
-    
+
     /* Send rest of the bytes */
     DMA0_vStart(DMA_CHANNEL0);
+
+    ulTxDone = ulTaskNotifyTake(COMM_TASK_NOTIFICATION, xMaxBlockTime);
+    configASSERT(ulTxDone == COMM_TASK_NOTIFICATION);
+
+    /* Disable DMA TX & RX */
+    BME_AND8(&SPI1->C2, ~(uint8_t)SPI_C2_TXDMAE(1));
+    BME_AND8(&SPI1->C2, ~(uint8_t)SPI_C2_RXDMAE(1));
+
+    DMA0_vStop(DMA_CHANNEL0);
+
+    /* Clear DONE & error bits */
+    BME_OR32(&DMA0->DMA[DMA_CHANNEL0].DSR_BCR, DMA_DSR_BCR_DONE(1));
+    BME_OR32(&DMA0->DMA[DMA_CHANNEL1].DSR_BCR, DMA_DSR_BCR_DONE(1));
 }
 
 

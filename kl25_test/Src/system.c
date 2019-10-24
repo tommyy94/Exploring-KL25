@@ -3,7 +3,6 @@
 
 /* Global variables */
 EventGroupHandle_t xMotorEventGroup;
-EventGroupHandle_t xTimeoutEventGroup;
 
 
 /* Local defines */
@@ -35,7 +34,7 @@ static void vSystemInit(void)
 
     /* Analog functionalities */
     ADC0_vInit();
-    TPM0_vInit(4800);
+    TPM0_vInit();
     TPM1_vInit();
     TPM2_vInit();
     CMP0_vInit();
@@ -98,9 +97,6 @@ static void vCreateEvents(void)
 {
     xMotorEventGroup = xEventGroupCreate();
     configASSERT(xMotorEventGroup);
-    
-    xTimeoutEventGroup = xEventGroupCreate();
-    configASSERT(xTimeoutEventGroup);
 }
 
 

@@ -19,8 +19,6 @@
 
 
 /* Global defines */
-#define MSEC_TO_TICK(msec)      (((uint32_t)(msec) + 500uL / (uint32_t)configTICK_RATE_HZ) * (uint32_t)configTICK_RATE_HZ / 1000uL)
-#define TICKS_TO_MSEC(tick)     ((tick)*1000uL / (uint32_t)configTICK_RATE_HZ)
 #define MAX_QUEUE_SIZE          (32UL)
 
 /* Task priorities */
