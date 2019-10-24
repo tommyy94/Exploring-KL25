@@ -24,7 +24,7 @@
     <BSP_ID>com.sysprogs.arm.freescale.kinetis_ksdk</BSP_ID>
     <BSP_VERSION>1.3.2</BSP_VERSION>
     <InPlaceBSPSubdir />
-    <ProjectName>kl25_test</ProjectName>
+    <ProjectName>Remote</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
@@ -203,8 +203,8 @@
     <ClInclude Include="$(BSP_ROOT)\platform\devices\MKL25Z4\include\MKL25Z4_extension.h" />
     <ClInclude Include="$(BSP_ROOT)\platform\devices\MKL25Z4\include\MKL25Z4_features.h" />
     <ClInclude Include="$(BSP_ROOT)\platform\devices\MKL25Z4\startup\system_MKL25Z4.h" />
-    <None Include="kl25_test-Debug.vgdbsettings" />
-    <None Include="kl25_test-Release.vgdbsettings" />
+    <None Include="Remote-Debug.vgdbsettings" />
+    <None Include="Remote-Release.vgdbsettings" />
     <None Include="kinetis.xml" />
   </ItemGroup>
   <ItemGroup>

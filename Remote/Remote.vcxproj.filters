@@ -93,10 +93,10 @@
     <ClInclude Include="$(BSP_ROOT)\platform\devices\MKL25Z4\startup\system_MKL25Z4.h">
       <Filter>Header files\Device-specific files</Filter>
     </ClInclude>
-    <None Include="kl25_test-Debug.vgdbsettings">
+    <None Include="Remote-Debug.vgdbsettings">
       <Filter>VisualGDB settings</Filter>
     </None>
-    <None Include="kl25_test-Release.vgdbsettings">
+    <None Include="Remote-Release.vgdbsettings">
       <Filter>VisualGDB settings</Filter>
     </None>
     <None Include="kinetis.xml">
