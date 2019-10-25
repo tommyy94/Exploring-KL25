@@ -81,6 +81,7 @@
       <InlineFunctions>false</InlineFunctions>
       <VerboseMode>false</VerboseMode>
       <LinkTimeOptimization>false</LinkTimeOptimization>
+      <InputLanguage>C</InputLanguage>
     </ClCompile>
     <Link>
       <AdditionalLinkerInputs>%(Link.AdditionalLinkerInputs)</AdditionalLinkerInputs>
