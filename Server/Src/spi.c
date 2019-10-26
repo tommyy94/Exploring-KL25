@@ -4,134 +4,88 @@
 /**
  * @brief   Initialize SPI peripheral.
  * 
- * @param   pxSpi       Pointer to SPI structure.
+ * @param   fd          File descriptor.
  * 
- * @param   plFile      Pointer to SPI file descriptor.
+ * @param   transfer    Pointer to SPI structure.
  * 
- * @param   ulMode      Mask for CPOl (Clock Polarity) and CPHA (Clock Phase).
+ * @param   mode        Mask for CPOl (Clock Polarity) and CPHA (Clock Phase).
  * 
- * @param   ulSpeed     Maximum transfer speed.
- * 
- * @param   ulBits      Bits per word.
- * 
- * @return  lStatus     Success/Failure.
+ * @return  None
  */
-int32_t SPI_lInit(struct spi_ioc_transfer *pxSpi, int32_t *const plFile, const uint32_t ulMode, const uint32_t ulSpeed, const uint8_t ucBits)
+void spi_init(const int fd, struct spi_ioc_transfer *transfer, const unsigned long mode)
 {
-    int32_t lStatus = 0;
+    int ret;
     
-    pxSpi->speed_hz = ulSpeed;
-    pxSpi->bits_per_word = ucBits;
-    pxSpi->delay_usecs = 0;
-    pxSpi->cs_change = 0;
-    pxSpi->delay_usecs = 0;
-    pxSpi->pad = 0;
-    
-    *plFile = open("/dev/spidev0.1", O_RDWR);
-    if (*plFile < 0)
-    {
-        perror("Error opening SPI device!\n");
-        lStatus = *plFile;
-        goto Cleanup;
-    }
-    
-    lStatus = ioctl(*plFile, SPI_IOC_WR_MODE, &ulMode);
-    if (lStatus < 0)
+    ret = ioctl(fd, SPI_IOC_WR_MODE, &mode);
+    if (ret < 0)
     {
         perror("Error setting SPI WR mode!\n");
-        goto Cleanup;
+        exit(EXIT_FAILURE);
     }
     
-    lStatus = ioctl(*plFile, SPI_IOC_RD_MODE, &ulMode);
-    if (lStatus < 0)
+    ret = ioctl(fd, SPI_IOC_RD_MODE, &mode);
+    if (ret < 0)
     {
         perror("Error setting SPI RD mode!\n");
-        goto Cleanup;
+        exit(EXIT_FAILURE);
     }
     
-    lStatus = ioctl(*plFile, SPI_IOC_WR_BITS_PER_WORD, &pxSpi->bits_per_word);
-    if (lStatus < 0)
+    ret = ioctl(fd, SPI_IOC_WR_BITS_PER_WORD, &transfer->bits_per_word);
+    if (ret < 0)
     {
         perror("Error setting SPI WR bits!\n");
-        goto Cleanup;
+        exit(EXIT_FAILURE);
     }
     
-    lStatus = ioctl(*plFile, SPI_IOC_RD_BITS_PER_WORD, &pxSpi->bits_per_word);
-    if (lStatus < 0)
+    ret = ioctl(fd, SPI_IOC_RD_BITS_PER_WORD, &transfer->bits_per_word);
+    if (ret < 0)
     {
         perror("Error setting SPI RD bits!\n");
-        goto Cleanup;
+        exit(EXIT_FAILURE);
     }
     
-    lStatus = ioctl(*plFile, SPI_IOC_WR_MAX_SPEED_HZ, &pxSpi->speed_hz);
-    if (lStatus < 0)
+    ret = ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &transfer->speed_hz);
+    if (ret < 0)
     {
         perror("Error setting SPI WR max speed!\n");
-        goto Cleanup;
+        exit(EXIT_FAILURE);
     }
     
-    lStatus = ioctl(*plFile, SPI_IOC_RD_MAX_SPEED_HZ, &pxSpi->speed_hz);
-    if (lStatus < 0)
+    ret = ioctl(fd, SPI_IOC_RD_MAX_SPEED_HZ, &transfer->speed_hz);
+    if (ret < 0)
     {
         perror("Error setting SPI RD max speed!\n");
-        goto Cleanup;
+        exit(EXIT_FAILURE);
     }
-    
-Cleanup:
-    return (lStatus);
 }
 
 
 /**
  * @brief  Write full-duplex SPI message.
  * 
- * @param   pxSpi       Pointer to SPI structure.
+ * @param   fd          File descriptor.
  * 
- * @param   plFile      Pointer to SPI file descriptor.
+ * @param   transfer    Pointer to SPI structure.
  *
- * @param   pulTxData   Pointer to TX message.
+ * @param   tx_data     Pointer to TX message.
  *
- * @param   pulTxData   Pointer to RX message.
+ * @param   rx_Data     Pointer to RX message.
  
- * @param   ulLength    Message length.
+ * @param   len         Message length.
  * 
- * @return  lStatus     Success/Failure
+ * @return  None
  */
-int32_t SPI_lReadWrite(struct spi_ioc_transfer *pxSpi, int32_t *const plFile, uint64_t *const pullTxData, uint64_t *const pullRxData, const uint32_t ulLength)
+void spi_readwrite(const int fd, struct spi_ioc_transfer *transfer, unsigned char *const tx_data, unsigned char *const rx_data, const unsigned long len)
 {
-    int32_t lStatus;
+    int ret;
     
-    pxSpi->tx_buf = (uint64_t)pullTxData;
-    pxSpi->rx_buf = (uint64_t)pullRxData;
-    pxSpi->len = ulLength;
+    transfer->tx_buf = (unsigned long)tx_data;
+    transfer->rx_buf = (unsigned long)rx_data;
+    transfer->len = len;
 
-    lStatus = ioctl(*plFile, SPI_IOC_MESSAGE(ulLength), &pxSpi);
-
-    if (lStatus < 0)
+    ret = ioctl(fd, SPI_IOC_MESSAGE(1), &*transfer);
+    if (ret < 0)
     {
         perror("Error transmitting SPI data!\n");
     }
-
-    return (lStatus);
-}
-
-
-/**
- * @brief   Close SPI peripheral file descriptor.
- * 
- * @param   plFile      Pointer to SPI file descriptor.
- * 
- * @return  lStatus     Success/Failure
- */
-int32_t SPI_lClose(int32_t *const plFile)
-{
-    int32_t lStatus = 0;
-
-    lStatus = close(*plFile);
-    if (lStatus < 0)
-    {
-        perror("Error closing SPI device!\n");
-    }
-    
-    return (lStatus);
 }
