@@ -13,7 +13,7 @@
 #define MOSI                    (3UL)
 #define SS                      (4UL)
 
-#define COMM_TASK_NOTIFICATION (1UL)
+#define COMM_TASK_NOTIFICATION  (1UL)
 #define BYTE_OFFSET             (0x01UL)
 
 

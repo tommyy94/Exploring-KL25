@@ -48,7 +48,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
     <GNUConfigurationType>Debug</GNUConfigurationType>
     <ToolchainID>com.visualgdb.arm-eabi</ToolchainID>
-    <ToolchainVersion>7.2.0/8.0.1/r3</ToolchainVersion>
+    <ToolchainVersion>9.2.1/8.3.0/r1</ToolchainVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <GNUConfigurationType>Debug</GNUConfigurationType>
@@ -141,6 +141,7 @@
     <ClCompile Include="Drivers\Src\spi.c" />
     <ClCompile Include="Drivers\Src\tpm.c" />
     <ClCompile Include="FreeRTOS\port\gcc\port.c" />
+    <ClCompile Include="FreeRTOS\port\gcc\portasm.S" />
     <ClCompile Include="FreeRTOS\src\croutine.c" />
     <ClCompile Include="FreeRTOS\src\event_groups.c" />
     <ClCompile Include="FreeRTOS\src\heap_1.c" />
@@ -207,6 +208,9 @@
     <None Include="Remote-Debug.vgdbsettings" />
     <None Include="Remote-Release.vgdbsettings" />
     <None Include="kinetis.xml" />
+    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\arm_math.h" />
+    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cm4.h" />
+    <ClInclude Include="$(BSP_ROOT)\platform\CMSIS\Include\core_cm7.h" />
   </ItemGroup>
   <ItemGroup>
     <LinkerScript Include="MKL25Z128xxx4_flash.lds" />

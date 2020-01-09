@@ -74,8 +74,7 @@ void vFrameTask(void *const pvParam)
             if (xQueueReceive(xAnalogQueue, &pxSensor, (TickType_t)50))
             {
                 /* Build the frame */
-                lBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=23;hum=50;soil=30;");
-                //cBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%ldhum=%lumst=%lu", pxSensor->lTemperature, pxSensor->ulHumidity, pxSensor->ulSoilMoisture);
+                lBytesWritten = csnprintf(pxMessage->ucFrame, MAX_FRAME_SIZE, "tmp=%ldhum=%lumst=%lu", pxSensor->lTemperature, pxSensor->ulHumidity, pxSensor->ulSoilMoisture);
                 configASSERT(lBytesWritten >= 0);
             
                 /* Transmit */
