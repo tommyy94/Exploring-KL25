@@ -5,6 +5,7 @@
 
 #pragma once
 
+
 /* Bit shifting */
 #define SIGNAL_SHIFT                    (5) /* For testing purposes */
 #define MASK(pin)                       (1UL << (pin))

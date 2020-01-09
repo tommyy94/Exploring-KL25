@@ -114,7 +114,7 @@ static void vCreateTasks(void *const pvMotorTimers)
     
     configASSERT((uint32_t) pvMotorTimers);
     
-    xAssert = xTaskCreate(vFrameTask, (const char *)"SQL", FRAMETASKSIZE / sizeof(portSTACK_TYPE), 0, FRAMETASKPRIORITY, &xHandle);
+    xAssert = xTaskCreate(vFrameTask, (const char *)"Frame", FRAMETASKSIZE / sizeof(portSTACK_TYPE), 0, FRAMETASKPRIORITY, &xHandle);
     configASSERT(xAssert);
     
     xAssert = xTaskCreate(vSensorTask, (const char *)"Sensor", ANALOGTASKSIZE / sizeof(portSTACK_TYPE), 0, ANALOGTASKPRIORITY, &xHandle);
@@ -195,6 +195,9 @@ static void vMotorTimerCallback(const TimerHandle_t xTimer)
  */
 void vStartupTask(void *const pvMotorTimers)
 {
+    /* Initialize hardware */
+    vSystemInit();
+    
     /* Initialize FreeRTOS components */
     vCreateQueues();
     vCreateSemaphores();
@@ -245,7 +248,7 @@ void vAssertCalled(const uint32_t ulLine, char *const pcFile)
 
     while (ulSetToNonZeroInDebuggerToContinue == 0)
     {
-        ;  /* Use debug view to read variables */
+        ; /* Use debug view to read variables */
     }
     
     taskEXIT_CRITICAL();
