@@ -10,7 +10,7 @@
 	<ItemDefinitionGroup>
 		<ClCompile>
 			<PreprocessorDefinitions>ARM_MATH_CM0PLUS;MKL25Z128VLK4;CPU_MKL25Z128VLK4;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
-			<AdditionalIncludeDirectories>$(BSP_ROOT)/KL25Z4/StartupFiles;$(BSP_ROOT)/platform/devices/MKL25Z4/startup;$(BSP_ROOT)/platform/CMSIS/Include;$(BSP_ROOT)/platform/devices;$(BSP_ROOT)/platform/devices/MKL25Z4/include;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<AdditionalIncludeDirectories>%(ClCompile.AdditionalIncludeDirectories);$(BSP_ROOT)/KL25Z4/StartupFiles;$(BSP_ROOT)/platform/devices/MKL25Z4/startup;$(BSP_ROOT)/platform/CMSIS/Include;$(BSP_ROOT)/platform/devices;$(BSP_ROOT)/platform/devices/MKL25Z4/include</AdditionalIncludeDirectories>
 		</ClCompile>
 	</ItemDefinitionGroup>
 	<ItemDefinitionGroup>
@@ -25,8 +25,8 @@
 
 	<ItemDefinitionGroup>
 		<ToolchainSettingsContainer>
-			<ARMCPU>cortex-m0plus</ARMCPU>
-			<InstructionSet>THUMB</InstructionSet>
+			<ARMCPU  Condition="'%(ToolchainSettingsContainer.ARMCPU)' == ''">cortex-m0plus</ARMCPU>
+			<InstructionSet  Condition="'%(ToolchainSettingsContainer.InstructionSet)' == ''">THUMB</InstructionSet>
 		</ToolchainSettingsContainer>
 	</ItemDefinitionGroup>
 </Project>

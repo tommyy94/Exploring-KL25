@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2036
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28917.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kl25_test", "kl25_test\kl25_test.vcxproj", "{C6C93B83-ED40-4D32-9D64-9F7A8F5231BD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Remote", "Remote\Remote.vcxproj", "{C6C93B83-ED40-4D32-9D64-9F7A8F5231BD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{99CB304E-7482-4CFD-AE4B-DDD06C5B8558}"
 	ProjectSection(SolutionItems) = preProject
