@@ -5,21 +5,17 @@ Takes care of your precious plants.
 
 - [Description](#description)
 - [Hardware](#hardware)
-- [Notes](#notes)
 - [TODO](#todo)
 
 ## Description
 * Reads soil moisture, temperature and air humidity
 * Waters the plant(s) according to soil moisture
-* Sends data to remote database via RF link
+* Sends data to remote database via RF link (to be implemented)
 * Utilizes low power modes to save energy
 
 ## Hardware
-* Evaluation board: FRDM-KL25Z
+* MKL25Z128VLK4
 * nRF24L01+ radio module
-
-## Notes
-* Notes go here
 
 ## TODO
 * Web server
