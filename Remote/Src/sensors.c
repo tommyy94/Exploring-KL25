@@ -60,8 +60,6 @@ void vSensorTask(void *const pvParam)
             if (xSensor.ulSoilMoisture[i] < SOIL_MOISTURE_THRESHOLD)
             {
                 xMotors.ucMotorState[i] = TRUE;
-                
-                /* Compute motor run time here */
             }
         }
         
@@ -71,7 +69,7 @@ void vSensorTask(void *const pvParam)
             configASSERT(xAssert);
         }
         
-        vTaskDelay(pdMS_TO_TICKS(500));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 

@@ -25,7 +25,7 @@ void ADC0_vInit(void)
     /* Select analog for pin */
     PORTB->PCR[TEMP_SENSOR_PIN] |= PORT_PCR_MUX(ALT0);
     PORTB->PCR[MOIST_SENSOR_PIN] |= PORT_PCR_MUX(ALT0);
-    PORTB->PCR[HUMID_SENSOR_PIN] |= PORT_PCR_MUX(ALT0);
+    PORTE->PCR[HUMID_SENSOR_PIN] |= PORT_PCR_MUX(ALT0);
     
     /**
      * Low power configuration
