@@ -25,10 +25,7 @@
 
 /* IC Counts */
 #define SOIL_MOISTURE_SENSOR_COUNT      (2UL)
-#define MOTOR_COUNT                     (2UL)
-
-/* Timer IDs */
-#define ESP8266_TIMER                   (0UL)
+#define MOTOR_COUNT                     (1UL)   /* Max 5 */
 
 /* Sensor thresholds */
 #define MIN_TEMPERATURE                 (-40L)
