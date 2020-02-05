@@ -47,7 +47,7 @@ void TPM0_vInit(void)
     /* Set duty cycle */
     for (uint8_t i = 0; i < MOTOR_COUNT; i++)
     {
-        TPM0->CONTROLS[i].CnV = 4800;
+        TPM0->CONTROLS[i].CnV = 30000;
     }
     
     /* Start TPM0 */

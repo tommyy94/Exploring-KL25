@@ -45,7 +45,7 @@ AR Path="/5E4374CB" Ref="R?"  Part="1"
 AR Path="/5E3AB7F2/5E4374CB" Ref="R3"  Part="1" 
 F 0 "R3" H 2009 5946 50  0000 L CNN
 F 1 "1M" H 2009 5855 50  0000 L CNN
-F 2 "Resistor_THT:R_Axial_DIN0411_L9.9mm_D3.6mm_P12.70mm_Horizontal" H 1950 5900 50  0001 C CNN
+F 2 "Resistor_SMD:R_2512_6332Metric_Pad1.52x3.35mm_HandSolder" H 1950 5900 50  0001 C CNN
 F 3 "~" H 1950 5900 50  0001 C CNN
 	1    1950 5900
 	-1   0    0    1   
@@ -78,7 +78,7 @@ AR Path="/5E4374E5" Ref="R?"  Part="1"
 AR Path="/5E3AB7F2/5E4374E5" Ref="R2"  Part="1" 
 F 0 "R2" H 2009 5596 50  0000 L CNN
 F 1 "220ohm" H 2009 5505 50  0000 L CNN
-F 2 "Resistor_THT:R_Axial_DIN0411_L9.9mm_D3.6mm_P12.70mm_Horizontal" H 1950 5550 50  0001 C CNN
+F 2 "Resistor_SMD:R_2512_6332Metric_Pad1.52x3.35mm_HandSolder" H 1950 5550 50  0001 C CNN
 F 3 "~" H 1950 5550 50  0001 C CNN
 	1    1950 5550
 	-1   0    0    1   
@@ -138,7 +138,7 @@ AR Path="/5E448589" Ref="R?"  Part="1"
 AR Path="/5E3AB7F2/5E448589" Ref="R5"  Part="1" 
 F 0 "R5" V 5704 5300 50  0000 C CNN
 F 1 "1M" V 5795 5300 50  0000 C CNN
-F 2 "Resistor_THT:R_Axial_DIN0411_L9.9mm_D3.6mm_P12.70mm_Horizontal" H 5900 5300 50  0001 C CNN
+F 2 "Resistor_SMD:R_2512_6332Metric_Pad1.52x3.35mm_HandSolder" H 5900 5300 50  0001 C CNN
 F 3 "~" H 5900 5300 50  0001 C CNN
 	1    5900 5300
 	0    1    1    0   
@@ -153,7 +153,7 @@ AR Path="/5E448590" Ref="C?"  Part="1"
 AR Path="/5E3AB7F2/5E448590" Ref="C10"  Part="1" 
 F 0 "C10" H 6292 5596 50  0000 L CNN
 F 1 "16nF" H 6292 5505 50  0000 L CNN
-F 2 "Capacitor_THT:CP_Radial_Tantal_D4.5mm_P5.00mm" H 6200 5550 50  0001 C CNN
+F 2 "Capacitor_Tantalum_SMD:CP_EIA-3528-15_AVX-H_Pad1.50x2.35mm_HandSolder" H 6200 5550 50  0001 C CNN
 F 3 "~" H 6200 5550 50  0001 C CNN
 	1    6200 5550
 	1    0    0    -1  
@@ -208,7 +208,7 @@ AR Path="/5E4485AB" Ref="R?"  Part="1"
 AR Path="/5E3AB7F2/5E4485AB" Ref="R4"  Part="1" 
 F 0 "R4" V 1904 2300 50  0000 C CNN
 F 1 "1M" V 1995 2300 50  0000 C CNN
-F 2 "Resistor_THT:R_Axial_DIN0411_L9.9mm_D3.6mm_P12.70mm_Horizontal" H 2100 2300 50  0001 C CNN
+F 2 "Resistor_SMD:R_2512_6332Metric_Pad1.52x3.35mm_HandSolder" H 2100 2300 50  0001 C CNN
 F 3 "~" H 2100 2300 50  0001 C CNN
 	1    2100 2300
 	0    1    1    0   
@@ -221,7 +221,7 @@ AR Path="/5E4485B1" Ref="C?"  Part="1"
 AR Path="/5E3AB7F2/5E4485B1" Ref="C9"  Part="1" 
 F 0 "C9" H 2442 2596 50  0000 L CNN
 F 1 "16nF" H 2442 2505 50  0000 L CNN
-F 2 "Capacitor_THT:CP_Radial_Tantal_D4.5mm_P5.00mm" H 2350 2550 50  0001 C CNN
+F 2 "Capacitor_Tantalum_SMD:CP_EIA-3528-15_AVX-H_Pad1.50x2.35mm_HandSolder" H 2350 2550 50  0001 C CNN
 F 3 "~" H 2350 2550 50  0001 C CNN
 	1    2350 2550
 	1    0    0    -1  
@@ -256,7 +256,7 @@ P 1550 2400
 AR Path="/5E4485C2" Ref="J?"  Part="1" 
 AR Path="/5E3AB7F2/5E4485C2" Ref="J2"  Part="1" 
 F 0 "J2" H 1658 2681 50  0000 C CNN
-F 1 "Sensor Connector" H 1658 2590 50  0000 C CNN
+F 1 "SEN0193" H 1658 2590 50  0000 C CNN
 F 2 "Connector_PinSocket_2.54mm:PinSocket_1x03_P2.54mm_Vertical" H 1550 2400 50  0001 C CNN
 F 3 "~" H 1550 2400 50  0001 C CNN
 	1    1550 2400
@@ -304,34 +304,34 @@ Wire Wire Line
 $Comp
 L power:GND #PWR?
 U 1 1 5E46E342
-P 6200 2400
+P 5500 2750
 AR Path="/5E46E342" Ref="#PWR?"  Part="1" 
 AR Path="/5E3AB7F2/5E46E342" Ref="#PWR018"  Part="1" 
-F 0 "#PWR018" H 6200 2150 50  0001 C CNN
-F 1 "GND" H 6205 2227 50  0000 C CNN
-F 2 "" H 6200 2400 50  0001 C CNN
-F 3 "" H 6200 2400 50  0001 C CNN
-	1    6200 2400
+F 0 "#PWR018" H 5500 2500 50  0001 C CNN
+F 1 "GND" H 5505 2577 50  0000 C CNN
+F 2 "" H 5500 2750 50  0001 C CNN
+F 3 "" H 5500 2750 50  0001 C CNN
+	1    5500 2750
 	1    0    0    -1  
 $EndComp
 $Comp
 L power:+3V3 #PWR?
 U 1 1 5E46E348
-P 4600 1850
+P 5500 1550
 AR Path="/5E46E348" Ref="#PWR?"  Part="1" 
 AR Path="/5E3AB7F2/5E46E348" Ref="#PWR017"  Part="1" 
-F 0 "#PWR017" H 4600 1700 50  0001 C CNN
-F 1 "+3V3" H 4615 2023 50  0000 C CNN
-F 2 "" H 4600 1850 50  0001 C CNN
-F 3 "" H 4600 1850 50  0001 C CNN
-	1    4600 1850
+F 0 "#PWR017" H 5500 1400 50  0001 C CNN
+F 1 "+3V3" H 5515 1723 50  0000 C CNN
+F 2 "" H 5500 1550 50  0001 C CNN
+F 3 "" H 5500 1550 50  0001 C CNN
+	1    5500 1550
 	1    0    0    -1  
 $EndComp
-Text GLabel 4900 2200 0    50   Input ~ 0
+Text GLabel 5000 1850 0    50   Input ~ 0
 NRF24L01P_MOSI
-Text GLabel 4900 2100 0    50   Input ~ 0
+Text GLabel 5000 2150 0    50   Input ~ 0
 NRF24L01P_CSN
-Text GLabel 4900 2300 0    50   Input ~ 0
+Text GLabel 5000 2450 0    50   Input ~ 0
 NRF24L01P_IRQ
 Wire Wire Line
 	1950 5350 2050 5350
@@ -355,12 +355,12 @@ $EndComp
 $Comp
 L Connector:Conn_01x02_Female J1
 U 1 1 5E5500BC
-P 9000 3300
-F 0 "J1" H 9028 3276 50  0000 L CNN
-F 1 "Motor Connector" H 9028 3185 50  0000 L CNN
-F 2 "Connector_PinSocket_2.54mm:PinSocket_2x01_P2.54mm_Vertical" H 9000 3300 50  0001 C CNN
-F 3 "~" H 9000 3300 50  0001 C CNN
-	1    9000 3300
+P 9000 2700
+F 0 "J1" H 9028 2676 50  0000 L CNN
+F 1 "Motor" H 9028 2585 50  0000 L CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_2x01_P2.54mm_Vertical" H 9000 2700 50  0001 C CNN
+F 3 "~" H 9000 2700 50  0001 C CNN
+	1    9000 2700
 	0    -1   -1   0   
 $EndComp
 $Comp
@@ -377,12 +377,12 @@ $EndComp
 $Comp
 L Diode:1N4001 D1
 U 1 1 5E55298C
-P 8850 3900
-F 0 "D1" H 8850 4116 50  0000 C CNN
-F 1 "1N4001" H 8850 4025 50  0000 C CNN
-F 2 "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal" H 8850 3725 50  0001 C CNN
-F 3 "http://www.vishay.com/docs/88503/1n4001.pdf" H 8850 3900 50  0001 C CNN
-	1    8850 3900
+P 8650 3900
+F 0 "D1" H 8650 4116 50  0000 C CNN
+F 1 "1N4001" H 8650 4025 50  0000 C CNN
+F 2 "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal" H 8650 3725 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/88503/1n4001.pdf" H 8650 3900 50  0001 C CNN
+	1    8650 3900
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -391,7 +391,7 @@ U 1 1 5E55407A
 P 9750 2950
 F 0 "R7" H 9809 2996 50  0000 L CNN
 F 1 "10K" H 9809 2905 50  0000 L CNN
-F 2 "Resistor_THT:R_Axial_DIN0411_L9.9mm_D3.6mm_P12.70mm_Horizontal" H 9750 2950 50  0001 C CNN
+F 2 "Resistor_SMD:R_2512_6332Metric_Pad1.52x3.35mm_HandSolder" H 9750 2950 50  0001 C CNN
 F 3 "~" H 9750 2950 50  0001 C CNN
 	1    9750 2950
 	0    -1   -1   0   
@@ -402,7 +402,7 @@ U 1 1 5E554FDD
 P 9550 2550
 F 0 "R6" H 9609 2596 50  0000 L CNN
 F 1 "220ohm" H 9609 2505 50  0000 L CNN
-F 2 "Resistor_THT:R_Axial_DIN0411_L9.9mm_D3.6mm_P12.70mm_Horizontal" H 9550 2550 50  0001 C CNN
+F 2 "Resistor_SMD:R_2512_6332Metric_Pad1.52x3.35mm_HandSolder" H 9550 2550 50  0001 C CNN
 F 3 "~" H 9550 2550 50  0001 C CNN
 	1    9550 2550
 	1    0    0    -1  
@@ -410,12 +410,12 @@ $EndComp
 $Comp
 L power:+12V #PWR07
 U 1 1 5E557616
-P 8200 3150
-F 0 "#PWR07" H 8200 3000 50  0001 C CNN
-F 1 "+12V" H 8215 3323 50  0000 C CNN
-F 2 "" H 8200 3150 50  0001 C CNN
-F 3 "" H 8200 3150 50  0001 C CNN
-	1    8200 3150
+P 8200 2900
+F 0 "#PWR07" H 8200 2750 50  0001 C CNN
+F 1 "+12V" H 8215 3073 50  0000 C CNN
+F 2 "" H 8200 2900 50  0001 C CNN
+F 3 "" H 8200 2900 50  0001 C CNN
+	1    8200 2900
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -448,38 +448,22 @@ U 1 1 5E298D26
 P 8200 4050
 F 0 "C11" H 8292 4096 50  0000 L CNN
 F 1 "20nF" H 8292 4005 50  0000 L CNN
-F 2 "Capacitor_THT:CP_Radial_Tantal_D4.5mm_P5.00mm" H 8200 4050 50  0001 C CNN
+F 2 "Capacitor_Tantalum_SMD:CP_EIA-3528-15_AVX-H_Pad1.50x2.35mm_HandSolder" H 8200 4050 50  0001 C CNN
 F 3 "~" H 8200 4050 50  0001 C CNN
 	1    8200 4050
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	8200 4200 8200 4300
-Wire Wire Line
-	9100 3500 9100 3900
 Connection ~ 9100 3900
-Wire Wire Line
-	9100 3900 9000 3900
-Wire Wire Line
-	9000 3500 8200 3500
-Connection ~ 8200 3500
-Wire Wire Line
-	8200 3500 8200 3900
 Wire Wire Line
 	10000 2950 9850 2950
 Wire Wire Line
 	9800 3750 9800 3900
 Wire Wire Line
 	9800 3900 9100 3900
-Connection ~ 9800 3900
-Wire Wire Line
-	9800 3900 9800 4200
 Wire Wire Line
 	9550 3450 9600 3450
 Wire Wire Line
-	8200 3900 8700 3900
-Wire Wire Line
-	8200 4200 9800 4200
+	8200 3900 8500 3900
 Wire Wire Line
 	10300 2950 10000 2950
 Wire Wire Line
@@ -514,43 +498,70 @@ Wire Wire Line
 	8200 3900 8200 3950
 Connection ~ 8200 3900
 Wire Wire Line
-	8200 4150 8200 4200
-Connection ~ 8200 4200
-Wire Wire Line
 	1950 5650 1950 5800
-Wire Wire Line
-	8200 3150 8200 3500
-Wire Wire Line
-	4900 2000 4600 2000
-Wire Wire Line
-	4600 2000 4600 1850
-Text GLabel 5400 2100 2    50   Input ~ 0
+Text GLabel 5000 2350 0    50   Input ~ 0
 NRF24L01P_CE
-Text GLabel 5400 2200 2    50   Input ~ 0
+Text GLabel 5000 2050 0    50   Input ~ 0
 NRF24L01P_SCK
-Text GLabel 5400 2300 2    50   Input ~ 0
+Text GLabel 5000 1950 0    50   Input ~ 0
 NRF24L01P_MISO
-$Comp
-L Connector_Generic:Conn_02x04_Odd_Even J5
-U 1 1 5E2B260A
-P 5100 2100
-F 0 "J5" H 5150 2417 50  0000 C CNN
-F 1 "nRF24L01P Connector" H 5150 2326 50  0000 C CNN
-F 2 "Connector_PinSocket_2.54mm:PinSocket_2x04_P2.54mm_Vertical" H 5100 2100 50  0001 C CNN
-F 3 "~" H 5100 2100 50  0001 C CNN
-	1    5100 2100
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	5400 2000 6200 2000
-Wire Wire Line
-	6200 2000 6200 2400
-Wire Notes Line
-	4050 1200 4050 2750
-Wire Notes Line
-	4050 2750 6450 2750
-Wire Notes Line
-	6450 2750 6450 1200
 Wire Notes Line
 	6450 1200 4050 1200
+$Comp
+L RF:NRF24L01_Breakout U3
+U 1 1 5E38C6DA
+P 5500 2150
+F 0 "U3" H 5880 2196 50  0000 L CNN
+F 1 "nRF24L01+" H 5880 2105 50  0000 L CNN
+F 2 "RF_Module:nRF24L01_Breakout" H 5650 2750 50  0001 L CIN
+F 3 "http://www.nordicsemi.com/eng/content/download/2730/34105/file/nRF24L01_Product_Specification_v2_0.pdf" H 5500 2050 50  0001 C CNN
+	1    5500 2150
+	1    0    0    -1  
+$EndComp
+Wire Notes Line
+	6450 1200 6450 3100
+Wire Notes Line
+	6450 3100 4050 3100
+Wire Notes Line
+	4050 3100 4050 1200
+Wire Wire Line
+	8200 4150 8200 4300
+Wire Wire Line
+	8800 3900 9100 3900
+$Comp
+L Device:C_Small C?
+U 1 1 5E3B46FD
+P 8900 3250
+AR Path="/5E3B46FD" Ref="C?"  Part="1" 
+AR Path="/5E3AB7F2/5E3B46FD" Ref="C14"  Part="1" 
+F 0 "C14" V 8750 3200 50  0000 L CNN
+F 1 "0.1uF" V 8650 3150 50  0000 L CNN
+F 2 "Capacitor_Tantalum_SMD:CP_EIA-3528-15_AVX-H_Pad1.50x2.35mm_HandSolder" H 8900 3250 50  0001 C CNN
+F 3 "~" H 8900 3250 50  0001 C CNN
+	1    8900 3250
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	8200 3250 8750 3250
+Wire Wire Line
+	8200 3250 8200 3900
+Wire Wire Line
+	8200 2900 8200 3250
+Connection ~ 8200 3250
+Wire Wire Line
+	9100 2900 9100 3250
+Wire Wire Line
+	9000 3250 9100 3250
+Connection ~ 9100 3250
+Wire Wire Line
+	9100 3250 9100 3900
+Wire Wire Line
+	9000 2900 9000 3050
+Wire Wire Line
+	9000 3050 8750 3050
+Wire Wire Line
+	8750 3050 8750 3250
+Connection ~ 8750 3250
+Wire Wire Line
+	8750 3250 8800 3250
 $EndSCHEMATC
