@@ -5,7 +5,6 @@ Takes care of your precious plants.
 
 - [Description](#description)
 - [Hardware](#hardware)
-- [TODO](#todo)
 
 ## Description
 * Reads soil moisture, temperature and air humidity
@@ -16,7 +15,3 @@ Takes care of your precious plants.
 ## Hardware
 * MKL25Z128VLK4
 * nRF24L01+ radio module
-
-## TODO
-* Web server
-* PCB
