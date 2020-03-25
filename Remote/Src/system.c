@@ -59,7 +59,7 @@ static void vSystemInit(void)
  */
 static void vEnableClockGating(void)
 {
-    SIM->SCGC4 |= SIM_SCGC4_SPI1(1);
+    SIM->SCGC4 |= SIM_SCGC4_SPI1(1) | SIM_SCGC4_CMP(1);
     SIM->SCGC5 |= SIM_SCGC5_PORTA(1) | SIM_SCGC5_PORTB(1) | SIM_SCGC5_PORTD(1) | SIM_SCGC5_PORTE(1);
     SIM->SCGC6 |= SIM_SCGC6_TPM0(1) | SIM_SCGC6_TPM1(1) | SIM_SCGC6_TPM2(1) | SIM_SCGC6_ADC0(1) | SIM_SCGC6_DMAMUX(1);
     SIM->SCGC7 |= SIM_SCGC7_DMA(1);

@@ -80,13 +80,7 @@ uint16_t ADC0_usReadPolling(const uint8_t ucChannel)
  * @return  None
  */
 void CMP0_vInit(void)
-{
-    /* Enable clock to comparator */
-    SIM->SCGC4 |= SIM_SCGC4_CMP(1);
-    
-    /* Enable clock to PORTE */
-    SIM->SCGC5 |= SIM_SCGC5_PORTE_MASK;
-    
+{    
     /* Select pin multiplexer for CMP0 */
     PORTE->PCR[CMP0_OUT_PIN] |= PORT_PCR_MUX(ALT5); 
     

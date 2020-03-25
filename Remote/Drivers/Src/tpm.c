@@ -33,7 +33,7 @@ void TPM0_vInit(void)
     TPM0->MOD |= 4800 - 1;
     
     /* Continue in debug mode */
-    TPM0->CONF = TPM_CONF_DBGMODE(1);
+    TPM0->CONF = TPM_CONF_DBGMODE(3);
     
     /* Prescaler 2 */
     TPM0->SC = TPM_SC_CPWMS(1) | TPM_SC_PS(1);
