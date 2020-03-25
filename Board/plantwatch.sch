@@ -217,7 +217,7 @@ U 1 1 5E4F9447
 P 1900 2000
 F 0 "J3" H 1950 2417 50  0000 C CNN
 F 1 "SWD" H 1950 2326 50  0000 C CNN
-F 2 "Connector_PinHeader_1.00mm:PinHeader_2x05_P1.00mm_Vertical_SMD" H 1900 2000 50  0001 C CNN
+F 2 "Connector_PinHeader_1.27mm:PinHeader_2x05_P1.27mm_Vertical_SMD" H 1900 2000 50  0001 C CNN
 F 3 "~" H 1900 2000 50  0001 C CNN
 	1    1900 2000
 	1    0    0    -1  
